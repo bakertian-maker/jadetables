@@ -25,16 +25,7 @@
 </section>
 
 <div class="wrap page-pad">
-    @foreach (var r in myRooms)
-    {
-        <div class="continue-card" role="status">
-            <div>
-                <strong>@L["Continue your game"]</strong>
-                <span class="mj-muted">@(r.Started ? L["Game in progress in room {0}", r.Code] : L["Waiting room {0}", r.Code])</span>
-            </div>
-            <a class="btn btn-primary" href="/mahjong/room/@r.Code">@L["Continue"]</a>
-        </div>
-    }
+    <ContinueGames GameKey="mahjong" />
 
     <div class="name-row">
         <label for="nickname">@L["Your name at the table"]</label>
@@ -118,7 +109,6 @@
     string joinCode = "";
     string? joinError;
     string? createError;
-    IReadOnlyList<Room> myRooms = [];
     bool busy;
 
     sealed record Identity(string Id, string Name);
@@ -129,7 +119,6 @@
         var identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
         id = identity.Id;
         nickname = identity.Name;
-        myRooms = Rooms.RoomsWithSeatFor(id);
         StateHasChanged();
     }
 
@@ -145,7 +134,7 @@
 
     void Open(MjRoomSettings settings)
     {
-        var room = Rooms.TryCreateMahjong(settings);
+        var room = Rooms.TryCreate(code => new MahjongRoom(code, settings));
         if (room is null)
         {
             createError = L["The server is busy right now. Please try again in a few minutes."];

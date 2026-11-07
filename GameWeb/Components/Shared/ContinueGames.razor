@@ -1,0 +1,39 @@
+@* "Continue your game" cards for unfinished rooms where this browser holds a seat. *@
+@inject RoomService Rooms
+@inject GameCatalog Catalog
+@inject IJSRuntime JS
+
+@foreach (var r in rooms)
+{
+    var game = Catalog.Find(r.GameKey);
+    <div class="continue-card" role="status">
+        <div>
+            <strong>@L["Continue your game"]</strong>
+            <span class="mj-muted">
+                @if (GameKey is null && game is not null)
+                {
+                    @L[game.NavName]<text> · </text>
+                }
+                @(r.Started ? L["Game in progress in room {0}", r.Code] : L["Waiting room {0}", r.Code])
+            </span>
+        </div>
+        <a class="btn btn-primary" href="@r.Url">@L["Continue"]</a>
+    </div>
+}
+
+@code {
+    /// <summary>Only this game's rooms; null shows rooms from every game.</summary>
+    [Parameter] public string? GameKey { get; set; }
+
+    IReadOnlyList<Room> rooms = [];
+
+    sealed record Identity(string Id, string Name);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
+        rooms = Rooms.RoomsWithSeatFor(identity.Id, GameKey);
+        if (rooms.Count > 0) StateHasChanged();
+    }
+}

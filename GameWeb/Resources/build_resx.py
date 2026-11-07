@@ -25,9 +25,11 @@ DYNAMIC_KEYS = [
     "Hong Kong Mahjong", "Four players, 136 tiles, one winning hand.",
     "Classic Cantonese rules with faan scoring. Play the computer straight away, or open a private room and send the link to three friends.",
     "4 players", "Xiangqi", "Chinese chess on the river board.",
-    "Two generals, one river. Play a friend or a computer opponent from beginner to master.", "2 players",
+    "Two generals, one river. Play a friend or the computer, from beginner level up.", "2 players",
     "Dou Dizhu", "Fight the landlord.", "Three players, one landlord. Bid, team up and empty your hand first.", "3 players",
     "East", "South", "West", "North",
+    # Xiangqi piece names (XqText.PieceName)
+    "General", "Advisor", "Elephant", "Horse", "Chariot", "Cannon", "Soldier",
 ]
 
 out = sys.stdout.buffer

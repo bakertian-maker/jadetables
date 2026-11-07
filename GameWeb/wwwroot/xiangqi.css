@@ -1,0 +1,138 @@
+/* Xiangqi: board, pieces, table layout. Shares the jade table look with mahjong.css. */
+
+/* ---------- Pieces ---------- */
+.xq-disc { display: block; width: 100%; height: 100%; overflow: visible; }
+.xq-disc-edge { fill: #a2733d; }
+.xq-disc-face { fill: #f4e4c1; }
+.xq-disc-ring { fill: none; stroke-width: 1.7; }
+.xq-disc.is-red .xq-disc-ring { stroke: #b3261e; }
+.xq-disc.is-black .xq-disc-ring { stroke: #22302b; }
+.xq-char, .xq-letter { text-anchor: middle; }
+.xq-char { font-family: var(--font-zh); font-weight: 900; font-size: 21px; }
+.xq-letter { font-family: var(--font); font-weight: 700; font-size: 19px; }
+.xq-disc.is-red text { fill: #b3261e; }
+.xq-disc.is-black text { fill: #1d2422; }
+
+/* ---------- Table layout ---------- */
+.xq-table {
+    min-height: calc(100vh - 60px);
+    background: radial-gradient(ellipse at 50% 40%, #1f7a5c 0%, #17614a 55%, #0f4637 100%);
+    color: #f3ead4;
+    position: relative;
+}
+.xq-topbar {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 10px 16px; background: rgba(0, 0, 0, .18); font-size: .88rem;
+}
+.xq-layout {
+    display: grid; grid-template-columns: minmax(0, 560px) minmax(260px, 320px); gap: 24px;
+    justify-content: center; align-items: start; padding: 16px; max-width: 960px; margin: 0 auto;
+}
+/* The column (board plus both player cards) fits the window height on short screens. */
+.xq-board-col {
+    display: grid; gap: 10px; min-width: 0; width: 100%; justify-self: center;
+    max-width: max(300px, calc((100svh - 60px - 44px - 32px - 2 * 56px) * 92 / 102));
+}
+
+/* ---------- Board ---------- */
+.xq-board {
+    position: relative; width: 100%; aspect-ratio: 92 / 102;
+    background: radial-gradient(ellipse at 40% 30%, #f1d3a0 0%, #e4bd80 60%, #d6a865 100%);
+    border-radius: 10px;
+    box-shadow: 0 2px 0 #9c6b35, 0 14px 30px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .25);
+    user-select: none;
+}
+.xq-grid { position: absolute; inset: 0; width: 100%; height: 100%; }
+.xq-grid line { stroke: #6b4523; stroke-width: .38; }
+.xq-frame { fill: none; stroke: #6b4523; stroke-width: .9; }
+.xq-marker { fill: none; stroke: #6b4523; stroke-width: .35; }
+.xq-river text { font-family: var(--font-zh); font-weight: 700; font-size: 5px; fill: rgba(107, 69, 35, .7); text-anchor: middle; letter-spacing: 1px; }
+
+.xq-piece, .xq-target, .xq-mark {
+    position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1;
+}
+.xq-piece {
+    width: 10%; z-index: 2; padding: 0; border: 0; background: none; color: inherit; font: inherit;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .3));
+    transition: transform .12s ease, filter .12s ease;
+}
+button.xq-piece { cursor: pointer; }
+button.xq-piece:hover { transform: translate(-50%, -54%); }
+button.xq-piece:focus-visible { outline: 3px solid #f2c94c; outline-offset: 2px; border-radius: 50%; }
+.xq-piece.is-selected {
+    transform: translate(-50%, -56%) scale(1.08);
+    filter: drop-shadow(0 0 0 #f2c94c) drop-shadow(0 0 6px rgba(242, 201, 76, .95)) drop-shadow(0 6px 6px rgba(0, 0, 0, .35));
+}
+.xq-piece.is-check { animation: xq-check 1s ease-in-out infinite; }
+@keyframes xq-check {
+    0%, 100% { filter: drop-shadow(0 0 2px rgba(220, 38, 38, .6)) drop-shadow(0 2px 2px rgba(0, 0, 0, .3)); }
+    50% { filter: drop-shadow(0 0 10px rgba(220, 38, 38, 1)) drop-shadow(0 2px 2px rgba(0, 0, 0, .3)); }
+}
+@media (prefers-reduced-motion: reduce) { .xq-piece.is-check { animation: none; filter: drop-shadow(0 0 8px rgba(220, 38, 38, 1)); } }
+
+.xq-target {
+    width: 4.2%; z-index: 3; border: 0; padding: 0; border-radius: 50%; cursor: pointer;
+    background: rgba(23, 97, 74, .85); box-shadow: 0 0 0 2px rgba(255, 255, 255, .55);
+}
+.xq-target::before { content: ""; position: absolute; inset: -110%; border-radius: 50%; } /* bigger tap area */
+.xq-target:hover, .xq-target:focus-visible { background: #1f7a5c; outline: none; box-shadow: 0 0 0 3px #f2c94c; }
+.xq-target.is-capture { width: 11%; background: transparent; box-shadow: inset 0 0 0 3px rgba(23, 97, 74, .95), 0 0 0 2px rgba(255, 255, 255, .6); }
+.xq-target.is-capture::before { inset: 0; }
+.xq-target.is-capture:hover, .xq-target.is-capture:focus-visible { box-shadow: inset 0 0 0 3px #f2c94c, 0 0 0 2px rgba(255, 255, 255, .8); }
+
+.xq-mark { width: 11%; border-radius: 50%; z-index: 1; pointer-events: none; }
+.xq-mark-from { box-shadow: inset 0 0 0 2px rgba(107, 69, 35, .55); background: rgba(255, 255, 255, .18); }
+.xq-mark-to { box-shadow: 0 0 0 3px rgba(242, 201, 76, .95), 0 0 12px rgba(242, 201, 76, .7); }
+.xq-mark-hint { box-shadow: 0 0 0 3px rgba(47, 128, 237, .95), 0 0 12px rgba(47, 128, 237, .6); }
+
+/* ---------- Players and side panel ---------- */
+.xq-player {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 46px;
+    background: rgba(8, 30, 24, .55); border: 1px solid rgba(255, 255, 255, .1); border-radius: 12px; padding: 6px 12px 6px 6px;
+    transition: border-color .2s, box-shadow .2s;
+}
+.xq-player.is-active { border-color: #f2c94c; box-shadow: 0 0 0 2px rgba(242, 201, 76, .35); }
+.xq-player-side { width: 32px; height: 32px; flex: none; }
+.xq-player-name { font-weight: 600; }
+.xq-player .mj-tag { background: rgba(255, 255, 255, .14); color: #f3ead4; }
+.xq-player .mj-tag-away { background: #fde7c2; color: #7a4b00; }
+.xq-thinking { font-size: .85rem; color: #f2c94c; }
+.xq-captured { display: flex; flex-wrap: wrap; gap: 2px; margin-left: auto; }
+.xq-captured-piece { width: 20px; height: 20px; }
+
+.xq-side { background: rgba(8, 30, 24, .45); border: 1px solid rgba(255, 255, 255, .08); border-radius: 14px; padding: 14px; display: grid; gap: 12px; }
+.xq-status { display: grid; gap: 8px; }
+.xq-status-text { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.xq-status-text .mj-muted { color: #cfd8d2; }
+.xq-timer { width: 100%; }
+.xq-actions { justify-content: flex-start; }
+.xq-moves-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #a9b5ae; margin: 4px 0 0; }
+.xq-moves-scroll { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column-reverse; }
+.xq-moves { margin: 0; padding-left: 2.2em; font-variant-numeric: tabular-nums; }
+.xq-moves li { padding: 3px 0; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.xq-moves li::marker { color: #a9b5ae; }
+.xq-moves span { display: inline-block; min-width: 6.2em; }
+.xq-move-red { color: #ffb4a8; }
+.xq-move-black { color: #f3ead4; }
+.xq-moves-empty { margin: 0; color: #a9b5ae; }
+.xq-result .mj-dialog-actions { justify-content: flex-start; }
+
+/* ---------- Lobby, waiting room and rules ---------- */
+.xq-hero-pieces { gap: 12px; }
+.xq-hero-pieces .xq-disc { width: 62px; height: 62px; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .3)); }
+.xq-seat-badge { font-family: var(--font-zh); color: var(--red); }
+.xq-rules-piece { white-space: nowrap; }
+.xq-rules-icons { display: inline-flex; gap: 4px; vertical-align: middle; margin-right: 8px; }
+.xq-rules-icons .xq-disc { width: 30px; height: 30px; }
+.xq-rules-table td { vertical-align: middle; }
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 860px) {
+    .xq-layout { grid-template-columns: minmax(0, 1fr); padding: 8px; gap: 12px; }
+    .xq-side { padding: 12px; }
+    .xq-moves-scroll { max-height: 200px; }
+}
+@media (max-width: 560px) {
+    .xq-rules-piece { white-space: normal; }
+    .xq-rules-icons .xq-disc { width: 24px; height: 24px; }
+}

@@ -41,6 +41,9 @@ public abstract class Room : IDisposable
 
     public string Code { get; }
     public abstract string GameKey { get; }
+
+    /// <summary>The room's page, e.g. /mahjong/room/K7Q2M.</summary>
+    public string Url => $"/{GameKey}/room/{Code}";
     public Seat[] Seats { get; }
     public string? HostId { get; protected set; }
     public bool Started { get; protected set; }
@@ -225,6 +228,19 @@ public abstract class Room : IDisposable
 
     /// <summary>Called every 200 ms under the room lock. Return true if anything changed.</summary>
     protected abstract bool Tick(DateTime now);
+
+    /// <summary>Starts the game (host only). Empty seats are filled with computer players.</summary>
+    public abstract bool Start(string playerId);
+
+    /// <summary>
+    /// Copies of the seats for display. Player ids are replaced with a placeholder,
+    /// because a player id is that player's secret.
+    /// </summary>
+    protected Seat[] SeatSnapshot() => Seats.Select(s => new Seat
+    {
+        Name = s.Name, IsBot = s.IsBot, BotIndex = s.BotIndex,
+        PlayerId = s.PlayerId is null ? null : "x", Connections = s.Connections,
+    }).ToArray();
 
     public void Dispose()
     {

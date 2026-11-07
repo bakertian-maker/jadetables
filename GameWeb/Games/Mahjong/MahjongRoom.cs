@@ -70,7 +70,7 @@ public sealed class MahjongRoom : Room
         if (Settings.QuickPlay && !Started) StartLocked();
     }
 
-    public bool Start(string playerId)
+    public override bool Start(string playerId)
     {
         lock (Sync)
         {
@@ -192,10 +192,7 @@ public sealed class MahjongRoom : Room
         lock (Sync)
         {
             int me = Array.FindIndex(Seats, s => s.PlayerId == playerId);
-            var lobbySeats = Seats.Select(s => new Seat
-            {
-                Name = s.Name, IsBot = s.IsBot, BotIndex = s.BotIndex, PlayerId = s.PlayerId is null ? null : "x", Connections = s.Connections,
-            }).ToArray();
+            var lobbySeats = SeatSnapshot();
             var g = _game;
             if (g is null)
                 return new MjView { Code = Code, MySeat = me, IsHost = playerId == HostId, Started = false, Settings = Settings, LobbySeats = lobbySeats };

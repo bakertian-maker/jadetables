@@ -14,6 +14,7 @@ builder.Services.AddSingleton<GameCatalog>();
 builder.Services.AddSingleton<RoomService>();
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.AddScoped<GameText>();
+builder.Services.AddScoped<XqText>();
 
 var app = builder.Build();
 

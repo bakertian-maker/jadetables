@@ -1,0 +1,19 @@
+@page "/xiangqi/rules"
+
+<PageTitle>@L["Xiangqi rules · GameWeb"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@L["Xiangqi (Chinese chess) rules: the board, how each piece moves, check, checkmate and draws."]" />
+</HeadContent>
+
+@if (Languages.Current == Script.Traditional)
+{
+    <XiangqiRulesZhHant />
+}
+else if (Languages.Current == Script.Simplified)
+{
+    <XiangqiRulesZhHans />
+}
+else
+{
+    <XiangqiRulesEn />
+}

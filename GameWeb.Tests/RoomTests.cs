@@ -1,3 +1,4 @@
+using GameWeb.Games.Xiangqi;
 using GameWeb.Games.Mahjong;
 using GameWeb.Games.Rooms;
 using GameWeb.Localization;
@@ -12,6 +13,7 @@ public class RoomTests
     {
         public override string GameKey => "test";
         protected override bool Tick(DateTime now) => false;
+        public override bool Start(string playerId) => false;
         public bool RunMaintenance(DateTime now) => MaintainSeats(now);
     }
 
@@ -48,16 +50,16 @@ public class RoomTests
     {
         using var service = new RoomService(NullLogger<RoomService>.Instance);
         for (int i = 0; i < RoomService.MaxRooms; i++)
-            Assert.NotNull(service.TryCreateMahjong(new MjRoomSettings()));
-        Assert.Null(service.TryCreateMahjong(new MjRoomSettings()));
+            Assert.NotNull(service.TryCreate(c => new MahjongRoom(c, new MjRoomSettings())));
+        Assert.Null(service.TryCreate(c => new MahjongRoom(c, new MjRoomSettings())));
     }
 
     [Fact]
     public void RoomService_FindsRoomsWhereThePlayerHasASeat()
     {
         using var service = new RoomService(NullLogger<RoomService>.Instance);
-        var mine = service.TryCreateMahjong(new MjRoomSettings())!;
-        var other = service.TryCreateMahjong(new MjRoomSettings())!;
+        var mine = service.TryCreate(c => new MahjongRoom(c, new MjRoomSettings()))!;
+        var other = service.TryCreate(c => new MahjongRoom(c, new MjRoomSettings()))!;
         mine.Connect("me", "Me");
         other.Connect("someone-else", "Other");
 
@@ -79,5 +81,83 @@ public class RoomTests
     public void IsSafeLocalPath(string? url, bool expected)
     {
         Assert.Equal(expected, Languages.IsSafeLocalPath(url));
+    }
+}
+
+public class XiangqiRoomTests
+{
+    static XqMove M(string s) => XqMove.Parse(s);
+
+    [Fact]
+    public void HostPlaysRed_ByDefault_AndOnlyTheSideToMoveCanMove()
+    {
+        using var room = new XiangqiRoom("XQ001", new XqRoomSettings());
+        room.Connect("host", "Host");
+        room.Connect("guest", "Guest");
+        Assert.True(room.Start("host"));
+
+        var hostView = room.GetView("host");
+        Assert.Equal(XqSide.Red, hostView.MySide);
+        Assert.True(hostView.MyTurn);
+        Assert.Contains(Sq.At(2, 7), hostView.MyMoves.Keys); // the cannon on h2 can move
+
+        Assert.False(room.Move("guest", M("h9g7")));        // Black cannot move first
+        Assert.True(room.Move("host", M("h2e2")));
+        Assert.True(room.Move("guest", M("h9g7")));
+        Assert.Equal(2, room.GetView("guest").History.Count);
+    }
+
+    [Fact]
+    public void GuestCanPlayRed()
+    {
+        using var room = new XiangqiRoom("XQ002", new XqRoomSettings { Red = XqRedChoice.Guest });
+        room.Connect("host", "Host");
+        room.Connect("guest", "Guest");
+        room.Start("host");
+        Assert.Equal(XqSide.Red, room.GetView("guest").MySide);
+        Assert.Equal(XqSide.Black, room.GetView("host").MySide);
+    }
+
+    [Fact]
+    public void Resign_EndsTheGame_AndRematchSwapsSides()
+    {
+        using var room = new XiangqiRoom("XQ003", new XqRoomSettings());
+        room.Connect("host", "Host");
+        room.Connect("guest", "Guest");
+        room.Start("host");
+        Assert.True(room.Resign("guest"));
+        var view = room.GetView("host");
+        Assert.Equal(XqResult.RedWins, view.Result);
+        Assert.Equal(XqEndReason.Resignation, view.Reason);
+        Assert.True(room.IsFinished);
+
+        Assert.True(room.Rematch("guest"));
+        Assert.Equal(XqSide.Red, room.GetView("guest").MySide);
+        Assert.False(room.IsFinished);
+    }
+
+    [Fact]
+    public void Spectators_GetNoMoves()
+    {
+        using var room = new XiangqiRoom("XQ004", new XqRoomSettings());
+        room.Connect("host", "Host");
+        room.Connect("guest", "Guest");
+        room.Start("host");
+        Assert.Equal(JoinOutcome.Spectating, room.Connect("watcher", "Watcher"));
+        var view = room.GetView("watcher");
+        Assert.Null(view.MySide);
+        Assert.Empty(view.MyMoves);
+        Assert.False(room.Move("watcher", M("h2e2")));
+    }
+
+    [Fact]
+    public async Task QuickPlay_ComputerAnswersTheFirstMove()
+    {
+        using var room = new XiangqiRoom("XQ005", new XqRoomSettings { QuickPlay = true, BotLevel = XqLevel.Easy });
+        room.Connect("me", "Me");
+        Assert.True(room.Move("me", M("h2e2")));
+        for (int i = 0; i < 50 && room.GetView("me").History.Count < 2; i++) await Task.Delay(100);
+        Assert.Equal(2, room.GetView("me").History.Count);
+        Assert.True(room.GetView("me").MyTurn);
     }
 }

@@ -1,0 +1,343 @@
+@* The Xiangqi table: board (from the viewer's side), players, status, move list and result. *@
+@using System.Globalization
+@inject XqText X
+@inject GameText T
+
+<div class="xq-table">
+    <div class="xq-topbar">
+        <div class="mj-topbar-info">
+            <span class="mj-chip">@L["Room"] @View.Code</span>
+            <span class="mj-chip mj-hide-sm">@(View.Settings.MoveSeconds == 0 ? L["No move timer"] : L["{0}s per move", View.Settings.MoveSeconds])</span>
+        </div>
+        <div class="mj-topbar-links">
+            <button type="button" class="mj-link-button" aria-pressed="@(Letters ? "true" : "false")" @onclick="OnToggleLetters"
+                    title="@L["Show letters instead of Chinese characters on the pieces"]">@(Letters ? L["Letters"] : L["Characters"])</button>
+            <button type="button" class="mj-link-button" aria-pressed="@(SoundOn ? "true" : "false")" @onclick="OnToggleSound"
+                    title="@L["Play a chime when it's your turn and this tab is in the background"]">@(SoundOn ? L["Sound on"] : L["Sound off"])</button>
+            <a href="/xiangqi/rules" target="_blank">@L["Rules"]</a>
+            <a href="/xiangqi">@L["Leave"]</a>
+        </div>
+    </div>
+
+    <div class="xq-layout">
+        <div class="xq-board-col">
+            @PlayerCard(TopSide)
+
+            <div class="xq-board" role="grid" aria-label="@L["Xiangqi board"]">
+                <svg class="xq-grid" viewBox="0 0 92 102" aria-hidden="true">
+                    <rect x="1.5" y="1.5" width="89" height="99" rx="2" class="xq-frame" />
+                    @for (int y = 0; y <= 9; y++)
+                    {
+                        <line x1="6" y1="@Py(y)" x2="86" y2="@Py(y)" />
+                    }
+                    @for (int x = 0; x <= 8; x++)
+                    {
+                        if (x == 0 || x == 8)
+                        {
+                            <line x1="@Px(x)" y1="6" x2="@Px(x)" y2="96" />
+                        }
+                        else
+                        {
+                            <line x1="@Px(x)" y1="6" x2="@Px(x)" y2="46" />
+                            <line x1="@Px(x)" y1="56" x2="@Px(x)" y2="96" />
+                        }
+                    }
+                    <line x1="36" y1="6" x2="56" y2="26" /><line x1="56" y1="6" x2="36" y2="26" />
+                    <line x1="36" y1="76" x2="56" y2="96" /><line x1="56" y1="76" x2="36" y2="96" />
+                    @foreach (var (mx, my) in Markers)
+                    {
+                        @Marker(mx, my)
+                    }
+                    <g class="xq-river">
+                        <text x="26" y="53.3">楚 河</text>
+                        <text x="66" y="53.3">@(Languages.Current == Script.Simplified ? "汉 界" : "漢 界")</text>
+                    </g>
+                </svg>
+
+                @if (View.LastMove is XqMove last)
+                {
+                    <span class="xq-mark xq-mark-from" style="@Pos(last.From)"></span>
+                    <span class="xq-mark xq-mark-to" style="@Pos(last.To)"></span>
+                }
+                @if (HintMove is XqMove hint)
+                {
+                    <span class="xq-mark xq-mark-hint" style="@Pos(hint.From)"></span>
+                    <span class="xq-mark xq-mark-hint" style="@Pos(hint.To)"></span>
+                }
+
+                @for (int sq = 0; sq < 90; sq++)
+                {
+                    int square = sq;
+                    int piece = View.Board[sq];
+                    if (piece == 0) continue;
+                    bool movable = View.MyTurn && View.MyMoves.ContainsKey(square);
+                    string css = $"xq-piece{(selected == square ? " is-selected" : "")}{(View.CheckSquare == square ? " is-check" : "")}{(movable ? " is-movable" : "")}";
+                    string label = $"{X.SideName(Pieces.SideOf(piece))} {X.PieceName(piece)}, {XqText.SquareName(square)}";
+                    if (movable)
+                    {
+                        <button type="button" class="@css" style="@Pos(square)" aria-label="@label" aria-pressed="@(selected == square ? "true" : "false")"
+                                @onclick="() => Select(square)">
+                            <XqPiece Piece="piece" Letters="Letters" />
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="@css" style="@Pos(square)" role="img" aria-label="@label"><XqPiece Piece="piece" Letters="Letters" /></span>
+                    }
+                }
+
+                @if (selected is int from && View.MyMoves.TryGetValue(from, out var targets))
+                {
+                    @foreach (var to in targets)
+                    {
+                        int target = to;
+                        bool capture = View.Board[target] != 0;
+                        <button type="button" class="xq-target @(capture ? "is-capture" : "")" style="@Pos(target)"
+                                aria-label="@L["Move to {0}", XqText.SquareName(target)]" @onclick="() => MoveTo(from, target)"></button>
+                    }
+                }
+            </div>
+
+            @PlayerCard(BottomSide)
+        </div>
+
+        <aside class="xq-side">
+            <div class="xq-status" aria-live="polite">
+                @StatusLine()
+                @if (View.SecondsLeft is not null && View.SecondsTotal > 0 && !View.IsOver)
+                {
+                    <div class="mj-timer xq-timer" @key="View.Version">
+                        <div class="mj-timer-fill" style="@timerStyle"></div>
+                    </div>
+                }
+            </div>
+
+            @if (View.MySide is not null && !View.IsOver)
+            {
+                <div class="mj-buttons xq-actions">
+                    @if (View.MyTurn)
+                    {
+                        <button class="btn btn-ghost btn-sm" @onclick="OnHint">@L["Hint"]</button>
+                    }
+                    @if (confirmResign)
+                    {
+                        <button class="btn btn-primary btn-sm" @onclick="Resign">@L["Yes, resign"]</button>
+                        <button class="btn btn-ghost btn-sm" @onclick="() => confirmResign = false">@L["Keep playing"]</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-ghost btn-sm" @onclick="() => confirmResign = true">@L["Resign"]</button>
+                    }
+                </div>
+            }
+
+            <h2 class="xq-moves-title">@L["Moves"]</h2>
+            <div class="xq-moves-scroll">
+                @if (View.History.Count == 0)
+                {
+                    <p class="mj-muted xq-moves-empty">@L["Red moves first."]</p>
+                }
+                else
+                {
+                    <ol class="xq-moves">
+                        @for (int i = 0; i < View.History.Count; i += 2)
+                        {
+                            <li>
+                                <span class="xq-move-red">@X.Notation(View.History[i].Notation)</span>
+                                @if (i + 1 < View.History.Count)
+                                {
+                                    <span class="xq-move-black">@X.Notation(View.History[i + 1].Notation)</span>
+                                }
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+        </aside>
+    </div>
+
+    @if (View.IsOver && !hideResult)
+    {
+        @ResultDialog()
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public XqView View { get; set; } = default!;
+    [Parameter] public EventCallback<XqMove> OnMove { get; set; }
+    [Parameter] public EventCallback OnResign { get; set; }
+    [Parameter] public EventCallback OnHint { get; set; }
+    [Parameter] public EventCallback OnRematch { get; set; }
+    [Parameter] public XqMove? HintMove { get; set; }
+    [Parameter] public bool Letters { get; set; }
+    [Parameter] public EventCallback OnToggleLetters { get; set; }
+    [Parameter] public bool SoundOn { get; set; } = true;
+    [Parameter] public EventCallback OnToggleSound { get; set; }
+
+    int? selected;
+    bool confirmResign;
+    bool hideResult;
+    int lastVersion = -1;
+    int lastGame = -1;
+    string timerStyle = "";
+
+    /// <summary>The side shown at the bottom: the viewer's own, or Red for spectators.</summary>
+    XqSide BottomSide => View.MySide ?? XqSide.Red;
+    XqSide TopSide => Pieces.Other(BottomSide);
+    bool Flipped => BottomSide == XqSide.Black;
+
+    static readonly (int X, int Y)[] Markers =
+    [
+        (1, 2), (7, 2), (1, 7), (7, 7),
+        (0, 3), (2, 3), (4, 3), (6, 3), (8, 3), (0, 6), (2, 6), (4, 6), (6, 6), (8, 6),
+    ];
+
+    protected override void OnParametersSet()
+    {
+        if (View.Version != lastVersion)
+        {
+            lastVersion = View.Version;
+            selected = null;
+            confirmResign = false;
+            timerStyle = View.SecondsLeft is double left && View.SecondsTotal > 0
+                ? FormattableString.Invariant($"--from:{Math.Clamp(left / View.SecondsTotal * 100, 0, 100):0.#}%;animation-duration:{left:0.##}s")
+                : "";
+        }
+        if (View.GameNumber != lastGame)
+        {
+            lastGame = View.GameNumber;
+            hideResult = false;
+        }
+    }
+
+    // Board geometry: points are 10 units apart with a 6-unit margin, in a 92 x 102 box.
+    static string Px(int x) => (6 + 10 * x).ToString(CultureInfo.InvariantCulture);
+    static string Py(int y) => (6 + 10 * y).ToString(CultureInfo.InvariantCulture);
+
+    (int X, int Y) Display(int sq)
+    {
+        int r = Sq.Rank(sq), f = Sq.File(sq);
+        return Flipped ? (8 - f, r) : (f, 9 - r);
+    }
+
+    string Pos(int sq)
+    {
+        var (x, y) = Display(sq);
+        return FormattableString.Invariant($"left:{(6 + 10 * x) / 92.0 * 100:0.###}%;top:{(6 + 10 * y) / 102.0 * 100:0.###}%");
+    }
+
+    RenderFragment Marker(int x, int y) => __builder =>
+    {
+        double cx = 6 + 10 * x, cy = 6 + 10 * y;
+        foreach (var dx in new[] { -1, 1 })
+        {
+            if ((x == 0 && dx < 0) || (x == 8 && dx > 0)) continue;
+            foreach (var dy in new[] { -1, 1 })
+            {
+                string d = FormattableString.Invariant($"M{cx + dx * 3.2} {cy + dy * 1.2} H{cx + dx * 1.2} V{cy + dy * 3.2}");
+                <path d="@d" class="xq-marker" />
+            }
+        }
+    };
+
+    void Select(int square) => selected = selected == square ? null : square;
+
+    async Task MoveTo(int from, int to)
+    {
+        selected = null;
+        await OnMove.InvokeAsync(new XqMove(from, to));
+    }
+
+    async Task Resign()
+    {
+        confirmResign = false;
+        await OnResign.InvokeAsync();
+    }
+
+    string NameOf(XqSide side)
+    {
+        int seat = View.SeatOf(side);
+        return seat < View.Seats.Count ? T.SeatName(View.Seats[seat]) : "";
+    }
+
+    RenderFragment PlayerCard(XqSide side) => __builder =>
+    {
+        int seat = View.SeatOf(side);
+        var s = View.Seats[seat];
+        bool toMove = !View.IsOver && View.SideToMove == side;
+        var captured = View.History.Where(h => h.Captured != 0 && Pieces.SideOf(h.Piece) == side).Select(h => h.Captured).ToList();
+        <div class="xq-player @(toMove ? "is-active" : "")">
+            <span class="xq-player-side" title="@X.SideName(side)"><XqPiece Piece="@Pieces.Make(Pieces.General, side)" Letters="false" /></span>
+            <span class="xq-player-name">@T.SeatName(s)</span>
+            @if (seat == View.MySeat)
+            {
+                <span class="mj-tag">@L["You"]</span>
+            }
+            @if (s.IsBot)
+            {
+                <span class="mj-tag">@L["Computer · {0}", L[View.Settings.BotLevel == XqLevel.Easy ? "Easy" : "Medium"]]</span>
+            }
+            else if (s.Connections == 0)
+            {
+                <span class="mj-tag mj-tag-away">@L["Away"]</span>
+            }
+            @if (toMove && s.IsBot && View.BotThinking)
+            {
+                <span class="mj-thinking xq-thinking">@L["Thinking"]</span>
+            }
+            <span class="xq-captured" aria-label="@L["Captured pieces"]">
+                @foreach (var p in captured)
+                {
+                    <span class="xq-captured-piece"><XqPiece Piece="p" Letters="Letters" /></span>
+                }
+            </span>
+        </div>
+    };
+
+    RenderFragment StatusLine() => __builder =>
+    {
+        if (View.IsOver)
+        {
+            <p class="xq-status-text">@ResultTitle()</p>
+            return;
+        }
+        bool check = View.CheckSquare >= 0;
+        if (View.MyTurn)
+        {
+            <p class="xq-status-text"><strong>@(check ? L["Check! Your turn."] : L["Your turn."])</strong>
+                <span class="mj-muted">@(selected is null ? L["Tap a piece, then tap where it should go."] : L["Tap a dot to move there."])</span></p>
+        }
+        else
+        {
+            <p class="xq-status-text">@(check ? L["Check!"] : "") <span class="mj-thinking">@L["{0} to move", NameOf(View.SideToMove)]</span></p>
+        }
+    };
+
+    string ResultTitle()
+    {
+        if (View.Result == XqResult.Draw) return L["Drawn game"];
+        var winner = View.Result == XqResult.RedWins ? XqSide.Red : XqSide.Black;
+        if (View.MySide is XqSide mine) return mine == winner ? L["You won!"] : L["You lose"];
+        return L["{0} won", X.SideName(winner)];
+    }
+
+    RenderFragment ResultDialog() => __builder =>
+    {
+        var loser = View.Result == XqResult.RedWins ? XqSide.Black : XqSide.Red;
+        <div class="mj-overlay" role="dialog" aria-modal="true" aria-labelledby="xq-result-title">
+            <div class="mj-dialog xq-result">
+                <h2 id="xq-result-title">@ResultTitle()</h2>
+                <p class="mj-dialog-sub">@X.ReasonText(View.Reason, NameOf(loser))</p>
+                <p class="mj-muted">@L["{0} moves played.", (View.History.Count + 1) / 2]</p>
+                <div class="mj-dialog-actions">
+                    <button class="btn btn-ghost" @onclick="() => hideResult = true">@L["View board"]</button>
+                    @if (View.MySide is not null)
+                    {
+                        <button class="btn btn-primary" @onclick="OnRematch">@L["Play again (swap sides)"]</button>
+                    }
+                    <a class="btn btn-ghost" href="/xiangqi">@L["Back to lobby"]</a>
+                </div>
+            </div>
+        </div>
+    };
+}

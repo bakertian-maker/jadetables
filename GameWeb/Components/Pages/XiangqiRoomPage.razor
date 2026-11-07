@@ -1,0 +1,181 @@
+@page "/xiangqi/room/{Code}"
+@rendermode InteractiveServer
+@implements IDisposable
+@inject RoomService Rooms
+@inject IJSRuntime JS
+@inject XqText X
+
+<PageTitle>@L["Xiangqi room {0} · GameWeb", Code.ToUpperInvariant()]</PageTitle>
+
+@if (state == PageState.Loading)
+{
+    <div class="wrap page-pad"><p class="mj-muted">@L["Joining room…"]</p></div>
+}
+else if (state == PageState.NotFound)
+{
+    <div class="wrap page-pad narrow">
+        <h1>@L["Room not found"]</h1>
+        <p>@L["Room {0} doesn't exist or has closed. Rooms close after 10 minutes with nobody in them.", Code.ToUpperInvariant()]</p>
+        <a class="btn btn-primary" href="/xiangqi">@L["Back to Xiangqi"]</a>
+    </div>
+}
+else if (state == PageState.Full)
+{
+    <div class="wrap page-pad narrow">
+        <h1>@L["This table is full"]</h1>
+        <p>@L["Both seats in room {0} are taken.", Code.ToUpperInvariant()]</p>
+        <a class="btn btn-primary" href="/xiangqi">@L["Start your own room"]</a>
+    </div>
+}
+else if (view is { Started: false })
+{
+    <WaitingRoom Code="@view.Code" Seats="view.Seats" MySeat="view.MySeat" IsHost="view.IsHost" InviteUrl="@inviteUrl"
+                 Lead="@L["Send the link to a friend. If nobody joins, the computer takes the other seat when the game starts."]"
+                 OnAddBot="() => room!.AddBot(identity.Id)" OnRemove="i => room!.RemoveSeat(identity.Id, i)" OnStart="() => room!.Start(identity.Id)">
+        <SeatBadge Context="i">
+            <span class="seat-wind xq-seat-badge">@BadgeFor(i)</span>
+        </SeatBadge>
+        <Summary>
+            @RedSummary() ·
+            @(view.Settings.MoveSeconds == 0 ? L["No move timer"] : L["{0}s per move", view.Settings.MoveSeconds]) ·
+            @L["Computer: {0}", L[view.Settings.BotLevel == XqLevel.Easy ? "Easy" : "Medium"]]
+        </Summary>
+    </WaitingRoom>
+}
+else if (view is not null)
+{
+    <XiangqiBoard View="view" OnMove="Move" OnResign="Resign" OnHint="Hint" OnRematch="Rematch" HintMove="hint"
+                  Letters="letters" OnToggleLetters="ToggleLetters" SoundOn="soundOn" OnToggleSound="ToggleSound" />
+}
+
+@code {
+    enum PageState { Loading, NotFound, Full, Ready }
+
+    sealed record Identity(string Id, string Name);
+
+    [Parameter] public string Code { get; set; } = "";
+
+    PageState state = PageState.Loading;
+    XiangqiRoom? room;
+    XqView? view;
+    Identity identity = new("", "");
+    string inviteUrl = "";
+    XqMove? hint;
+    int hintVersion = -1;
+    bool connected;
+    volatile bool disposed;
+    readonly ViewerCulture culture = ViewerCulture.Capture();
+    bool soundOn = true;
+    bool letters;
+    bool needsMe;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        room = Rooms.Get(Code) as XiangqiRoom;
+        if (room is null)
+        {
+            state = PageState.NotFound;
+            StateHasChanged();
+            return;
+        }
+        identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
+        inviteUrl = await JS.InvokeAsync<string>("gameweb.origin") + room.Url;
+        soundOn = await JS.InvokeAsync<bool>("gameweb.soundEnabled");
+        letters = await JS.InvokeAsync<string?>("gameweb.getPref", "xq.letters") == "1";
+
+        room.Changed += OnRoomChanged;
+        var outcome = room.Connect(identity.Id, identity.Name);
+        connected = outcome is JoinOutcome.Seated or JoinOutcome.Rejoined;
+        state = outcome == JoinOutcome.Full ? PageState.Full : PageState.Ready;
+        view = room.GetView(identity.Id);
+        StateHasChanged();
+        await UpdateAttention();
+    }
+
+    void OnRoomChanged()
+    {
+        if (disposed) return;
+        _ = InvokeAsync(() =>
+        {
+            if (room is null || disposed) return Task.CompletedTask;
+            culture.Apply();
+            view = room.GetView(identity.Id);
+            if (view.Version != hintVersion) hint = null;
+            StateHasChanged();
+            return UpdateAttention();
+        });
+    }
+
+    /// <summary>Tells the browser when it is this player's move, so a background tab can alert them.</summary>
+    async Task UpdateAttention()
+    {
+        bool now = view is { MyTurn: true };
+        if (now == needsMe) return;
+        needsMe = now;
+        try
+        {
+            await JS.InvokeVoidAsync("gameweb.attention", now, L["Your turn"].Value);
+        }
+        catch (JSDisconnectedException)
+        {
+            // The browser has gone; nothing to alert.
+        }
+    }
+
+    void Move(XqMove move)
+    {
+        hint = null;
+        room?.Move(identity.Id, move);
+    }
+
+    void Resign() => room?.Resign(identity.Id);
+
+    void Rematch() => room?.Rematch(identity.Id);
+
+    async Task Hint()
+    {
+        if (room is null || view is null) return;
+        int version = view.Version;
+        hint = await Task.Run(() => room.Hint(identity.Id));
+        hintVersion = version;
+    }
+
+    async Task ToggleLetters()
+    {
+        letters = !letters;
+        await JS.InvokeVoidAsync("gameweb.setPref", "xq.letters", letters ? "1" : "0");
+    }
+
+    async Task ToggleSound()
+    {
+        soundOn = !soundOn;
+        await JS.InvokeVoidAsync("gameweb.setSound", soundOn);
+    }
+
+    /// <summary>Seat 0 is the room's creator (the host) until the game starts.</summary>
+    string BadgeFor(int seat)
+    {
+        if (view is null) return "";
+        var red = view.Settings.Red;
+        if (red == XqRedChoice.Random) return "?";
+        bool hostSeat = seat == 0;
+        bool isRed = red == XqRedChoice.Host ? hostSeat : !hostSeat;
+        return X.PieceChar(Pieces.Make(Pieces.General, isRed ? XqSide.Red : XqSide.Black));
+    }
+
+    string RedSummary() => view!.Settings.Red switch
+    {
+        XqRedChoice.Host => L["Host plays Red"],
+        XqRedChoice.Guest => L["Guest plays Red"],
+        _ => L["Sides chosen at random"],
+    };
+
+    public void Dispose()
+    {
+        disposed = true;
+        if (room is null) return;
+        room.Changed -= OnRoomChanged;
+        if (connected) room.Disconnect(identity.Id);
+    }
+}

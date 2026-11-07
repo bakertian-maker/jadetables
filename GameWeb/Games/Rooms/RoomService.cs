@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
-using GameWeb.Games.Mahjong;
 
 namespace GameWeb.Games.Rooms;
 
@@ -26,8 +25,11 @@ public sealed class RoomService : IDisposable
 
     public int Count => _rooms.Count;
 
-    /// <summary>Creates a room, or returns null when the server already has <see cref="MaxRooms"/> open.</summary>
-    public MahjongRoom? TryCreateMahjong(MjRoomSettings settings)
+    /// <summary>
+    /// Creates a room with a fresh code, or returns null when the server already has
+    /// <see cref="MaxRooms"/> open. <paramref name="create"/> builds the room for a given code.
+    /// </summary>
+    public T? TryCreate<T>(Func<string, T> create) where T : Room
     {
         if (_rooms.Count >= MaxRooms) Cleanup();
         if (_rooms.Count >= MaxRooms)
@@ -38,10 +40,10 @@ public sealed class RoomService : IDisposable
         while (true)
         {
             var code = RandomNumberGenerator.GetString(CodeChars, 5);
-            var room = new MahjongRoom(code, settings);
+            var room = create(code);
             if (_rooms.TryAdd(code, room))
             {
-                _logger.LogInformation("Created mahjong room {Code}", code);
+                _logger.LogInformation("Created {Game} room {Code}", room.GameKey, code);
                 return room;
             }
             room.Dispose();
@@ -50,11 +52,11 @@ public sealed class RoomService : IDisposable
 
     public Room? Get(string code) => _rooms.TryGetValue(code.Trim(), out var r) ? r : null;
 
-    /// <summary>Unfinished rooms where this player holds a seat, most recently active first.</summary>
-    public IReadOnlyList<Room> RoomsWithSeatFor(string playerId) =>
+    /// <summary>Unfinished rooms where this player holds a seat (optionally of one game), most recent first.</summary>
+    public IReadOnlyList<Room> RoomsWithSeatFor(string playerId, string? gameKey = null) =>
         string.IsNullOrEmpty(playerId)
             ? []
-            : _rooms.Values.Where(r => r.HasSeat(playerId) && !r.IsFinished)
+            : _rooms.Values.Where(r => r.HasSeat(playerId) && !r.IsFinished && (gameKey is null || r.GameKey == gameKey))
                 .OrderByDescending(r => r.LastActivity)
                 .Take(3)
                 .ToList();

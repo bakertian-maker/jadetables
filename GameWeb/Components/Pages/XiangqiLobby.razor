@@ -1,0 +1,163 @@
+@page "/xiangqi"
+@rendermode InteractiveServer
+@inject RoomService Rooms
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>@L["Xiangqi · GameWeb"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@L["Play Xiangqi (Chinese chess) online for free, against the computer or a friend with a private link."]" />
+</HeadContent>
+
+<section class="lobby-hero xq-hero">
+    <div class="wrap lobby-hero-inner">
+        <div>
+            <p class="eyebrow">@L["象棋 · Chinese chess"]</p>
+            <h1>@L["Xiangqi"]</h1>
+            <p class="lead">@L["Two armies face each other across the river. Checkmate the enemy general to win."]</p>
+        </div>
+        <div class="lobby-hero-tiles xq-hero-pieces" aria-hidden="true">
+            <XqPiece Piece="@Pieces.Make(Pieces.General, XqSide.Red)" />
+            <XqPiece Piece="@Pieces.Make(Pieces.Cannon, XqSide.Red)" />
+            <XqPiece Piece="@Pieces.Make(Pieces.Horse, XqSide.Black)" />
+        </div>
+    </div>
+</section>
+
+<div class="wrap page-pad">
+    <ContinueGames GameKey="xiangqi" />
+
+    <div class="name-row">
+        <label for="nickname">@L["Your name at the table"]</label>
+        <input id="nickname" maxlength="20" value="@nickname" @onchange="SaveName" placeholder="@L["Guest"]" />
+    </div>
+
+    @if (createError is not null)
+    {
+        <p class="form-error" role="alert">@createError</p>
+    }
+
+    <div class="lobby-grid">
+        <article class="card card-feature">
+            <h2>@L["Play the computer"]</h2>
+            <p>@L["You play Red and move first. No timer."]</p>
+            <div class="form-grid">
+                <label>
+                    @L["Level"]
+                    <select @bind="quickLevel">
+                        <option value="@XqLevel.Easy">@L["Easy"]</option>
+                        <option value="@XqLevel.Medium">@L["Medium"]</option>
+                    </select>
+                </label>
+            </div>
+            <button class="btn btn-primary btn-lg" @onclick="QuickPlay" disabled="@busy">@L["Play now"]</button>
+        </article>
+
+        <article class="card">
+            <h2>@L["Private room"]</h2>
+            <p>@L["Get a link for a friend. If nobody joins, the computer takes the other seat."]</p>
+            <div class="form-grid">
+                <label>
+                    @L["Who plays Red (moves first)"]
+                    <select @bind="red">
+                        <option value="@XqRedChoice.Host">@L["Me"]</option>
+                        <option value="@XqRedChoice.Guest">@L["My friend"]</option>
+                        <option value="@XqRedChoice.Random">@L["Random"]</option>
+                    </select>
+                </label>
+                <label>
+                    @L["Move timer"]
+                    <select @bind="moveSeconds">
+                        <option value="60">@L["{0} seconds", 60]</option>
+                        <option value="30">@L["{0} seconds", 30]</option>
+                        <option value="0">@L["No timer"]</option>
+                    </select>
+                </label>
+                <label>
+                    @L["Computer level (if a seat stays empty)"]
+                    <select @bind="roomLevel">
+                        <option value="@XqLevel.Easy">@L["Easy"]</option>
+                        <option value="@XqLevel.Medium">@L["Medium"]</option>
+                    </select>
+                </label>
+            </div>
+            <button class="btn btn-primary" @onclick="CreateRoom" disabled="@busy">@L["Create room"]</button>
+        </article>
+
+        <article class="card">
+            <h2>@L["Join a room"]</h2>
+            <p>@L["Have a room code from a friend? Enter it here, or just open their link."]</p>
+            <form class="join-form" @onsubmit="Join" @onsubmit:preventDefault>
+                <input aria-label="@L["Room code"]" placeholder="@L["Code, e.g. K7Q2M"]" maxlength="5" @bind="joinCode" class="code-input" />
+                <button class="btn btn-ghost" type="submit">@L["Join"]</button>
+            </form>
+            @if (joinError is not null)
+            {
+                <p class="form-error">@joinError</p>
+            }
+        </article>
+    </div>
+
+    <section class="how">
+        <h2>@L["How to play"]</h2>
+        <ol class="how-steps">
+            <li><strong>@L["Move"]</strong> @L["one piece per turn. Red moves first."]</li>
+            <li><strong>@L["Capture"]</strong> @L["by moving onto an enemy piece. Cannons must jump exactly one piece to capture."]</li>
+            <li><strong>@L["Protect"]</strong> @L["your general: it stays in its palace, and the two generals may never face each other on an open line."]</li>
+            <li><strong>@L["Win the game"]</strong> @L["by checkmate, or when your opponent has no legal move."] <a href="/xiangqi/rules">@L["Read the full rules"]</a></li>
+        </ol>
+    </section>
+</div>
+
+@code {
+    string nickname = "";
+    XqLevel quickLevel = XqLevel.Easy;
+    XqLevel roomLevel = XqLevel.Medium;
+    XqRedChoice red = XqRedChoice.Host;
+    int moveSeconds = 60;
+    string joinCode = "";
+    string? joinError;
+    string? createError;
+    bool busy;
+
+    sealed record Identity(string Id, string Name);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
+        nickname = identity.Name;
+        StateHasChanged();
+    }
+
+    async Task SaveName(ChangeEventArgs e)
+    {
+        nickname = Room.CleanName(e.Value?.ToString());
+        await JS.InvokeVoidAsync("gameweb.setName", nickname);
+    }
+
+    void QuickPlay() => Open(new XqRoomSettings { QuickPlay = true, BotLevel = quickLevel, Red = XqRedChoice.Host, MoveSeconds = 0 });
+
+    void CreateRoom() => Open(new XqRoomSettings { BotLevel = roomLevel, Red = red, MoveSeconds = moveSeconds });
+
+    void Open(XqRoomSettings settings)
+    {
+        var room = Rooms.TryCreate(code => new XiangqiRoom(code, settings));
+        if (room is null)
+        {
+            createError = L["The server is busy right now. Please try again in a few minutes."];
+            return;
+        }
+        busy = true;
+        Nav.NavigateTo(room.Url);
+    }
+
+    void Join()
+    {
+        var code = joinCode.Trim().ToUpperInvariant();
+        if (code.Length == 0) { joinError = L["Enter a room code."]; return; }
+        var room = Rooms.Get(code);
+        if (room is null) { joinError = L["No open room with code {0}.", code]; return; }
+        Nav.NavigateTo(room.Url);
+    }
+}

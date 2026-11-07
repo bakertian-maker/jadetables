@@ -1,0 +1,79 @@
+@* 繁體中文象棋規則，顯示在 /xiangqi/rules。 *@
+
+<div class="wrap page-pad rules">
+    <p class="eyebrow">中國象棋</p>
+    <h1>象棋規則</h1>
+    <p class="lead">將死對方的將（帥）即可獲勝；對方無子可走時也算你贏。</p>
+
+    <nav class="rules-toc" aria-label="本頁目錄">
+        <a href="#board">棋盤</a><a href="#pieces">棋子走法</a><a href="#check">將軍與將死</a><a href="#draws">和棋</a><a href="#notation">記譜</a><a href="#here">在 GameWeb 下棋</a>
+    </nav>
+
+    <h2 id="board">棋盤</h2>
+    <p>棋子放在線的交叉點上：橫向 9 路，縱向 10 行。中間的<strong>河界</strong>（楚河 漢界）把棋盤分成兩半。雙方各有一個畫著斜線的 3 × 3 <strong>九宮</strong>，帥（將）和仕（士）只能在九宮裡活動。紅方先走，之後雙方輪流，每次走一步。</p>
+
+    <h2 id="pieces">棋子走法</h2>
+    <p>除炮以外，所有棋子都是走到對方棋子所在的點上把它吃掉。</p>
+    <table class="rules-table xq-rules-table">
+        <thead><tr><th>棋子</th><th>走法</th></tr></thead>
+        <tbody>
+            @Row(Pieces.General, "帥 / 將", "在九宮內上下左右走一步。")
+            @Row(Pieces.Advisor, "仕 / 士", "在九宮內斜走一步。")
+            @Row(Pieces.Elephant, "相 / 象", "斜走兩步（走「田」字）。不能過河；中間的點有棋子時不能走（塞象眼）。")
+            @Row(Pieces.Horse, "傌 / 馬", "先直走一步再斜走一步（走「日」字）。直走的那一點有棋子時不能走（蹩馬腿）。")
+            @Row(Pieces.Chariot, "俥 / 車", "直線走任意步數。")
+            @Row(Pieces.Cannon, "炮 / 砲", "不吃子時和車一樣走；吃子時必須隔著一個棋子（炮架）跳過去吃。")
+            @Row(Pieces.Soldier, "兵 / 卒", "向前走一步；過河後也可以橫走一步。永遠不能後退。")
+        </tbody>
+    </table>
+
+    <h2 id="check">將軍與將死</h2>
+    <ul>
+        <li>帥（將）被攻擊叫<strong>將軍</strong>。被將軍時必須立即應將；走完後自己的帥（將）仍被攻擊的著法不允許。</li>
+        <li><strong>對面笑：</strong>雙方的帥和將不能在同一條直線上直接相對、中間沒有棋子。</li>
+        <li><strong>將死</strong>即獲勝：對方被將軍且無法解救。</li>
+        <li><strong>困斃</strong>也算獲勝：對方無子可走即輸棋，這一點和國際象棋不同。</li>
+    </ul>
+
+    <h2 id="draws">和棋與其他結局</h2>
+    <ul>
+        <li>雙方各走 60 步都沒有吃子：判和。</li>
+        <li>雙方都沒有車、馬、炮、兵（卒）：無法進攻，判和。</li>
+        <li>可以隨時認輸。有走棋限時的房間裡，超時判負。</li>
+    </ul>
+
+    <h2 id="notation">看懂棋譜</h2>
+    <p>每步棋按「棋子、所在直線、方向、目的地」記錄。直線從各自的右邊數起：紅方用中文數字，黑方用阿拉伯數字。</p>
+    <ul>
+        <li><strong>炮二平五</strong>：二路的炮橫走到五路。</li>
+        <li><strong>馬８進７</strong>：８路的馬向前跳到７路。</li>
+        <li><strong>俥一進三</strong>：一路的俥向前走三步。直走時最後的數字是步數；橫走和斜走時是到達的直線。</li>
+        <li>同一直線上有兩個相同棋子時，用「前」「後」區分。</li>
+    </ul>
+
+    <h2 id="here">在 GameWeb 下棋</h2>
+    <ul>
+        <li>點一個棋子查看能走的位置，再點小圓點走棋。</li>
+        <li>電腦分<strong>簡單</strong>和<strong>中等</strong>兩個難度。</li>
+        <li>私人房間可以設每步 30 或 60 秒限時；和電腦下棋不限時。</li>
+        <li>一局結束後，<strong>再來一局</strong>會交換紅黑方開新局。</li>
+    </ul>
+
+    <p><a class="btn btn-primary" href="/xiangqi">開始下象棋</a></p>
+</div>
+
+@code {
+    RenderFragment Row(int type, string name, string moves) => __builder =>
+    {
+        <tr>
+            <td class="xq-rules-piece">
+                <span class="xq-rules-icons">
+                    <XqPiece Piece="@Pieces.Make(type, XqSide.Red)" />
+                    <XqPiece Piece="@Pieces.Make(type, XqSide.Black)" />
+                </span>
+                <strong>@name</strong>
+            </td>
+            <td>@moves</td>
+        </tr>
+    };
+}

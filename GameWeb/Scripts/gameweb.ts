@@ -15,6 +15,8 @@ interface GameWebApi {
     attention(needed: boolean, label: string): void;
     soundEnabled(): boolean;
     setSound(on: boolean): void;
+    getPref(key: string): string | null;
+    setPref(key: string, value: string): void;
 }
 
 declare global {
@@ -174,6 +176,15 @@ window.gameweb = {
 
     soundEnabled(): boolean {
         return read(SOUND_KEY) !== "off";
+    },
+
+    /** Small per-browser preferences, such as letter pieces in Xiangqi. */
+    getPref(key: string): string | null {
+        return read("gw.pref." + key);
+    },
+
+    setPref(key: string, value: string): void {
+        write("gw.pref." + key, value);
     },
 
     setSound(on: boolean): void {

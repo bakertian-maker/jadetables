@@ -29,75 +29,18 @@ else if (state == PageState.Full)
 }
 else if (view is { Started: false })
 {
-    <div class="wrap page-pad">
-        <div class="waiting">
-            <div class="waiting-head">
-                <p class="eyebrow">@L["Private room"]</p>
-                <h1>@L["Room"] <span class="room-code">@view.Code</span></h1>
-                <p class="lead">@L["Send the link to up to three friends. Empty seats are filled by computer players when the game starts."]</p>
-                <div class="invite">
-                    <input readonly value="@inviteUrl" aria-label="@L["Invite link"]" @onfocus="SelectInvite" id="invite-link" />
-                    <button class="btn btn-primary" @onclick="CopyInvite">@(copied ? L["Copied"] : L["Copy link"])</button>
-                </div>
-            </div>
-
-            <ol class="seat-list">
-                @for (int i = 0; i < 4; i++)
-                {
-                    var idx = i;
-                    var s = view.LobbySeats[i];
-                    <li class="seat @(s.IsEmpty ? "is-empty" : "") @(idx == view.MySeat ? "is-me" : "")">
-                        <span class="seat-wind" title="@T.WindName(i)">@T.WindGlyph(i)</span>
-                        <span class="seat-name">
-                            @if (s.IsEmpty)
-                            {
-                                <span class="mj-muted">@L["Open seat"]</span>
-                            }
-                            else
-                            {
-                                @T.SeatName(s)
-                                @if (idx == view.MySeat)
-                                {
-                                    <span class="mj-tag">@L["You"]</span>
-                                }
-                                @if (s.IsBot)
-                                {
-                                    <span class="mj-tag">@L["Bot"]</span>
-                                }
-                                else if (s.Connections == 0)
-                                {
-                                    <span class="mj-tag mj-tag-away">@L["Reconnecting"]</span>
-                                }
-                            }
-                        </span>
-                        @if (view.IsHost && !s.IsEmpty && idx != view.MySeat)
-                        {
-                            <button class="btn btn-ghost btn-sm" @onclick="() => room!.RemoveSeat(identity.Id, idx)">@L["Remove"]</button>
-                        }
-                    </li>
-                }
-            </ol>
-
-            <div class="waiting-foot">
-                <p class="mj-muted">
-                    @L["Hong Kong rules · minimum {0} faan", view.Settings.MinFaan] ·
-                    @(view.Settings.Rounds == 1 ? L["East round"] : L["Full game, four rounds"]) ·
-                    @(view.Settings.TurnSeconds == 0 ? L["no turn timer"] : L["{0}s per turn", view.Settings.TurnSeconds])
-                </p>
-                @if (view.IsHost)
-                {
-                    <div class="mj-buttons">
-                        <button class="btn btn-ghost" @onclick="() => room!.AddBot(identity.Id)" disabled="@(!view.LobbySeats.Any(s => s.IsEmpty))">@L["Add computer player"]</button>
-                        <button class="btn btn-primary btn-lg" @onclick="() => room!.Start(identity.Id)">@L["Start game"]</button>
-                    </div>
-                }
-                else
-                {
-                    <p><strong>@L["Waiting for the host to start the game."]</strong></p>
-                }
-            </div>
-        </div>
-    </div>
+    <WaitingRoom Code="@view.Code" Seats="view.LobbySeats" MySeat="view.MySeat" IsHost="view.IsHost" InviteUrl="@inviteUrl"
+                 Lead="@L["Send the link to up to three friends. Empty seats are filled by computer players when the game starts."]"
+                 OnAddBot="() => room!.AddBot(identity.Id)" OnRemove="i => room!.RemoveSeat(identity.Id, i)" OnStart="() => room!.Start(identity.Id)">
+        <SeatBadge Context="i">
+            <span class="seat-wind" title="@T.WindName(i)">@T.WindGlyph(i)</span>
+        </SeatBadge>
+        <Summary>
+            @L["Hong Kong rules · minimum {0} faan", view.Settings.MinFaan] ·
+            @(view.Settings.Rounds == 1 ? L["East round"] : L["Full game, four rounds"]) ·
+            @(view.Settings.TurnSeconds == 0 ? L["no turn timer"] : L["{0}s per turn", view.Settings.TurnSeconds])
+        </Summary>
+    </WaitingRoom>
 }
 else if (view is not null)
 {
@@ -117,11 +60,11 @@ else if (view is not null)
     MjView? view;
     Identity identity = new("", "");
     string inviteUrl = "";
-    bool copied;
     int? hint;
     int hintVersion = -1;
     bool connected;
     volatile bool disposed;
+    readonly ViewerCulture culture = ViewerCulture.Capture();
     bool soundOn = true;
     bool needsMe;
 
@@ -137,7 +80,7 @@ else if (view is not null)
         }
         identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
         var origin = await JS.InvokeAsync<string>("gameweb.origin");
-        inviteUrl = $"{origin}/mahjong/room/{room.Code}";
+        inviteUrl = origin + room.Url;
 
         room.Changed += OnRoomChanged;
         var outcome = room.Connect(identity.Id, identity.Name);
@@ -177,6 +120,7 @@ else if (view is not null)
         _ = InvokeAsync(() =>
         {
             if (room is null || disposed) return Task.CompletedTask;
+            culture.Apply();
             view = room.GetView(identity.Id);
             if (view.PhaseVersion != hintVersion) hint = null;
             StateHasChanged();
@@ -198,13 +142,6 @@ else if (view is not null)
     }
 
     void PlayAgain() => room?.PlayAgain(identity.Id);
-
-    async Task CopyInvite()
-    {
-        copied = await JS.InvokeAsync<bool>("gameweb.copy", inviteUrl);
-    }
-
-    async Task SelectInvite() => await JS.InvokeVoidAsync("gameweb.select", "invite-link");
 
     public void Dispose()
     {

@@ -1,0 +1,90 @@
+@* The waiting room shared by every game: invite link, seat list, add-bot and Start controls. *@
+@inject IJSRuntime JS
+@inject GameText T
+
+<div class="wrap page-pad">
+    <div class="waiting">
+        <div class="waiting-head">
+            <p class="eyebrow">@L["Private room"]</p>
+            <h1>@L["Room"] <span class="room-code">@Code</span></h1>
+            <p class="lead">@Lead</p>
+            <div class="invite">
+                <input readonly value="@InviteUrl" aria-label="@L["Invite link"]" @onfocus="SelectInvite" id="invite-link" />
+                <button class="btn btn-primary" @onclick="CopyInvite">@(copied ? L["Copied"] : L["Copy link"])</button>
+            </div>
+        </div>
+
+        <ol class="seat-list">
+            @for (int i = 0; i < Seats.Count; i++)
+            {
+                var idx = i;
+                var s = Seats[i];
+                <li class="seat @(s.IsEmpty ? "is-empty" : "") @(idx == MySeat ? "is-me" : "")">
+                    @SeatBadge(idx)
+                    <span class="seat-name">
+                        @if (s.IsEmpty)
+                        {
+                            <span class="mj-muted">@L["Open seat"]</span>
+                        }
+                        else
+                        {
+                            @T.SeatName(s)
+                            @if (idx == MySeat)
+                            {
+                                <span class="mj-tag">@L["You"]</span>
+                            }
+                            @if (s.IsBot)
+                            {
+                                <span class="mj-tag">@L["Bot"]</span>
+                            }
+                            else if (s.Connections == 0)
+                            {
+                                <span class="mj-tag mj-tag-away">@L["Reconnecting"]</span>
+                            }
+                        }
+                    </span>
+                    @if (IsHost && !s.IsEmpty && idx != MySeat)
+                    {
+                        <button class="btn btn-ghost btn-sm" @onclick="() => OnRemove.InvokeAsync(idx)">@L["Remove"]</button>
+                    }
+                </li>
+            }
+        </ol>
+
+        <div class="waiting-foot">
+            <p class="mj-muted">@Summary</p>
+            @if (IsHost)
+            {
+                <div class="mj-buttons">
+                    <button class="btn btn-ghost" @onclick="OnAddBot" disabled="@(!Seats.Any(s => s.IsEmpty))">@L["Add computer player"]</button>
+                    <button class="btn btn-primary btn-lg" @onclick="OnStart">@L["Start game"]</button>
+                </div>
+            }
+            else
+            {
+                <p><strong>@L["Waiting for the host to start the game."]</strong></p>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Code { get; set; } = "";
+    [Parameter, EditorRequired] public IReadOnlyList<Seat> Seats { get; set; } = [];
+    [Parameter] public int MySeat { get; set; } = -1;
+    [Parameter] public bool IsHost { get; set; }
+    [Parameter] public string InviteUrl { get; set; } = "";
+    [Parameter] public string Lead { get; set; } = "";
+    /// <summary>The marker shown before each seat (a wind, or a side colour).</summary>
+    [Parameter, EditorRequired] public RenderFragment<int> SeatBadge { get; set; } = default!;
+    [Parameter] public RenderFragment? Summary { get; set; }
+    [Parameter] public EventCallback OnAddBot { get; set; }
+    [Parameter] public EventCallback<int> OnRemove { get; set; }
+    [Parameter] public EventCallback OnStart { get; set; }
+
+    bool copied;
+
+    async Task CopyInvite() => copied = await JS.InvokeAsync<bool>("gameweb.copy", InviteUrl);
+
+    async Task SelectInvite() => await JS.InvokeVoidAsync("gameweb.select", "invite-link");
+}

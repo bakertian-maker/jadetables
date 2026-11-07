@@ -1,0 +1,80 @@
+@* English Xiangqi rules, shown on /xiangqi/rules. *@
+
+<div class="wrap page-pad rules">
+    <p class="eyebrow">象棋</p>
+    <h1>Xiangqi rules</h1>
+    <p class="lead">Xiangqi is Chinese chess. You win by checkmating the enemy general, or when your opponent has no legal move left.</p>
+
+    <nav class="rules-toc" aria-label="On this page">
+        <a href="#board">Board</a><a href="#pieces">Pieces</a><a href="#check">Check and checkmate</a><a href="#draws">Draws</a><a href="#notation">Move notation</a><a href="#here">On GameWeb</a>
+    </nav>
+
+    <h2 id="board">The board</h2>
+    <p>Pieces stand on the points where lines cross: 9 files across and 10 ranks deep. The <strong>river</strong> (楚河 漢界) splits the board into two halves. Each side has a <strong>palace</strong>, the 3 × 3 points marked with diagonals, where its general and advisors live. Red moves first; then the players take turns, one move each.</p>
+
+    <h2 id="pieces">How the pieces move</h2>
+    <p>Every piece captures by moving onto an enemy piece, except the cannon, which captures by jumping.</p>
+    <table class="rules-table xq-rules-table">
+        <thead><tr><th>Piece</th><th>Moves</th></tr></thead>
+        <tbody>
+            @Row(Pieces.General, "General", "One point up, down, left or right, inside the palace only.")
+            @Row(Pieces.Advisor, "Advisor", "One point diagonally, inside the palace only.")
+            @Row(Pieces.Elephant, "Elephant", "Exactly two points diagonally. It cannot cross the river, and it is blocked if the point in between is occupied (the \"elephant's eye\").")
+            @Row(Pieces.Horse, "Horse", "One point straight, then one point diagonally outward. It is blocked if the first straight point is occupied (\"hobbling the horse\").")
+            @Row(Pieces.Chariot, "Chariot", "Any number of points in a straight line, like a rook in chess.")
+            @Row(Pieces.Cannon, "Cannon", "Moves like a chariot, but captures only by jumping over exactly one piece (the \"screen\") to the target.")
+            @Row(Pieces.Soldier, "Soldier", "One point forward. After crossing the river it may also move one point sideways. It never moves backward.")
+        </tbody>
+    </table>
+
+    <h2 id="check">Check and checkmate</h2>
+    <ul>
+        <li>A general under attack is in <strong>check</strong>. You must get out of check at once; a move that leaves your own general in check is not allowed.</li>
+        <li><strong>Flying general:</strong> the two generals may never face each other on the same file with nothing between them. That means a general can attack the other along an open file.</li>
+        <li><strong>Checkmate</strong> wins: the opponent is in check and has no move to escape.</li>
+        <li><strong>No legal move</strong> also wins. Unlike Western chess, a stalemated player loses.</li>
+    </ul>
+
+    <h2 id="draws">Draws and other endings</h2>
+    <ul>
+        <li>60 moves by each side with no capture: the game is drawn.</li>
+        <li>Neither side has a chariot, horse, cannon or soldier left: the game is drawn, because nobody can attack.</li>
+        <li>A player may resign at any time. With a move timer, running out of time loses.</li>
+    </ul>
+
+    <h2 id="notation">Reading the move list</h2>
+    <p>Moves are written as piece, starting file, direction and destination. Files are counted 1 to 9 from each player's own right.</p>
+    <ul>
+        <li><strong>C2.5</strong> (炮二平五): the cannon on file 2 moves sideways to file 5.</li>
+        <li><strong>H8+7</strong> (馬8進7): the horse on file 8 moves forward to file 7.</li>
+        <li><strong>R1+3</strong>: the chariot on file 1 moves forward 3 ranks. For straight moves the last number is the distance; for sideways and diagonal moves it is the new file.</li>
+        <li>Two of the same piece on one file are told apart as front (+) and rear (−).</li>
+    </ul>
+    <p class="mj-muted">Letters: K general, A advisor, E elephant, H horse, R chariot, C cannon, P soldier. Turn on <strong>Letters</strong> at the table to show them on the pieces.</p>
+
+    <h2 id="here">On GameWeb</h2>
+    <ul>
+        <li>Tap a piece to see where it can go, then tap a dot to move.</li>
+        <li>The computer plays at two levels: <strong>Easy</strong> for learning and <strong>Medium</strong> for a real game.</li>
+        <li>Private rooms can have a move timer of 30 or 60 seconds. Games against the computer have no timer.</li>
+        <li>After a game, <strong>Play again</strong> starts a new one with the sides swapped.</li>
+    </ul>
+
+    <p><a class="btn btn-primary" href="/xiangqi">Play Xiangqi</a></p>
+</div>
+
+@code {
+    RenderFragment Row(int type, string name, string moves) => __builder =>
+    {
+        <tr>
+            <td class="xq-rules-piece">
+                <span class="xq-rules-icons">
+                    <XqPiece Piece="@Pieces.Make(type, XqSide.Red)" />
+                    <XqPiece Piece="@Pieces.Make(type, XqSide.Black)" />
+                </span>
+                <strong>@name</strong>
+            </td>
+            <td>@moves</td>
+        </tr>
+    };
+}
