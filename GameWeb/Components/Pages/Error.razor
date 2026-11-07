@@ -1,0 +1,42 @@
+﻿@page "/Error"
+@using System.Diagnostics
+
+<PageTitle>@(IsNotFound ? L["Page not found · GameWeb"] : L["Something went wrong · GameWeb"])</PageTitle>
+
+<div class="wrap page-pad narrow error-page">
+    <span class="error-tile" aria-hidden="true">@(IsNotFound ? "?" : "!")</span>
+    @if (IsNotFound)
+    {
+        <h1>@L["Page not found"]</h1>
+        <p class="lead">@L["This page doesn't exist. The link may be mistyped, or a room may have closed."]</p>
+    }
+    else
+    {
+        <h1>@L["Something went wrong"]</h1>
+        <p class="lead">@L["Sorry, the server ran into a problem. Please try again in a moment."]</p>
+    }
+    <div class="hero-actions">
+        <a class="btn btn-primary" href="/">@L["Back to home"]</a>
+        <a class="btn btn-ghost" href="/mahjong">@L["Play Mahjong"]</a>
+    </div>
+    @if (!IsNotFound && RequestId is not null)
+    {
+        <p class="mj-muted error-id">@L["Error reference: {0}", RequestId]</p>
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    /// <summary>Set by UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}").</summary>
+    [SupplyParameterFromQuery]
+    private int? StatusCode { get; set; }
+
+    private string? RequestId { get; set; }
+
+    private bool IsNotFound => StatusCode == 404;
+
+    protected override void OnInitialized() =>
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

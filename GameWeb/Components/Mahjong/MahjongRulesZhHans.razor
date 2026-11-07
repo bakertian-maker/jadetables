@@ -1,0 +1,98 @@
+@* 简体中文规则，显示在 /mahjong/rules。 *@
+
+<div class="wrap page-pad rules">
+    <p class="eyebrow">广东麻将 · 港式规则</p>
+    <h1>港式麻将规则</h1>
+    <p class="lead">目标是最先凑成四组牌加一对将牌，且番数不少于房间设定的起和番（通常为 3 番）。</p>
+
+    <nav class="rules-toc" aria-label="本页目录">
+        <a href="#tiles">牌张</a><a href="#play">行牌</a><a href="#claims">吃碰杠</a><a href="#winning">和牌</a><a href="#faan">番种表</a><a href="#points">计分</a>
+    </nav>
+
+    <h2 id="tiles">牌张</h2>
+    <p>共 136 张：34 种牌，每种 4 张。GameWeb 不使用花牌。牌面保留传统的繁体字样，和实体麻将一致。</p>
+    <div class="tile-groups">
+        <div class="tile-group">
+            <h3>万子 萬</h3>
+            <div class="tile-row">@for (int k = 0; k < 9; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>筒子 筒</h3>
+            <div class="tile-row">@for (int k = 9; k < 18; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>条子 索</h3>
+            <div class="tile-row">@for (int k = 18; k < 27; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>风牌与箭牌</h3>
+            <div class="tile-row">@for (int k = 27; k < 34; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+            <p class="mj-muted">东、南、西、北 · 红中、发财、白板</p>
+        </div>
+    </div>
+
+    <h2 id="play">行牌</h2>
+    <ol>
+        <li>每人起手 13 张。庄家（东）多摸一张，先打出一张牌。</li>
+        <li>按逆时针（东 → 南 → 西 → 北）轮流行牌。轮到你时，从牌墙摸一张，再打出一张。</li>
+        <li>手里有四张相同的牌可以暗杠；已碰的刻子摸到第四张可以加杠。杠牌后从牌墙尾部补摸一张。</li>
+        <li>牌墙摸完仍无人和牌即为流局，由原庄家继续坐庄。</li>
+        <li>庄家和牌或流局时连庄；否则由下家坐庄。庄家轮转一圈后，圈风随之改变。</li>
+    </ol>
+
+    <h2 id="claims">吃、碰、杠</h2>
+    <p>有人打出一张牌后，其他玩家有几秒钟时间决定是否要这张牌：</p>
+    <table class="rules-table">
+        <thead><tr><th>动作</th><th>谁可以</th><th>优先级</th></tr></thead>
+        <tbody>
+            <tr><td>和牌</td><td>这张牌能让自己和牌的任何人</td><td>最高。两人同时可和时，按行牌顺序由先到者和牌（截和）。</td></tr>
+            <tr><td>杠 / 碰</td><td>手中有三张 / 两张相同牌的人</td><td>高于吃</td></tr>
+            <tr><td>吃</td><td>只有打牌者的下家</td><td>最低</td></tr>
+        </tbody>
+    </table>
+    <p>吃、碰、杠的牌组要亮在桌面上。吃或碰后直接打出一张牌；杠后先补摸一张。加杠时，若有人正好和这张牌，可以抢杠和牌。</p>
+
+    <h2 id="winning">和牌</h2>
+    <p>和牌牌型为四组牌加一对将牌。一组牌可以是顺子（同花色三张连续，如三四五条）、刻子（三张相同）或杠子（四张相同）。唯一的特殊牌型是十三幺：每种幺九牌和字牌各一张，再加其中任意一张成对。</p>
+    <div class="example-hand" aria-label="和牌示例">
+        <span class="mj-meld"><MjTile Kind="1" Size="sm" /><MjTile Kind="2" Size="sm" /><MjTile Kind="3" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="13" Size="sm" /><MjTile Kind="14" Size="sm" /><MjTile Kind="15" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="24" Size="sm" /><MjTile Kind="24" Size="sm" /><MjTile Kind="24" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="Tiles.Red" Size="sm" /><MjTile Kind="Tiles.Red" Size="sm" /><MjTile Kind="Tiles.Red" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="Tiles.East" Size="sm" /><MjTile Kind="Tiles.East" Size="sm" /></span>
+    </div>
+    <p class="mj-muted">两组顺子、一组七条刻子、一组红中刻子，加一对东风作将。</p>
+
+    <h2 id="faan">番种表</h2>
+    <p>番数累加；达到房间的起和番才能和牌。总番数以满贯（10 番）封顶，满贯牌型直接计满贯。</p>
+    <table class="rules-table faan-table">
+        <thead><tr><th>番种</th><th>港式名称</th><th class="num">番数</th></tr></thead>
+        <tbody>
+            @foreach (var f in Scoring.AllPatterns)
+            {
+                <tr>
+                    <td>@f.Simplified</td>
+                    <td class="zh">@f.Chinese</td>
+                    <td class="num">@(f.Limit ? "满贯" : f.Faan.ToString())</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <ul class="rules-notes">
+        <li><strong>门前清</strong>：没有吃、碰、明杠（暗杠不影响）。</li>
+        <li><strong>平和</strong>：四组都是顺子，将牌不限。</li>
+        <li><strong>混一色</strong>：一种花色加字牌。<strong>清一色</strong>：只有一种花色。</li>
+        <li><strong>小三元</strong>（两组箭牌刻子加箭牌作将）和<strong>小四喜</strong>（三组风牌刻子加风牌作将）已包含其中的箭刻与风刻，不再另计。</li>
+        <li><strong>天和</strong>：庄家起手即和。<strong>地和</strong>：和庄家打出的第一张牌。</li>
+    </ul>
+
+    <h2 id="points">计分</h2>
+    <p>分数只为娱乐，不涉及任何赌注。番数换算为分数：</p>
+    <table class="rules-table points-table">
+        <thead><tr><th>番数</th>@for (int f = 0; f <= 10; f++) { <th class="num">@f</th> }</tr></thead>
+        <tbody><tr><td>分数</td>@for (int f = 0; f <= 10; f++) { <td class="num">@Scoring.BasePoints(f)</td> }</tr></tbody>
+    </table>
+    <p>点炮和牌：打出这张牌的玩家付双倍分数。自摸：其余三家各付一份分数。</p>
+
+    <p><a class="btn btn-primary" href="/mahjong">开始打麻将</a></p>
+</div>

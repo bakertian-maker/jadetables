@@ -1,0 +1,152 @@
+@page "/mahjong"
+@rendermode InteractiveServer
+@inject RoomService Rooms
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>@L["Hong Kong Mahjong · GameWeb"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@L["Play Hong Kong mahjong online for free. Play the computer straight away or open a private room for friends."]" />
+</HeadContent>
+
+<section class="lobby-hero">
+    <div class="wrap lobby-hero-inner">
+        <div>
+            <p class="eyebrow">@L["廣東麻雀 · Hong Kong rules"]</p>
+            <h1>@L["Mahjong"]</h1>
+            <p class="lead">@L["Draw, discard and claim your way to a winning hand of four sets and a pair. Faan scoring, 136 tiles, no flowers."]</p>
+        </div>
+        <div class="lobby-hero-tiles" aria-hidden="true">
+            <MjTile Kind="Tiles.Red" Size="lg" ShowIndex="false" />
+            <MjTile Kind="Tiles.Green" Size="lg" ShowIndex="false" />
+            <MjTile Kind="Tiles.White" Size="lg" ShowIndex="false" />
+        </div>
+    </div>
+</section>
+
+<div class="wrap page-pad">
+    <div class="name-row">
+        <label for="nickname">@L["Your name at the table"]</label>
+        <input id="nickname" maxlength="20" value="@nickname" @onchange="SaveName" placeholder="@L["Guest"]" />
+    </div>
+
+    @if (createError is not null)
+    {
+        <p class="form-error" role="alert">@createError</p>
+    }
+
+    <div class="lobby-grid">
+        <article class="card card-feature">
+            <h2>@L["Play the computer"]</h2>
+            <p>@L["You and three computer players, East round. Starts straight away."]</p>
+            <button class="btn btn-primary btn-lg" @onclick="QuickPlay" disabled="@busy">@L["Play now"]</button>
+        </article>
+
+        <article class="card">
+            <h2>@L["Private room"]</h2>
+            <p>@L["Get a link for up to three friends. Empty seats get computer players."]</p>
+            <div class="form-grid">
+                <label>
+                    @L["Minimum faan"]
+                    <select @bind="minFaan">
+                        <option value="3">@L["3 faan (standard)"]</option>
+                        <option value="1">@L["1 faan (easier)"]</option>
+                        <option value="0">@L["No minimum (learning)"]</option>
+                    </select>
+                </label>
+                <label>
+                    @L["Length"]
+                    <select @bind="rounds">
+                        <option value="1">@L["East round (about 4–8 hands)"]</option>
+                        <option value="4">@L["Full game (four rounds)"]</option>
+                    </select>
+                </label>
+                <label>
+                    @L["Turn timer"]
+                    <select @bind="turnSeconds">
+                        <option value="30">@L["{0} seconds", 30]</option>
+                        <option value="15">@L["{0} seconds", 15]</option>
+                        <option value="0">@L["No timer"]</option>
+                    </select>
+                </label>
+            </div>
+            <button class="btn btn-primary" @onclick="CreateRoom" disabled="@busy">@L["Create room"]</button>
+        </article>
+
+        <article class="card">
+            <h2>@L["Join a room"]</h2>
+            <p>@L["Have a room code from a friend? Enter it here, or just open their link."]</p>
+            <form class="join-form" @onsubmit="Join" @onsubmit:preventDefault>
+                <input aria-label="@L["Room code"]" placeholder="@L["Code, e.g. K7Q2M"]" maxlength="5" @bind="joinCode" class="code-input" />
+                <button class="btn btn-ghost" type="submit">@L["Join"]</button>
+            </form>
+            @if (joinError is not null)
+            {
+                <p class="form-error">@joinError</p>
+            }
+        </article>
+    </div>
+
+    <section class="how">
+        <h2>@L["How a hand works"]</h2>
+        <ol class="how-steps">
+            <li><strong>@L["Draw"]</strong> @L["a tile from the wall on your turn."]</li>
+            <li><strong>@L["Discard"]</strong> @L["one tile, so you keep 13."]</li>
+            <li><strong>@L["Claim"]</strong> @L["another player's discard to make a pung (three alike), kong (four alike) or, from the player before you, a chow (a run of three)."]</li>
+            <li><strong>@L["Win"]</strong> @L["with four sets and a pair worth at least the minimum faan."] <a href="/mahjong/rules">@L["Read the full rules"]</a></li>
+        </ol>
+    </section>
+</div>
+
+@code {
+    string nickname = "";
+    string id = "";
+    int minFaan = 3;
+    int rounds = 1;
+    int turnSeconds = 30;
+    string joinCode = "";
+    string? joinError;
+    string? createError;
+    bool busy;
+
+    sealed record Identity(string Id, string Name);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
+        id = identity.Id;
+        nickname = identity.Name;
+        StateHasChanged();
+    }
+
+    async Task SaveName(ChangeEventArgs e)
+    {
+        nickname = Room.CleanName(e.Value?.ToString());
+        await JS.InvokeVoidAsync("gameweb.setName", nickname);
+    }
+
+    void QuickPlay() => Open(new MjRoomSettings { QuickPlay = true, MinFaan = 3, Rounds = 1, TurnSeconds = 0 });
+
+    void CreateRoom() => Open(new MjRoomSettings { MinFaan = minFaan, Rounds = rounds, TurnSeconds = turnSeconds });
+
+    void Open(MjRoomSettings settings)
+    {
+        var room = Rooms.TryCreateMahjong(settings);
+        if (room is null)
+        {
+            createError = L["The server is busy right now. Please try again in a few minutes."];
+            return;
+        }
+        busy = true;
+        Nav.NavigateTo($"/mahjong/room/{room.Code}");
+    }
+
+    void Join()
+    {
+        var code = joinCode.Trim().ToUpperInvariant();
+        if (code.Length == 0) { joinError = L["Enter a room code."]; return; }
+        if (Rooms.Get(code) is null) { joinError = L["No open room with code {0}.", code]; return; }
+        Nav.NavigateTo($"/mahjong/room/{code}");
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gameweb",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "GameWeb/GameWeb.csproj", "--launch-profile", "http", "--no-launch-browser"],
+      "port": 5096
+    }
+  ]
+}

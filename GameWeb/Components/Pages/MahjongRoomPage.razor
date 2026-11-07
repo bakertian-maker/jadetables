@@ -1,0 +1,188 @@
+@page "/mahjong/room/{Code}"
+@rendermode InteractiveServer
+@implements IDisposable
+@inject RoomService Rooms
+@inject IJSRuntime JS
+@inject GameText T
+
+<PageTitle>@L["Mahjong room {0} · GameWeb", Code.ToUpperInvariant()]</PageTitle>
+
+@if (state == PageState.Loading)
+{
+    <div class="wrap page-pad"><p class="mj-muted">@L["Joining room…"]</p></div>
+}
+else if (state == PageState.NotFound)
+{
+    <div class="wrap page-pad narrow">
+        <h1>@L["Room not found"]</h1>
+        <p>@L["Room {0} doesn't exist or has closed. Rooms close after 10 minutes with nobody in them.", Code.ToUpperInvariant()]</p>
+        <a class="btn btn-primary" href="/mahjong">@L["Back to Mahjong"]</a>
+    </div>
+}
+else if (state == PageState.Full)
+{
+    <div class="wrap page-pad narrow">
+        <h1>@L["This table is full"]</h1>
+        <p>@L["All four seats in room {0} are taken.", Code.ToUpperInvariant()]</p>
+        <a class="btn btn-primary" href="/mahjong">@L["Start your own room"]</a>
+    </div>
+}
+else if (view is { Started: false })
+{
+    <div class="wrap page-pad">
+        <div class="waiting">
+            <div class="waiting-head">
+                <p class="eyebrow">@L["Private room"]</p>
+                <h1>@L["Room"] <span class="room-code">@view.Code</span></h1>
+                <p class="lead">@L["Send the link to up to three friends. Empty seats are filled by computer players when the game starts."]</p>
+                <div class="invite">
+                    <input readonly value="@inviteUrl" aria-label="@L["Invite link"]" @onfocus="SelectInvite" id="invite-link" />
+                    <button class="btn btn-primary" @onclick="CopyInvite">@(copied ? L["Copied"] : L["Copy link"])</button>
+                </div>
+            </div>
+
+            <ol class="seat-list">
+                @for (int i = 0; i < 4; i++)
+                {
+                    var idx = i;
+                    var s = view.LobbySeats[i];
+                    <li class="seat @(s.IsEmpty ? "is-empty" : "") @(idx == view.MySeat ? "is-me" : "")">
+                        <span class="seat-wind" title="@T.WindName(i)">@T.WindGlyph(i)</span>
+                        <span class="seat-name">
+                            @if (s.IsEmpty)
+                            {
+                                <span class="mj-muted">@L["Open seat"]</span>
+                            }
+                            else
+                            {
+                                @T.SeatName(s)
+                                @if (idx == view.MySeat)
+                                {
+                                    <span class="mj-tag">@L["You"]</span>
+                                }
+                                @if (s.IsBot)
+                                {
+                                    <span class="mj-tag">@L["Bot"]</span>
+                                }
+                                else if (s.Connections == 0)
+                                {
+                                    <span class="mj-tag mj-tag-away">@L["Reconnecting"]</span>
+                                }
+                            }
+                        </span>
+                        @if (view.IsHost && !s.IsEmpty && idx != view.MySeat)
+                        {
+                            <button class="btn btn-ghost btn-sm" @onclick="() => room!.RemoveSeat(identity.Id, idx)">@L["Remove"]</button>
+                        }
+                    </li>
+                }
+            </ol>
+
+            <div class="waiting-foot">
+                <p class="mj-muted">
+                    @L["Hong Kong rules · minimum {0} faan", view.Settings.MinFaan] ·
+                    @(view.Settings.Rounds == 1 ? L["East round"] : L["Full game, four rounds"]) ·
+                    @(view.Settings.TurnSeconds == 0 ? L["no turn timer"] : L["{0}s per turn", view.Settings.TurnSeconds])
+                </p>
+                @if (view.IsHost)
+                {
+                    <div class="mj-buttons">
+                        <button class="btn btn-ghost" @onclick="() => room!.AddBot(identity.Id)" disabled="@(!view.LobbySeats.Any(s => s.IsEmpty))">@L["Add computer player"]</button>
+                        <button class="btn btn-primary btn-lg" @onclick="() => room!.Start(identity.Id)">@L["Start game"]</button>
+                    </div>
+                }
+                else
+                {
+                    <p><strong>@L["Waiting for the host to start the game."]</strong></p>
+                }
+            </div>
+        </div>
+    </div>
+}
+else if (view is not null)
+{
+    <MahjongTable View="view" OnAction="Act" OnHint="Hint" HintTile="hint" OnPlayAgain="PlayAgain" />
+}
+
+@code {
+    enum PageState { Loading, NotFound, Full, Ready }
+
+    public sealed record Identity(string Id, string Name);
+
+    [Parameter] public string Code { get; set; } = "";
+
+    PageState state = PageState.Loading;
+    MahjongRoom? room;
+    MjView? view;
+    Identity identity = new("", "");
+    string inviteUrl = "";
+    bool copied;
+    int? hint;
+    int hintVersion = -1;
+    bool connected;
+    volatile bool disposed;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        room = Rooms.Get(Code) as MahjongRoom;
+        if (room is null)
+        {
+            state = PageState.NotFound;
+            StateHasChanged();
+            return;
+        }
+        identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
+        var origin = await JS.InvokeAsync<string>("gameweb.origin");
+        inviteUrl = $"{origin}/mahjong/room/{room.Code}";
+
+        room.Changed += OnRoomChanged;
+        var outcome = room.Connect(identity.Id, identity.Name);
+        connected = outcome is JoinOutcome.Seated or JoinOutcome.Rejoined;
+        state = outcome == JoinOutcome.Full ? PageState.Full : PageState.Ready;
+        view = room.GetView(identity.Id);
+        StateHasChanged();
+    }
+
+    void OnRoomChanged()
+    {
+        if (disposed) return;
+        _ = InvokeAsync(() =>
+        {
+            if (room is null || disposed) return;
+            view = room.GetView(identity.Id);
+            if (view.PhaseVersion != hintVersion) hint = null;
+            StateHasChanged();
+        });
+    }
+
+    void Act(MjAction action)
+    {
+        hint = null;
+        room?.Act(identity.Id, action);
+    }
+
+    void Hint()
+    {
+        if (room is null || view is null) return;
+        hint = room.Hint(identity.Id);
+        hintVersion = view.PhaseVersion;
+    }
+
+    void PlayAgain() => room?.PlayAgain(identity.Id);
+
+    async Task CopyInvite()
+    {
+        copied = await JS.InvokeAsync<bool>("gameweb.copy", inviteUrl);
+    }
+
+    async Task SelectInvite() => await JS.InvokeVoidAsync("gameweb.select", "invite-link");
+
+    public void Dispose()
+    {
+        disposed = true;
+        if (room is null) return;
+        room.Changed -= OnRoomChanged;
+        if (connected) room.Disconnect(identity.Id);
+    }
+}

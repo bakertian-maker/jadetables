@@ -1,0 +1,456 @@
+@* The four-seat mahjong table, drawn from the viewer's seat (their hand at the bottom). *@
+@inject GameText T
+
+<div class="mj-table">
+    <div class="mj-topbar">
+        <div class="mj-topbar-info">
+            <span class="mj-chip">@L["{0} round · Hand {1}", T.WindName(View.PrevailingWind), View.HandNumber]</span>
+            <span class="mj-chip">@L["Wall"] <strong>@View.WallCount</strong></span>
+            <span class="mj-chip mj-hide-sm">@L["Min {0} faan", View.Settings.MinFaan]</span>
+            <span class="mj-chip mj-hide-sm">@L["Room"] @View.Code</span>
+        </div>
+        <div class="mj-topbar-links">
+            <a href="/mahjong/rules" target="_blank">@L["Rules"]</a>
+            <a href="/mahjong">@L["Leave"]</a>
+        </div>
+    </div>
+
+    <div class="mj-board">
+        @Opponent(SeatAt(2), "top")
+        @Opponent(SeatAt(3), "left")
+        @Opponent(SeatAt(1), "right")
+
+        <div class="mj-center">
+            @Pond(SeatAt(2), "top")
+            @Pond(SeatAt(3), "left")
+            <div class="mj-compass" aria-label="@L["Table centre"]">
+                @for (int p = 0; p < 4; p++)
+                {
+                    var s = SeatAt(p);
+                    <span class="mj-compass-wind pos-@PosName(p) @(View.CurrentSeat == s && IsActivePhase ? "is-active" : "")">@T.WindGlyph(View.Seats[s].Wind)</span>
+                }
+                <div class="mj-compass-core">
+                    <span class="mj-compass-round">@T.WindGlyph(View.PrevailingWind)</span>
+                    <span class="mj-compass-wall">@L["{0} left", View.WallCount]</span>
+                </div>
+            </div>
+            @Pond(SeatAt(1), "right")
+            @Pond(SeatAt(0), "bottom")
+        </div>
+
+        <div class="mj-me">
+            <div class="mj-actions" aria-live="polite">
+                @ActionBar()
+                @if (View.SecondsLeft is not null && View.SecondsTotal > 0)
+                {
+                    <div class="mj-timer" @key="View.PhaseVersion">
+                        <div class="mj-timer-fill" style="@TimerStyle()"></div>
+                    </div>
+                }
+            </div>
+
+            @if (Me is not null)
+            {
+                <div class="mj-myrow">
+                    @if (Me.Melds.Count > 0)
+                    {
+                        <div class="mj-melds mine">
+                            @foreach (var m in Me.Melds)
+                            {
+                                @MeldView(m, "sm")
+                            }
+                        </div>
+                    }
+                    <div class="mj-hand @(CanDiscard ? "can-discard" : "")">
+                        @for (int i = 0; i < HandItems.Count; i++)
+                        {
+                            var idx = i;
+                            var (tile, drawn) = HandItems[i];
+                            var hinted = HintTile == tile && !HandItems.Take(idx).Any(h => h.Tile == tile);
+                            @if (CanDiscard)
+                            {
+                                <MjTile Kind="tile" Size="lg" Selected="selected == idx" Hinted="hinted" Extra="@(drawn ? "is-drawn" : null)"
+                                        OnClick="() => ClickTile(idx)" />
+                            }
+                            else
+                            {
+                                <MjTile Kind="tile" Size="lg" Extra="@(drawn ? "is-drawn" : null)" />
+                            }
+                        }
+                    </div>
+                </div>
+                @Plate(Me.Seat, "bottom")
+            }
+        </div>
+    </div>
+
+    @if (View.Log.Count > 0)
+    {
+        <details class="mj-log">
+            <summary>@L["Game log"]</summary>
+            <ol>
+                @foreach (var line in View.Log.Reverse())
+                {
+                    <li>@T.LogLine(line, NameOf)</li>
+                }
+            </ol>
+        </details>
+    }
+
+    @if (View.Phase == MjPhase.HandOver && View.Result is { } result)
+    {
+        @ResultDialog(result)
+    }
+    @if (View.Phase == MjPhase.MatchOver)
+    {
+        @MatchOverDialog()
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public MjView View { get; set; } = default!;
+    [Parameter] public EventCallback<MjAction> OnAction { get; set; }
+    [Parameter] public EventCallback OnHint { get; set; }
+    [Parameter] public EventCallback OnPlayAgain { get; set; }
+    [Parameter] public int? HintTile { get; set; }
+
+    int? selected;
+    int lastPhaseVersion = -1;
+    string timerStyle = "";
+
+    int Viewer => View.MySeat >= 0 ? View.MySeat : 0;
+    string NameOf(int seat) => seat >= 0 && seat < View.Seats.Count ? T.SeatName(View.Seats[seat]) : "";
+    int SeatAt(int pos) => (Viewer + pos) % 4;
+    static string PosName(int pos) => pos switch { 0 => "bottom", 1 => "right", 2 => "top", _ => "left" };
+    MjSeatView? Me => View.MySeat >= 0 ? View.Seats[View.MySeat] : null;
+    bool IsActivePhase => View.Phase is MjPhase.Turn or MjPhase.Claim or MjPhase.RobKong;
+    bool CanDiscard => Me is not null && View.Phase == MjPhase.Turn && View.CurrentSeat == View.MySeat;
+
+    /// <summary>My hand in display order (drawn tile last), rebuilt once per parameter update.</summary>
+    List<(int Tile, bool Drawn)> HandItems = [];
+
+    List<(int Tile, bool Drawn)> BuildHandItems()
+    {
+        {
+            if (Me?.Hand is null) return [];
+            var main = Me.Hand.ToList();
+            var items = new List<(int, bool)>();
+            if (View.DrawnTile is int d && main.Remove(d))
+            {
+                items.AddRange(main.Select(t => (t, false)));
+                items.Add((d, true));
+            }
+            else items.AddRange(main.Select(t => (t, false)));
+            return items;
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        HandItems = BuildHandItems();
+        if (View.PhaseVersion != lastPhaseVersion)
+        {
+            lastPhaseVersion = View.PhaseVersion;
+            selected = null;
+            if (View.SecondsLeft is double left && View.SecondsTotal > 0)
+            {
+                var from = Math.Clamp(left / View.SecondsTotal * 100, 0, 100);
+                timerStyle = FormattableString.Invariant($"--from:{from:0.#}%;animation-duration:{left:0.##}s");
+            }
+        }
+    }
+
+    string TimerStyle() => timerStyle;
+
+    async Task ClickTile(int idx)
+    {
+        if (selected == idx) await Discard(HandItems[idx].Tile);
+        else selected = idx;
+    }
+
+    async Task Discard(int tile)
+    {
+        selected = null;
+        await OnAction.InvokeAsync(new MjAction(MjActionType.Discard, tile));
+    }
+
+    Task Do(MjActionType type, int tile = -1) => OnAction.InvokeAsync(new MjAction(type, tile));
+
+    RenderFragment ActionBar() => __builder =>
+    {
+        if (Me is null)
+        {
+            <p class="mj-status">@L["You're watching this game."]</p>
+            return;
+        }
+        if (CanDiscard && View.Turn is { } turn)
+        {
+            <p class="mj-status"><strong>@L["Your turn."]</strong> @(selected is null ? L["Tap a tile to pick it, tap it again to discard."] : L["Tap again, or press Discard."])</p>
+            <div class="mj-buttons">
+                @if (turn.CanSelfDraw)
+                {
+                    <button class="btn btn-win" @onclick="() => Do(MjActionType.SelfDrawWin)">@L["Mahjong! Self-drawn · {0} faan", turn.SelfDrawScore!.Total]</button>
+                }
+                @foreach (var k in turn.ConcealedKongs)
+                {
+                    var kk = k;
+                    <button class="btn btn-claim" @onclick="() => Do(MjActionType.ConcealedKong, kk)">@L["Kong"] <MjTile Kind="kk" Size="xs" ShowIndex="false" /></button>
+                }
+                @foreach (var k in turn.AddKongs)
+                {
+                    var kk = k;
+                    <button class="btn btn-claim" @onclick="() => Do(MjActionType.AddKong, kk)">@L["Add kong"] <MjTile Kind="kk" Size="xs" ShowIndex="false" /></button>
+                }
+                @if (selected is int sIdx && sIdx < HandItems.Count)
+                {
+                    <button class="btn btn-primary" @onclick="() => Discard(HandItems[sIdx].Tile)">@L["Discard"]</button>
+                }
+                <button class="btn btn-ghost" @onclick="OnHint">@L["Hint"]</button>
+            </div>
+            return;
+        }
+        if (View.Claim is { } c)
+        {
+            <p class="mj-status">
+                @(View.Phase == MjPhase.RobKong ? L["{0} is adding to a kong with", NameOf(c.FromSeat)] : L["{0} discarded", NameOf(c.FromSeat)])
+                <MjTile Kind="c.Tile" Size="sm" Highlight="true" />
+            </p>
+            <div class="mj-buttons">
+                @if (c.Win)
+                {
+                    <button class="btn btn-win" @onclick="() => Do(MjActionType.Win)">@L["Mahjong! Win · {0} faan", c.WinScore!.Total]</button>
+                }
+                @if (c.Kong)
+                {
+                    <button class="btn btn-claim" @onclick="() => Do(MjActionType.Kong)">@L["Kong 槓"]</button>
+                }
+                @if (c.Pung)
+                {
+                    <button class="btn btn-claim" @onclick="() => Do(MjActionType.Pung)">@L["Pung 碰"]</button>
+                }
+                @foreach (var start in c.Chows)
+                {
+                    var st = start;
+                    <button class="btn btn-claim btn-chow" @onclick="() => Do(MjActionType.Chow, st)">
+                        @L["Chow 上"]
+                        <span class="mj-mini-run">
+                            @for (int k = st; k < st + 3; k++)
+                            {
+                                <MjTile Kind="k" Size="xs" ShowIndex="false" Highlight="k == c.Tile" />
+                            }
+                        </span>
+                    </button>
+                }
+                <button class="btn btn-ghost" @onclick="() => Do(MjActionType.Pass)">@L["Pass"]</button>
+            </div>
+            return;
+        }
+        if (View.Phase is MjPhase.Claim or MjPhase.RobKong)
+        {
+            <p class="mj-status">@(View.Responded ? L["Waiting for the other players…"] : L["{0} discarded. Others may claim it…", NameOf(View.LastDiscarder)])</p>
+            return;
+        }
+        if (View.Phase == MjPhase.Turn)
+        {
+            <p class="mj-status"><span class="mj-thinking">@L["{0} is playing", NameOf(View.CurrentSeat)]</span></p>
+            return;
+        }
+        <p class="mj-status">&nbsp;</p>
+    };
+
+    RenderFragment Plate(int seat, string pos) => __builder =>
+    {
+        var s = View.Seats[seat];
+        bool active = View.CurrentSeat == seat && IsActivePhase;
+        <div class="mj-plate @(active ? "is-active" : "") @(s.IsDealer ? "is-dealer" : "")">
+            <span class="mj-plate-wind" title="@L["{0} seat", T.WindName(s.Wind)]">@T.WindGlyph(s.Wind)</span>
+            <span class="mj-plate-name">@T.SeatName(s)</span>
+            @if (s.IsBot)
+            {
+                <span class="mj-tag">@L["Bot"]</span>
+            }
+            else if (s.Away)
+            {
+                <span class="mj-tag mj-tag-away">@L["Away"]</span>
+            }
+            @if (s.IsDealer)
+            {
+                <span class="mj-tag mj-tag-dealer">@L["Dealer"]</span>
+            }
+            <span class="mj-plate-score">@s.Score.ToString("+#;-#;0")</span>
+        </div>
+    };
+
+    RenderFragment Opponent(int seat, string pos) => __builder =>
+    {
+        var s = View.Seats[seat];
+        <div class="mj-opp pos-@pos">
+            @Plate(seat, pos)
+            <div class="mj-backs" aria-label="@L["{0} tiles", s.HandCount]">
+                @if (s.Hand is not null)
+                {
+                    @foreach (var t in s.Hand)
+                    {
+                        <MjTile Kind="t" Size="xs" ShowIndex="false" />
+                    }
+                }
+                else
+                {
+                    @for (int i = 0; i < s.HandCount; i++)
+                    {
+                        <MjTile Back="true" Size="xs" />
+                    }
+                    <span class="mj-count">@s.HandCount</span>
+                }
+            </div>
+            @if (s.Melds.Count > 0)
+            {
+                <div class="mj-melds">
+                    @foreach (var m in s.Melds)
+                    {
+                        @MeldView(m, "xs")
+                    }
+                </div>
+            }
+        </div>
+    };
+
+    RenderFragment Pond(int seat, string pos) => __builder =>
+    {
+        var s = View.Seats[seat];
+        <div class="mj-pond pond-@pos" aria-label="@L["{0}'s discards", T.SeatName(s)]">
+            @for (int i = 0; i < s.Discards.Count; i++)
+            {
+                var d = s.Discards[i];
+                bool last = seat == View.LastDiscarder && i == s.Discards.Count - 1 && View.Phase is MjPhase.Claim or MjPhase.RobKong or MjPhase.Turn;
+                <MjTile Kind="d.Tile" Size="sm" ShowIndex="false" Dim="d.Claimed" Highlight="last && !d.Claimed" />
+            }
+        </div>
+    };
+
+    RenderFragment MeldView(Meld m, string size) => __builder =>
+    {
+        var tiles = m.TilesInMeld.ToList();
+        bool markedClaim = false;
+        <span class="mj-meld">
+            @for (int i = 0; i < tiles.Count; i++)
+            {
+                bool back = m.Type == MeldType.Kong && m.Concealed && (i == 0 || i == 3);
+                bool claimed = !markedClaim && m.ClaimedTile == tiles[i];
+                if (claimed) markedClaim = true;
+                <MjTile Kind="tiles[i]" Back="back" Size="@size" ShowIndex="false" Extra="@(claimed ? "is-claimed" : null)" />
+            }
+        </span>
+    };
+
+    RenderFragment ResultDialog(HandResult r) => __builder =>
+    {
+        int me = View.MySeat;
+        int readyCount = View.Seats.Count(s => s.Ready);
+        <div class="mj-overlay" role="dialog" aria-modal="true" aria-labelledby="mj-result-title">
+            <div class="mj-dialog">
+                @if (r.IsDraw)
+                {
+                    <h2 id="mj-result-title">@L["Draw game"]</h2>
+                    <p class="mj-dialog-sub">@L["The wall ran out before anyone completed a hand. The dealer deals again."]</p>
+                }
+                else
+                {
+                    <h2 id="mj-result-title">@(r.Winner == me ? L["You win!"] : L["{0} wins", NameOf(r.Winner)])</h2>
+                    <p class="mj-dialog-sub">@(r.SelfDrawn ? L["Self-drawn"] : L["On {0}'s discard", NameOf(r.Discarder)])</p>
+                    <div class="mj-winhand">
+                        @foreach (var m in r.Melds[r.Winner])
+                        {
+                            @MeldView(m, "sm")
+                        }
+                        <span class="mj-meld">
+                            @{ bool marked = false; }
+                            @foreach (var t in r.Hands[r.Winner])
+                            {
+                                bool hl = !marked && t == r.WinTile;
+                                if (hl) marked = true;
+                                <MjTile Kind="t" Size="sm" Highlight="hl" />
+                            }
+                        </span>
+                    </div>
+                    <table class="mj-faan">
+                        <tbody>
+                            @foreach (var item in r.Score!.Items)
+                            {
+                                <tr>
+                                    <td>@T.FaanName(item)</td>
+                                    @if (!Languages.IsChinese)
+                                    {
+                                        <td class="zh">@T.FaanChinese(item)</td>
+                                    }
+                                    <td class="num">@(item.Limit ? L["Limit"] : item.Faan.ToString())</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="@(Languages.IsChinese ? 1 : 2)">@L["Total"] @(r.Score.IsLimit ? L["(limit)"] : "")</td>
+                                <td class="num">@L["{0} faan", r.Score.Total]</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                }
+                <table class="mj-scores">
+                    <thead><tr><th>@L["Player"]</th><th class="num">@L["This hand"]</th><th class="num">@L["Total"]</th></tr></thead>
+                    <tbody>
+                        @for (int s = 0; s < 4; s++)
+                        {
+                            var seat = View.Seats[s];
+                            <tr class="@(s == me ? "is-me" : "")">
+                                <td>
+                                    <span class="mj-ready-dot @(seat.Ready ? "on" : "")" title="@(seat.Ready ? L["Ready"] : L["Not ready"])"></span>
+                                    @T.SeatName(seat)
+                                </td>
+                                <td class="num @(r.Delta[s] > 0 ? "pos" : r.Delta[s] < 0 ? "neg" : "")">@r.Delta[s].ToString("+#;-#;0")</td>
+                                <td class="num">@seat.Score</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="mj-dialog-actions">
+                    @if (me >= 0 && !View.Seats[me].Ready)
+                    {
+                        <button class="btn btn-primary" @onclick="() => Do(MjActionType.Ready)">@L["Next hand"]</button>
+                    }
+                    else
+                    {
+                        <span class="mj-muted">@L["Waiting for players · {0}/4 ready", readyCount]</span>
+                    }
+                </div>
+            </div>
+        </div>
+    };
+
+    RenderFragment MatchOverDialog() => __builder =>
+    {
+        var standings = View.Seats.OrderByDescending(s => s.Score).ToList();
+        <div class="mj-overlay" role="dialog" aria-modal="true" aria-labelledby="mj-final-title">
+            <div class="mj-dialog">
+                <h2 id="mj-final-title">@L["Match over"]</h2>
+                <p class="mj-dialog-sub">@(standings[0].Seat == View.MySeat ? L["You finished first. 恭喜!"] : L["{0} finished first.", T.SeatName(standings[0])])</p>
+                <ol class="mj-standings">
+                    @foreach (var s in standings)
+                    {
+                        <li class="@(s.Seat == View.MySeat ? "is-me" : "")"><span>@T.SeatName(s)</span><strong>@s.Score</strong></li>
+                    }
+                </ol>
+                <div class="mj-dialog-actions">
+                    @if (View.IsHost)
+                    {
+                        <button class="btn btn-primary" @onclick="OnPlayAgain">@L["Play again"]</button>
+                    }
+                    else
+                    {
+                        <span class="mj-muted">@L["The host can start another match."]</span>
+                    }
+                    <a class="btn btn-ghost" href="/mahjong">@L["Back to lobby"]</a>
+                </div>
+            </div>
+        </div>
+    };
+}

@@ -1,0 +1,144 @@
+@* One mahjong tile drawn as SVG. Kind is 0..33 (see Tiles); Back shows the reverse. *@
+@inject GameText T
+@* Playable tiles are real buttons, so Enter and Space work and screen readers announce them. *@
+@if (OnClick.HasDelegate)
+{
+    <button type="button" class="@CssClass" title="@TitleOrNull" aria-label="@Label" aria-pressed="@(Selected ? "true" : "false")" @onclick="OnClick">
+        @Face()
+    </button>
+}
+else
+{
+    <span class="@CssClass" title="@TitleOrNull" role="img" aria-label="@Label">
+        @Face()
+    </span>
+}
+
+@code {
+    const string R = "#c23b22", G = "#1f7a4d", B = "#24509a";
+
+    [Parameter] public int Kind { get; set; }
+    [Parameter] public bool Back { get; set; }
+    /// <summary>xs, sm, md (default) or lg.</summary>
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public bool Selected { get; set; }
+    [Parameter] public bool Highlight { get; set; }
+    [Parameter] public bool Dim { get; set; }
+    [Parameter] public bool Hinted { get; set; }
+    [Parameter] public bool ShowIndex { get; set; } = true;
+    [Parameter] public string? Extra { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    string CssClass => string.Join(' ', new[]
+    {
+        "mj-tile", "mj-" + Size, Back ? "is-back" : null, Selected ? "is-selected" : null,
+        Highlight ? "is-highlight" : null, Dim ? "is-dim" : null, Hinted ? "is-hinted" : null,
+        OnClick.HasDelegate ? "is-clickable" : null, Extra,
+    }.Where(s => s is not null));
+
+    string? TitleOrNull => Back ? null : TitleText;
+
+    string Label => Back ? L["Hidden tile"] : T.TileName(Kind);
+
+    RenderFragment Face() => __builder =>
+    {
+    @if (!Back)
+    {
+        <svg viewBox="0 0 60 80" aria-hidden="true">
+            @switch (Tiles.SuitOf(Kind))
+            {
+                case Suit.Characters:
+                    <g><text x="30" y="35" class="t-num">@Tiles.Numeral(Tiles.Rank(Kind))</text></g>
+                    <g><text x="30" y="70" class="t-wan">萬</text></g>
+                    break;
+                case Suit.Dots:
+                    @foreach (var (x, y, c) in DotLayout(Tiles.Rank(Kind)))
+                    {
+                        var r = DotRadius(Tiles.Rank(Kind));
+                        <circle cx="@x" cy="@y" r="@r" fill="@c" />
+                        <circle cx="@x" cy="@y" r="@(r * 0.62)" fill="#fbf8ef" />
+                        <circle cx="@x" cy="@y" r="@(r * 0.3)" fill="@c" />
+                    }
+                    break;
+                case Suit.Bamboo:
+                    @if (Tiles.Rank(Kind) == 1)
+                    {
+                        <ellipse cx="30" cy="47" rx="12" ry="15" fill="@G" />
+                        <path d="M22 44 q8 10 16 0" stroke="#fbf8ef" stroke-width="2" fill="none" />
+                        <circle cx="30" cy="27" r="7.5" fill="@R" />
+                        <circle cx="27.5" cy="25.5" r="1.6" fill="#fbf8ef" />
+                        <path d="M37 26 l7 2.5 l-7 2.5 z" fill="#c9a24a" />
+                        <path d="M30 61 L19 75 M30 61 L30 77 M30 61 L41 75" stroke="@G" stroke-width="3" stroke-linecap="round" />
+                    }
+                    else
+                    {
+                        var h = StickHeight(Tiles.Rank(Kind));
+                        @foreach (var (x, y, c) in BambooLayout(Tiles.Rank(Kind)))
+                        {
+                            <rect x="@(x - 3.6)" y="@(y - h / 2)" width="7.2" height="@h" rx="3.2" fill="@c" />
+                            <rect x="@(x - 4.4)" y="@(y - 1.2)" width="8.8" height="2.4" rx="1.2" fill="@c" />
+                            <line x1="@x" y1="@(y - h / 2 + 3)" x2="@x" y2="@(y + h / 2 - 3)" stroke="#fbf8ef" stroke-width="1.1" opacity="0.7" />
+                        }
+                    }
+                    break;
+                case Suit.Wind:
+                    <g><text x="30" y="56" class="t-big t-ink">@Tiles.ChineseName(Kind)</text></g>
+                    break;
+                default:
+                    @if (Kind == Tiles.White)
+                    {
+                        <rect x="12" y="13" width="36" height="54" rx="4" fill="none" stroke="#2c5aa0" stroke-width="3.5" />
+                        <rect x="18" y="19" width="24" height="42" rx="2" fill="none" stroke="#2c5aa0" stroke-width="1.2" />
+                    }
+                    else
+                    {
+                        <g><text x="30" y="57" class="t-big @(Kind == Tiles.Red ? "t-red" : "t-green")">@Tiles.ChineseName(Kind)</text></g>
+                    }
+                    break;
+            }
+            @if (ShowIndex)
+            {
+                <g><text x="5" y="11" class="t-index">@IndexLabel</text></g>
+            }
+        </svg>
+    }
+    };
+
+    string TitleText => Languages.IsChinese ? T.TileName(Kind) : Tiles.Name(Kind) + " " + Tiles.ChineseName(Kind);
+
+    string IndexLabel => Tiles.SuitOf(Kind) switch
+    {
+        Suit.Characters or Suit.Dots or Suit.Bamboo => Tiles.Rank(Kind).ToString(),
+        Suit.Wind => "ESWN"[Kind - Tiles.East].ToString(),
+        _ => "",
+    };
+
+    static double DotRadius(int rank) => rank switch { 1 => 17, 2 => 11, 3 => 9.5, 4 => 10, 5 => 8.5, 6 => 8.2, 7 => 7.2, 8 => 7.4, _ => 7 };
+
+    static (double, double, string)[] DotLayout(int rank) => rank switch
+    {
+        1 => [(30, 40, R)],
+        2 => [(30, 24, G), (30, 57, B)],
+        3 => [(15, 19, B), (30, 40, R), (45, 61, G)],
+        4 => [(18, 24, B), (42, 24, G), (18, 56, G), (42, 56, B)],
+        5 => [(17, 20, B), (43, 20, G), (30, 40, R), (17, 60, G), (43, 60, B)],
+        6 => [(19, 16, G), (41, 16, G), (19, 44, R), (41, 44, R), (19, 65, R), (41, 65, R)],
+        7 => [(14, 13, G), (30, 21, G), (46, 29, G), (19, 50, R), (41, 50, R), (19, 67, R), (41, 67, R)],
+        8 => [(19, 13, B), (41, 13, B), (19, 31, B), (41, 31, B), (19, 49, B), (41, 49, B), (19, 67, B), (41, 67, B)],
+        _ => [(14, 16, B), (30, 16, B), (46, 16, B), (14, 40, R), (30, 40, R), (46, 40, R), (14, 64, G), (30, 64, G), (46, 64, G)],
+    };
+
+    static double StickHeight(int rank) => rank switch { 7 or 9 => 17, _ => 23 };
+
+    static (double, double, string)[] BambooLayout(int rank) => rank switch
+    {
+        2 => [(30, 23, G), (30, 57, G)],
+        3 => [(30, 23, G), (19, 57, G), (41, 57, G)],
+        4 => [(19, 23, G), (41, 23, G), (19, 57, G), (41, 57, G)],
+        5 => [(16, 23, G), (44, 23, G), (30, 40, R), (16, 57, G), (44, 57, G)],
+        6 => [(15, 23, G), (30, 23, G), (45, 23, G), (15, 57, G), (30, 57, G), (45, 57, G)],
+        7 => [(30, 14, R), (15, 40, G), (30, 40, G), (45, 40, G), (15, 64, G), (30, 64, G), (45, 64, G)],
+        8 => [(12, 23, G), (24, 23, G), (36, 23, G), (48, 23, G), (12, 57, G), (24, 57, G), (36, 57, G), (48, 57, G)],
+        _ => [(15, 15, G), (30, 15, R), (45, 15, G), (15, 40, G), (30, 40, R), (45, 40, G), (15, 65, G), (30, 65, R), (45, 65, G)],
+    };
+}

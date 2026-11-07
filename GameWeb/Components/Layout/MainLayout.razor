@@ -1,0 +1,53 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Nav
+
+<div class="site">
+    <header class="site-header">
+        <div class="wrap header-inner">
+            <a class="brand" href="/">
+                <span class="brand-tile" aria-hidden="true">麻</span>
+                <span class="brand-name">GameWeb</span>
+            </a>
+            <nav class="site-nav" aria-label="@L["Main"]">
+                <NavLink href="/" Match="NavLinkMatch.All">@L["Home"]</NavLink>
+                <NavLink href="/mahjong" Match="NavLinkMatch.All">@L["Mahjong"]</NavLink>
+                <NavLink href="/mahjong/rules">@L["Rules"]</NavLink>
+                <span class="lang-switch" role="group" aria-label="Language / 語言">
+                    @foreach (var (culture, label, name) in Languages.Menu)
+                    {
+                        if (culture == Languages.CurrentCulture)
+                        {
+                            <span class="lang-opt is-current" lang="@culture" title="@name" aria-current="true">@label</span>
+                        }
+                        else
+                        {
+                            <a class="lang-opt" href="@SwitchHref(culture)" data-enhance-nav="false" hreflang="@culture" lang="@culture" title="@name" aria-label="@name">@label</a>
+                        }
+                    }
+                </span>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-main">
+        @Body
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap footer-inner">
+            <span>@L["GameWeb · Classic Chinese games with friends"]</span>
+            <span>@L["Free to play. No sign-up, no real-money betting."]</span>
+        </div>
+    </footer>
+</div>
+
+<div id="blazor-error-ui">
+    @L["Something went wrong."]
+    <a href="" class="reload">@L["Reload"]</a>
+    <a class="dismiss">×</a>
+</div>
+
+@code {
+    string SwitchHref(string culture) =>
+        $"/culture/set?culture={culture}&redirectUri={Uri.EscapeDataString("/" + Nav.ToBaseRelativePath(Nav.Uri))}";
+}

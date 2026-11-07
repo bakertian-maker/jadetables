@@ -1,0 +1,74 @@
+@page "/"
+@inject GameCatalog Catalog
+
+<PageTitle>@L["GameWeb · Classic Chinese games with friends"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@L["Play mahjong and other classic Chinese games online with friends or the computer. Free, no sign-up."]" />
+</HeadContent>
+
+<section class="hero">
+    <div class="wrap hero-inner">
+        <div class="hero-copy">
+            <p class="eyebrow">@L["Free · no sign-up · play in your browser"]</p>
+            <h1>@L["Classic Chinese games, one link away."]</h1>
+            <p class="lead">@L["Open a private room, send the link to friends and play on any phone or laptop. Short a player? A computer player takes the empty seat."]</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary btn-lg" href="/mahjong">@L["Play Mahjong"]</a>
+                <a class="btn btn-ghost-light btn-lg" href="/mahjong/rules">@L["Learn the rules"]</a>
+            </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+            <div class="hero-fan">
+                <MjTile Kind="0" Size="lg" />
+                <MjTile Kind="10" Size="lg" />
+                <MjTile Kind="20" Size="lg" />
+                <MjTile Kind="Tiles.East" Size="lg" />
+                <MjTile Kind="Tiles.Red" Size="lg" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="wrap page-pad">
+    <h2 class="section-title">@L["Games"]</h2>
+    <div class="game-grid">
+        @foreach (var g in Catalog.Games)
+        {
+            var playable = g.Status == GameStatus.Playable;
+            <article class="game-card @(playable ? "" : "is-soon")">
+                <div class="game-card-head">
+                    <span class="game-zh">@(Languages.Current == Script.Simplified ? g.SimplifiedName : g.ChineseName)</span>
+                    @if (!playable)
+                    {
+                        <span class="mj-tag">@L["In development"]</span>
+                    }
+                </div>
+                <h3>@L[g.Name]</h3>
+                <p class="game-tagline">@L[g.Tagline]</p>
+                <p>@L[g.Description]</p>
+                <div class="game-card-foot">
+                    <span class="mj-muted">@L[g.Players]</span>
+                    @if (playable)
+                    {
+                        <a class="btn btn-primary" href="@g.Url">@L["Play"]</a>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+</section>
+
+<section class="wrap page-pad features">
+    <div class="feature">
+        <h3>@L["Private rooms"]</h3>
+        <p>@L["Every room gets a short code and a link. Anyone with the link can sit down."]</p>
+    </div>
+    <div class="feature">
+        <h3>@L["Computer players"]</h3>
+        <p>@L["Practise alone, or fill empty seats. If someone drops out, a computer player keeps their seat warm for them."]</p>
+    </div>
+    <div class="feature">
+        <h3>@L["Made for beginners too"]</h3>
+        <p>@L["Tile numbers in the corner, a hint button and plain-English rules with the Chinese names alongside."]</p>
+    </div>
+</section>

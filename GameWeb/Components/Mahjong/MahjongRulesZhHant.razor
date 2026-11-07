@@ -1,0 +1,97 @@
+@* 繁體中文（港式用語）規則，顯示在 /mahjong/rules。 *@
+
+<div class="wrap page-pad rules">
+    <p class="eyebrow">廣東麻雀 · 港式規則</p>
+    <h1>港式麻雀規則</h1>
+    <p class="lead">目標是最先湊成四組牌加一對眼，而且番數不少於房間設定的起糊番數（通常為 3 番）。</p>
+
+    <nav class="rules-toc" aria-label="本頁目錄">
+        <a href="#tiles">牌張</a><a href="#play">打法</a><a href="#claims">上碰槓</a><a href="#winning">食糊</a><a href="#faan">番數表</a><a href="#points">計分</a>
+    </nav>
+
+    <h2 id="tiles">牌張</h2>
+    <p>共 136 張：34 種牌，每種 4 張。GameWeb 不使用花牌。</p>
+    <div class="tile-groups">
+        <div class="tile-group">
+            <h3>萬子</h3>
+            <div class="tile-row">@for (int k = 0; k < 9; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>筒子</h3>
+            <div class="tile-row">@for (int k = 9; k < 18; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>索子</h3>
+            <div class="tile-row">@for (int k = 18; k < 27; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>風牌與三元牌</h3>
+            <div class="tile-row">@for (int k = 27; k < 34; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+            <p class="mj-muted">東、南、西、北 · 紅中、發財、白板</p>
+        </div>
+    </div>
+
+    <h2 id="play">打法</h2>
+    <ol>
+        <li>每人起手 13 張。莊家（東）多摸一張，先打出一張牌。</li>
+        <li>按逆時針方向（東 → 南 → 西 → 北）輪流。輪到你時，從牌牆摸一張，再打出一張。</li>
+        <li>手上有四張相同的牌可以暗槓；已碰的牌摸到第四張可以加槓。槓牌後從牌牆尾補摸一張。</li>
+        <li>牌牆摸完仍無人食糊即為流局，原莊家繼續做莊。</li>
+        <li>莊家食糊或流局時連莊；否則由下家做莊。莊家輪轉一圈後，圈風隨之改變。</li>
+    </ol>
+
+    <h2 id="claims">上、碰、槓</h2>
+    <p>有人打出一張牌後，其他玩家有幾秒時間決定是否要這張牌：</p>
+    <table class="rules-table">
+        <thead><tr><th>動作</th><th>誰可以</th><th>優先次序</th></tr></thead>
+        <tbody>
+            <tr><td>食糊</td><td>這張牌令自己食糊的任何人</td><td>最高。兩人同時可食時，按次序由較先者食糊（截糊）。</td></tr>
+            <tr><td>槓 / 碰</td><td>手上有三張 / 兩張相同牌的人</td><td>高於上</td></tr>
+            <tr><td>上</td><td>只限打牌者的下家</td><td>最低</td></tr>
+        </tbody>
+    </table>
+    <p>上、碰、槓的牌要攤在檯面。上或碰後直接打出一張牌；槓後先補摸一張。加槓時，若有人正好食這張牌，可以搶槓食糊。</p>
+
+    <h2 id="winning">食糊</h2>
+    <p>食糊的牌型為四組牌加一對眼。一組牌可以是順子（同一門三張相連，如三四五索）、刻子（三張相同）或槓（四張相同）。唯一特殊牌型是十三么：所有么九牌及字牌各一張，再加其中任何一張成對。</p>
+    <div class="example-hand" aria-label="食糊例子">
+        <span class="mj-meld"><MjTile Kind="1" Size="sm" /><MjTile Kind="2" Size="sm" /><MjTile Kind="3" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="13" Size="sm" /><MjTile Kind="14" Size="sm" /><MjTile Kind="15" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="24" Size="sm" /><MjTile Kind="24" Size="sm" /><MjTile Kind="24" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="Tiles.Red" Size="sm" /><MjTile Kind="Tiles.Red" Size="sm" /><MjTile Kind="Tiles.Red" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="Tiles.East" Size="sm" /><MjTile Kind="Tiles.East" Size="sm" /></span>
+    </div>
+    <p class="mj-muted">兩組順子、一組七索刻子、一組紅中刻子，加一對東風作眼。</p>
+
+    <h2 id="faan">番數表</h2>
+    <p>番數相加；要達到房間的起糊番數才可以食糊。總番數以滿貫（10 番）為上限，爆棚牌型直接計滿貫。</p>
+    <table class="rules-table faan-table">
+        <thead><tr><th>番種</th><th class="num">番數</th></tr></thead>
+        <tbody>
+            @foreach (var f in Scoring.AllPatterns)
+            {
+                <tr>
+                    <td class="zh">@f.Chinese</td>
+                    <td class="num">@(f.Limit ? "滿貫" : f.Faan.ToString())</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <ul class="rules-notes">
+        <li><strong>門前清</strong>：沒有上、碰、明槓（暗槓不影響）。</li>
+        <li><strong>平糊</strong>：四組都是順子，眼不限。</li>
+        <li><strong>混一色</strong>：一門花色加字牌。<strong>清一色</strong>：只有一門花色。</li>
+        <li><strong>小三元</strong>（兩組三元牌刻子加三元牌作眼）及<strong>小四喜</strong>（三組風牌刻子加風牌作眼）已包括其中的三元牌與風牌番數，不再另計。</li>
+        <li><strong>天糊</strong>：莊家起手即食糊。<strong>地糊</strong>：食莊家打出的第一張牌。</li>
+    </ul>
+
+    <h2 id="points">計分</h2>
+    <p>分數只供娛樂，不涉及任何賭注。番數換算為分數：</p>
+    <table class="rules-table points-table">
+        <thead><tr><th>番數</th>@for (int f = 0; f <= 10; f++) { <th class="num">@f</th> }</tr></thead>
+        <tbody><tr><td>分數</td>@for (int f = 0; f <= 10; f++) { <td class="num">@Scoring.BasePoints(f)</td> }</tr></tbody>
+    </table>
+    <p>食出銃：打出那張牌的玩家（出銃者）付雙倍分數。自摸：其餘三家各付一份分數。</p>
+
+    <p><a class="btn btn-primary" href="/mahjong">開始打麻雀</a></p>
+</div>

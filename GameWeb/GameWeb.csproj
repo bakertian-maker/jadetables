@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="GameWeb.Tests" />
+  </ItemGroup>
+
+  <!--
+    wwwroot/js is TypeScript output (Scripts/*.ts → tsconfig.json). It is left out of the
+    load-time file list because Clean/Rebuild deletes it before TypeScript recompiles it,
+    and it is added back as static web assets once the compiler has run.
+  -->
+  <ItemGroup>
+    <Content Remove="wwwroot\js\**" />
+    <None Remove="wwwroot\js\**" />
+  </ItemGroup>
+
+  <Target Name="IncludeCompiledTypeScript" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="SetTscExecutable;RunTscCompile">
+    <ItemGroup>
+      <Content Include="wwwroot\js\**\*.js;wwwroot\js\**\*.js.map" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Captcha" Version="4.4.2" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="7.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.14" />
+  </ItemGroup>
+
+</Project>

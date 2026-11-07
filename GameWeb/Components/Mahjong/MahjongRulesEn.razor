@@ -1,0 +1,98 @@
+@* English rules text, shown on /mahjong/rules. *@
+
+<div class="wrap page-pad rules">
+    <p class="eyebrow">廣東麻雀</p>
+    <h1>Hong Kong Mahjong rules</h1>
+    <p class="lead">The aim is to be first to complete a hand of four sets and one pair, worth at least the room's minimum faan (usually 3).</p>
+
+    <nav class="rules-toc" aria-label="On this page">
+        <a href="#tiles">Tiles</a><a href="#play">Play</a><a href="#claims">Claiming</a><a href="#winning">Winning</a><a href="#faan">Faan table</a><a href="#points">Points</a>
+    </nav>
+
+    <h2 id="tiles">The tiles</h2>
+    <p>136 tiles: four copies of each of 34 kinds. GameWeb plays without flower tiles.</p>
+    <div class="tile-groups">
+        <div class="tile-group">
+            <h3>Characters 萬</h3>
+            <div class="tile-row">@for (int k = 0; k < 9; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>Dots 筒</h3>
+            <div class="tile-row">@for (int k = 9; k < 18; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>Bamboo 索</h3>
+            <div class="tile-row">@for (int k = 18; k < 27; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+        </div>
+        <div class="tile-group">
+            <h3>Winds 風 and dragons 三元</h3>
+            <div class="tile-row">@for (int k = 27; k < 34; k++) { <MjTile Kind="k" Size="sm" /> }</div>
+            <p class="mj-muted">East, South, West, North · Red 中, Green 發, White 白</p>
+        </div>
+    </div>
+
+    <h2 id="play">How play goes</h2>
+    <ol>
+        <li>Each player gets 13 tiles. The dealer (East) takes a 14th and discards first.</li>
+        <li>Play moves to the right (East → South → West → North). On your turn, draw one tile from the wall, then discard one.</li>
+        <li>With four of a kind in your hand you may declare a concealed kong; with an exposed pung and the fourth tile, you may add it to make a kong. Either way, draw a replacement tile.</li>
+        <li>If the wall runs out, the hand is a draw and the dealer deals again.</li>
+        <li>The dealer keeps the deal after winning or a draw; otherwise the deal passes to the right. When the deal has gone all the way round, the prevailing wind changes.</li>
+    </ol>
+
+    <h2 id="claims">Claiming a discard</h2>
+    <p>When a tile is discarded, other players have a few seconds to claim it:</p>
+    <table class="rules-table">
+        <thead><tr><th>Claim</th><th>Who</th><th>Priority</th></tr></thead>
+        <tbody>
+            <tr><td>Win 食糊</td><td>Anyone whose hand it completes</td><td>Highest. If two can win, the first in turn order takes it.</td></tr>
+            <tr><td>Kong 槓 / Pung 碰</td><td>Anyone holding three / two of that tile</td><td>Beats a chow</td></tr>
+            <tr><td>Chow 上</td><td>Only the next player</td><td>Lowest</td></tr>
+        </tbody>
+    </table>
+    <p>Claimed sets are laid face up. After a pung or chow you discard straight away; after a kong you draw a replacement first. A player adding to a kong can be robbed: anyone who wins on that tile takes it (搶槓).</p>
+
+    <h2 id="winning">Winning hands</h2>
+    <p>A winning hand is four sets plus a pair. A set is a chow (three in a row of one suit, such as 3-4-5 bamboo), a pung (three alike) or a kong (four alike). The one special hand is Thirteen Orphans: one of each terminal and honour, plus a pair of any of them.</p>
+    <div class="example-hand" aria-label="Example winning hand">
+        <span class="mj-meld"><MjTile Kind="1" Size="sm" /><MjTile Kind="2" Size="sm" /><MjTile Kind="3" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="13" Size="sm" /><MjTile Kind="14" Size="sm" /><MjTile Kind="15" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="24" Size="sm" /><MjTile Kind="24" Size="sm" /><MjTile Kind="24" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="Tiles.Red" Size="sm" /><MjTile Kind="Tiles.Red" Size="sm" /><MjTile Kind="Tiles.Red" Size="sm" /></span>
+        <span class="mj-meld"><MjTile Kind="Tiles.East" Size="sm" /><MjTile Kind="Tiles.East" Size="sm" /></span>
+    </div>
+    <p class="mj-muted">Two chows, a pung of 7 bamboo, a pung of red dragons and a pair of East winds.</p>
+
+    <h2 id="faan">Faan table</h2>
+    <p>Faan add up; a hand needs the room's minimum to be declared. Totals are capped at the limit (10 faan). Limit hands score the limit outright.</p>
+    <table class="rules-table faan-table">
+        <thead><tr><th>Pattern</th><th>Chinese</th><th class="num">Faan</th></tr></thead>
+        <tbody>
+            @foreach (var f in Scoring.AllPatterns)
+            {
+                <tr>
+                    <td>@f.Name</td>
+                    <td class="zh">@f.Chinese</td>
+                    <td class="num">@(f.Limit ? "Limit" : f.Faan.ToString())</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <ul class="rules-notes">
+        <li><strong>Concealed hand</strong>: no claimed sets (concealed kongs are fine).</li>
+        <li><strong>All chows</strong>: four chows and any pair.</li>
+        <li><strong>Mixed one suit</strong>: one suit plus honours. <strong>Pure one suit</strong>: one suit only.</li>
+        <li><strong>Small three dragons</strong> (two dragon pungs and a dragon pair) and <strong>Small four winds</strong> (three wind pungs and a wind pair) replace the single dragon and wind pungs they contain.</li>
+        <li><strong>Heavenly hand</strong>: the dealer wins on their first tile. <strong>Earthly hand</strong>: winning on the dealer's first discard.</li>
+    </ul>
+
+    <h2 id="points">Points</h2>
+    <p>Points are for fun; there is no betting. Faan convert to points:</p>
+    <table class="rules-table points-table">
+        <thead><tr><th>Faan</th>@for (int f = 0; f <= 10; f++) { <th class="num">@f</th> }</tr></thead>
+        <tbody><tr><td>Points</td>@for (int f = 0; f <= 10; f++) { <td class="num">@Scoring.BasePoints(f)</td> }</tr></tbody>
+    </table>
+    <p>Win on a discard: the player who discarded pays double. Self-drawn win: each of the other three players pays the points.</p>
+
+    <p><a class="btn btn-primary" href="/mahjong">Play Mahjong</a></p>
+</div>

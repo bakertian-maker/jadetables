@@ -1,0 +1,32 @@
+# Build output
+bin/
+obj/
+*.user
+*.suo
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Claude Code: keep the shared launch config, not personal settings
+.claude/*
+!.claude/launch.json
+
+# Test results and coverage
+TestResults/
+coverage*/
+*.coverage
+
+# Published output
+publish/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Python caches from Resources/build_resx.py
+__pycache__/
+
+# TypeScript output (compiled from GameWeb/Scripts on every build)
+GameWeb/wwwroot/js/
