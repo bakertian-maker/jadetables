@@ -210,4 +210,20 @@ ZH_HANS = {
     "Sorry, the server ran into a problem. Please try again in a moment.": "抱歉，服务器遇到问题。请稍后再试。",
     "Back to home": "返回首页",
     "Error reference: {0}": "错误编号：{0}",
+
+    # Reconnect banner and your-turn alert
+    "Connection lost. Reconnecting…": "连接中断，正在重新连接…",
+    "Can't reach the server. Check your connection.": "无法连接服务器，请检查网络。",
+    "Try again": "重试",
+    "Reloading…": "正在重新加载…",
+    "Your turn": "轮到你了",
+    "Sound on": "声音：开",
+    "Sound off": "声音：关",
+    "Play a chime when it's your turn and this tab is in the background": "轮到你而此页在后台时播放提示音",
+
+    # Lobby: continue your game
+    "Continue your game": "继续你的牌局",
+    "Game in progress in room {0}": "房间 {0} 的牌局进行中",
+    "Waiting room {0}": "房间 {0} 等待开始",
+    "Continue": "继续",
 }

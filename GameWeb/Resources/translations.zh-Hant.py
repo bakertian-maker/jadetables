@@ -209,4 +209,20 @@ ZH_HANT = {
     "Sorry, the server ran into a problem. Please try again in a moment.": "抱歉，伺服器出現問題。請稍後再試。",
     "Back to home": "返回首頁",
     "Error reference: {0}": "錯誤編號：{0}",
+
+    # Reconnect banner and your-turn alert
+    "Connection lost. Reconnecting…": "連線中斷，正在重新連線…",
+    "Can't reach the server. Check your connection.": "無法連線到伺服器，請檢查網絡。",
+    "Try again": "再試一次",
+    "Reloading…": "正在重新載入…",
+    "Your turn": "輪到你了",
+    "Sound on": "聲音：開",
+    "Sound off": "聲音：關",
+    "Play a chime when it's your turn and this tab is in the background": "輪到你而此頁在背景時播放提示音",
+
+    # Lobby: continue your game
+    "Continue your game": "繼續你的牌局",
+    "Game in progress in room {0}": "房間 {0} 的牌局進行中",
+    "Waiting room {0}": "房間 {0} 等待開始",
+    "Continue": "繼續",
 }

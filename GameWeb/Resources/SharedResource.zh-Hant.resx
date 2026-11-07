@@ -19,6 +19,7 @@
   <data name="Back to home" xml:space="preserve"><value>返回首頁</value></data>
   <data name="Back to lobby" xml:space="preserve"><value>返回大堂</value></data>
   <data name="Bot" xml:space="preserve"><value>電腦</value></data>
+  <data name="Can't reach the server. Check your connection." xml:space="preserve"><value>無法連線到伺服器，請檢查網絡。</value></data>
   <data name="Chinese chess on the river board." xml:space="preserve"><value>楚河漢界，中國象棋。</value></data>
   <data name="Chow 上" xml:space="preserve"><value>上</value></data>
   <data name="Claim" xml:space="preserve"><value>上碰槓</value></data>
@@ -26,6 +27,9 @@
   <data name="Classic Chinese games, one link away." xml:space="preserve"><value>經典中國遊戲，一條連結即可開局。</value></data>
   <data name="Code, e.g. K7Q2M" xml:space="preserve"><value>房號，例如 K7Q2M</value></data>
   <data name="Computer players" xml:space="preserve"><value>電腦玩家</value></data>
+  <data name="Connection lost. Reconnecting…" xml:space="preserve"><value>連線中斷，正在重新連線…</value></data>
+  <data name="Continue" xml:space="preserve"><value>繼續</value></data>
+  <data name="Continue your game" xml:space="preserve"><value>繼續你的牌局</value></data>
   <data name="Copied" xml:space="preserve"><value>已複製</value></data>
   <data name="Copy link" xml:space="preserve"><value>複製連結</value></data>
   <data name="Create room" xml:space="preserve"><value>建立房間</value></data>
@@ -47,6 +51,7 @@
   <data name="Free · no sign-up · play in your browser" xml:space="preserve"><value>免費 · 毋須註冊 · 瀏覽器即玩</value></data>
   <data name="Full game (four rounds)" xml:space="preserve"><value>完整一場（四圈）</value></data>
   <data name="Full game, four rounds" xml:space="preserve"><value>完整一場，四圈</value></data>
+  <data name="Game in progress in room {0}" xml:space="preserve"><value>房間 {0} 的牌局進行中</value></data>
   <data name="Game log" xml:space="preserve"><value>牌局紀錄</value></data>
   <data name="GameWeb · Classic Chinese games with friends" xml:space="preserve"><value>GameWeb · 與朋友一起玩經典中國遊戲</value></data>
   <data name="Games" xml:space="preserve"><value>遊戲</value></data>
@@ -98,6 +103,7 @@
   <data name="Play" xml:space="preserve"><value>開始</value></data>
   <data name="Play Hong Kong mahjong online for free. Play the computer straight away or open a private room for friends." xml:space="preserve"><value>免費在網上玩港式麻雀。可以直接與電腦對局，也可以為朋友開私人房間。</value></data>
   <data name="Play Mahjong" xml:space="preserve"><value>開始打麻雀</value></data>
+  <data name="Play a chime when it's your turn and this tab is in the background" xml:space="preserve"><value>輪到你而此頁在背景時播放提示音</value></data>
   <data name="Play again" xml:space="preserve"><value>再來一場</value></data>
   <data name="Play mahjong and other classic Chinese games online with friends or the computer. Free, no sign-up." xml:space="preserve"><value>在網上與朋友或電腦玩麻雀等經典中國遊戲。免費，毋須註冊。</value></data>
   <data name="Play now" xml:space="preserve"><value>立即開始</value></data>
@@ -111,6 +117,7 @@
   <data name="Ready" xml:space="preserve"><value>已準備</value></data>
   <data name="Reconnecting" xml:space="preserve"><value>重新連線中</value></data>
   <data name="Reload" xml:space="preserve"><value>重新載入</value></data>
+  <data name="Reloading…" xml:space="preserve"><value>正在重新載入…</value></data>
   <data name="Remove" xml:space="preserve"><value>移除</value></data>
   <data name="Room" xml:space="preserve"><value>房間</value></data>
   <data name="Room code" xml:space="preserve"><value>房號</value></data>
@@ -123,6 +130,8 @@
   <data name="Something went wrong · GameWeb" xml:space="preserve"><value>出現錯誤 · GameWeb</value></data>
   <data name="Something went wrong." xml:space="preserve"><value>出現了一些問題。</value></data>
   <data name="Sorry, the server ran into a problem. Please try again in a moment." xml:space="preserve"><value>抱歉，伺服器出現問題。請稍後再試。</value></data>
+  <data name="Sound off" xml:space="preserve"><value>聲音：關</value></data>
+  <data name="Sound on" xml:space="preserve"><value>聲音：開</value></data>
   <data name="South" xml:space="preserve"><value>南</value></data>
   <data name="Start game" xml:space="preserve"><value>開始遊戲</value></data>
   <data name="Start your own room" xml:space="preserve"><value>自己開一個房間</value></data>
@@ -139,11 +148,13 @@
   <data name="Three players, one landlord. Bid, team up and empty your hand first." xml:space="preserve"><value>三人一局，一個地主。叫分、合作，誰先出完手牌誰贏。</value></data>
   <data name="Tile numbers in the corner, a hint button and plain-English rules with the Chinese names alongside." xml:space="preserve"><value>牌角標有數字，設有提示按鈕，規則說明簡單易明。</value></data>
   <data name="Total" xml:space="preserve"><value>合計</value></data>
+  <data name="Try again" xml:space="preserve"><value>再試一次</value></data>
   <data name="Turn timer" xml:space="preserve"><value>出牌限時</value></data>
   <data name="Two generals, one river. Play a friend or a computer opponent from beginner to master." xml:space="preserve"><value>兩位將帥，一條楚河。可與朋友對弈，也可挑戰由入門到大師的電腦。</value></data>
   <data name="Waiting for players · {0}/4 ready" xml:space="preserve"><value>等待玩家 · {0}/4 已準備</value></data>
   <data name="Waiting for the host to start the game." xml:space="preserve"><value>等待房主開始遊戲。</value></data>
   <data name="Waiting for the other players…" xml:space="preserve"><value>等待其他玩家…</value></data>
+  <data name="Waiting room {0}" xml:space="preserve"><value>房間 {0} 等待開始</value></data>
   <data name="Wall" xml:space="preserve"><value>牌牆</value></data>
   <data name="West" xml:space="preserve"><value>西</value></data>
   <data name="Win" xml:space="preserve"><value>食糊</value></data>
@@ -154,6 +165,7 @@
   <data name="You win!" xml:space="preserve"><value>你食糊了！</value></data>
   <data name="You're watching this game." xml:space="preserve"><value>你正在觀戰。</value></data>
   <data name="Your name at the table" xml:space="preserve"><value>你的牌桌名稱</value></data>
+  <data name="Your turn" xml:space="preserve"><value>輪到你了</value></data>
   <data name="Your turn." xml:space="preserve"><value>輪到你了。</value></data>
   <data name="a tile from the wall on your turn." xml:space="preserve"><value>：輪到你時從牌牆摸一張牌。</value></data>
   <data name="another player's discard to make a pung (three alike), kong (four alike) or, from the player before you, a chow (a run of three)." xml:space="preserve"><value>：要別人打出的牌組成碰（三張相同）、槓（四張相同），或上上家的牌組成順子（三張相連）。</value></data>

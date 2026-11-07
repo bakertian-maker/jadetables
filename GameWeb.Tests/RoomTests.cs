@@ -52,6 +52,20 @@ public class RoomTests
         Assert.Null(service.TryCreateMahjong(new MjRoomSettings()));
     }
 
+    [Fact]
+    public void RoomService_FindsRoomsWhereThePlayerHasASeat()
+    {
+        using var service = new RoomService(NullLogger<RoomService>.Instance);
+        var mine = service.TryCreateMahjong(new MjRoomSettings())!;
+        var other = service.TryCreateMahjong(new MjRoomSettings())!;
+        mine.Connect("me", "Me");
+        other.Connect("someone-else", "Other");
+
+        Assert.Equal([mine.Code], service.RoomsWithSeatFor("me").Select(r => r.Code));
+        Assert.Empty(service.RoomsWithSeatFor("stranger"));
+        Assert.Empty(service.RoomsWithSeatFor(""));
+    }
+
     [Theory]
     [InlineData("/", true)]
     [InlineData("/mahjong/room/ABCDE?x=1#faan", true)]

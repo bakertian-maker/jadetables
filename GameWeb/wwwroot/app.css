@@ -254,3 +254,32 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
     background: #fbf8ef; color: var(--red); font-weight: 700; font-size: 40px; box-shadow: 0 5px 0 #d6cba9, 0 8px 16px rgba(0,0,0,.2);
 }
 .error-id { margin-top: 28px; font-size: .85rem; word-break: break-all; }
+
+/* Reconnect banner (Blazor connection lost) */
+.reconnect {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%); margin: 0; z-index: 2000;
+    width: min(440px, calc(100% - 32px)); border: 0; border-radius: 14px; padding: 12px 16px;
+    background: #1d2422; color: #f3ead4; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.reconnect-inner { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.reconnect p { margin: 0; flex: 1; min-width: 180px; font-weight: 500; }
+.reconnect-retrying, .reconnect-failed, .reconnect-reloading { display: none; }
+.reconnect[data-state="retrying"] .reconnect-retrying,
+.reconnect[data-state="failed"] .reconnect-failed,
+.reconnect[data-state="reloading"] .reconnect-reloading { display: block; }
+.reconnect[data-state="failed"] button.reconnect-failed { display: inline-flex; }
+.reconnect[data-state="failed"] .reconnect-spinner { display: none; }
+.reconnect-spinner {
+    width: 18px; height: 18px; flex: none; border-radius: 50%;
+    border: 2.5px solid rgba(243,234,212,.25); border-top-color: #f2c94c; animation: reconnect-spin .8s linear infinite;
+}
+@keyframes reconnect-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .reconnect-spinner { animation-duration: 2.4s; } }
+
+/* Lobby: return to a game you have a seat in */
+.continue-card {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    background: var(--paper); border: 1px solid var(--gold); border-radius: var(--radius);
+    padding: 14px 18px; margin-bottom: 20px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 18%, transparent);
+}
+.continue-card > div { display: grid; gap: 2px; }

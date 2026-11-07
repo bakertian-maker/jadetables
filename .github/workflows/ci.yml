@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Translations: fails if a key used in the code has no translation, or if the committed
+      # .resx files are out of date with Resources/translations.*.py (run build_resx.py and commit).
+      - name: Check translations
+        run: |
+          python GameWeb/Resources/build_resx.py
+          git diff --ignore-cr-at-eol --exit-code -- GameWeb/Resources/
+
+      - name: Restore
+        run: dotnet restore GameWeb.slnx
+
+      # Also compiles Scripts/*.ts to wwwroot/js through Microsoft.TypeScript.MSBuild.
+      - name: Build
+        run: dotnet build GameWeb.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test GameWeb.Tests --no-build --configuration Release --logger "console;verbosity=normal"

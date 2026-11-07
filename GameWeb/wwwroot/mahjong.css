@@ -78,6 +78,9 @@ button.mj-tile:focus-visible { outline: 3px solid var(--focus, #e3b341); outline
 .mj-topbar-links { display: flex; gap: 14px; }
 .mj-topbar-links a { color: #f3ead4; text-decoration: none; font-weight: 500; }
 .mj-topbar-links a:hover { color: #fff; text-decoration: underline; }
+.mj-link-button { background: none; border: 0; padding: 0; font: inherit; font-weight: 500; color: #f3ead4; cursor: pointer; }
+.mj-link-button:hover { color: #fff; text-decoration: underline; }
+.mj-link-button[aria-pressed="false"] { color: #a9b5ae; }
 
 .mj-board {
     flex: 1;

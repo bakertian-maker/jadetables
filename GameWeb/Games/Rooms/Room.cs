@@ -53,6 +53,15 @@ public abstract class Room : IDisposable
 
     protected void NotifyChanged() => Changed?.Invoke();
 
+    /// <summary>True if this player (by their browser identity) holds a seat here.</summary>
+    public bool HasSeat(string playerId)
+    {
+        lock (Sync) return Seats.Any(s => s.PlayerId == playerId);
+    }
+
+    /// <summary>True once the match has ended, so the room is no longer worth returning to.</summary>
+    public virtual bool IsFinished => false;
+
     public bool HasConnectedHumans
     {
         get { lock (Sync) return Seats.Any(s => s.IsHuman && s.Connections > 0); }

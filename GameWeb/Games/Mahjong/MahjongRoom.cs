@@ -90,6 +90,11 @@ public sealed class MahjongRoom : Room
         _lastPhaseVersion = -1;
     }
 
+    public override bool IsFinished
+    {
+        get { lock (Sync) return _game is { Phase: MjPhase.MatchOver }; }
+    }
+
     public bool PlayAgain(string playerId)
     {
         lock (Sync)

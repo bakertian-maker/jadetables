@@ -17,7 +17,18 @@
 
 <body>
     <Routes />
+    @* Blazor drives this element while the live connection is down (see Scripts/gameweb.ts). *@
+    <dialog id="components-reconnect-modal" class="reconnect" data-state="retrying" aria-live="assertive" data-nosnippet>
+        <div class="reconnect-inner">
+            <span class="reconnect-spinner" aria-hidden="true"></span>
+            <p class="reconnect-retrying">@L["Connection lost. Reconnecting…"]</p>
+            <p class="reconnect-failed">@L["Can't reach the server. Check your connection."]</p>
+            <button type="button" class="btn btn-primary btn-sm reconnect-failed" id="components-reconnect-button">@L["Try again"]</button>
+            <p class="reconnect-reloading">@L["Reloading…"]</p>
+        </div>
+    </dialog>
     <script type="module" src="@Assets["js/gameweb.js"]"></script>
+    <script type="module" src="@Assets["js/reconnect.js"]"></script>
     <script src="_framework/blazor.web.js"></script>
 </body>
 

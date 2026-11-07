@@ -101,7 +101,8 @@ else if (view is { Started: false })
 }
 else if (view is not null)
 {
-    <MahjongTable View="view" OnAction="Act" OnHint="Hint" HintTile="hint" OnPlayAgain="PlayAgain" />
+    <MahjongTable View="view" OnAction="Act" OnHint="Hint" HintTile="hint" OnPlayAgain="PlayAgain"
+                  SoundOn="soundOn" OnToggleSound="ToggleSound" />
 }
 
 @code {
@@ -121,6 +122,8 @@ else if (view is not null)
     int hintVersion = -1;
     bool connected;
     volatile bool disposed;
+    bool soundOn = true;
+    bool needsMe;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -141,7 +144,31 @@ else if (view is not null)
         connected = outcome is JoinOutcome.Seated or JoinOutcome.Rejoined;
         state = outcome == JoinOutcome.Full ? PageState.Full : PageState.Ready;
         view = room.GetView(identity.Id);
+        soundOn = await JS.InvokeAsync<bool>("gameweb.soundEnabled");
         StateHasChanged();
+    }
+
+    /// <summary>Tells the browser when it is this player's move, so a background tab can alert them.</summary>
+    async Task UpdateAttention()
+    {
+        bool now = view is { Started: true, MySeat: >= 0 } v
+            && ((v.Phase == MjPhase.Turn && v.CurrentSeat == v.MySeat) || v.Claim is not null);
+        if (now == needsMe) return;
+        needsMe = now;
+        try
+        {
+            await JS.InvokeVoidAsync("gameweb.attention", now, L["Your turn"].Value);
+        }
+        catch (JSDisconnectedException)
+        {
+            // The browser has gone; nothing to alert.
+        }
+    }
+
+    async Task ToggleSound()
+    {
+        soundOn = !soundOn;
+        await JS.InvokeVoidAsync("gameweb.setSound", soundOn);
     }
 
     void OnRoomChanged()
@@ -149,10 +176,11 @@ else if (view is not null)
         if (disposed) return;
         _ = InvokeAsync(() =>
         {
-            if (room is null || disposed) return;
+            if (room is null || disposed) return Task.CompletedTask;
             view = room.GetView(identity.Id);
             if (view.PhaseVersion != hintVersion) hint = null;
             StateHasChanged();
+            return UpdateAttention();
         });
     }
 

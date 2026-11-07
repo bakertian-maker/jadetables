@@ -50,6 +50,15 @@ public sealed class RoomService : IDisposable
 
     public Room? Get(string code) => _rooms.TryGetValue(code.Trim(), out var r) ? r : null;
 
+    /// <summary>Unfinished rooms where this player holds a seat, most recently active first.</summary>
+    public IReadOnlyList<Room> RoomsWithSeatFor(string playerId) =>
+        string.IsNullOrEmpty(playerId)
+            ? []
+            : _rooms.Values.Where(r => r.HasSeat(playerId) && !r.IsFinished)
+                .OrderByDescending(r => r.LastActivity)
+                .Take(3)
+                .ToList();
+
     void Cleanup()
     {
         var now = DateTime.UtcNow;
