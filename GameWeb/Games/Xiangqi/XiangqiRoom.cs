@@ -187,13 +187,15 @@ public sealed class XiangqiRoom : Room
     public XqMove? Hint(string playerId)
     {
         XqPosition position;
+        XqBot.XqGameContext context;
         lock (Sync)
         {
             int seat = SeatOfPlayer(playerId);
             if (_game is not { IsOver: false } g || seat < 0 || SideOfSeat(seat) != g.SideToMove) return null;
             position = g.Position.Clone();
+            context = XqBot.XqGameContext.Of(g);
         }
-        return XqBot.ChooseMove(position, XqLevel.Medium, budget: TimeSpan.FromMilliseconds(400));
+        return XqBot.ChooseMove(position, XqLevel.Medium, budget: TimeSpan.FromMilliseconds(400), context: context);
     }
 
     protected override bool Tick(DateTime now)
@@ -233,6 +235,7 @@ public sealed class XiangqiRoom : Room
     {
         _botThinking = true;
         var position = g.Position.Clone();
+        var context = XqBot.XqGameContext.Of(g);
         int version = g.Version;
         var level = Settings.BotLevel;
         bool inOpening = g.History.Count < XqBook.MaxPlies;
@@ -253,7 +256,7 @@ public sealed class XiangqiRoom : Room
                     // Database slow or down: just search.
                 }
             }
-            return XqBot.ChooseMove(position, level);
+            return XqBot.ChooseMove(position, level, context: context);
         }).ContinueWith(t =>
         {
             lock (Sync)

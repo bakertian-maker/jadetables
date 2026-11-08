@@ -34,8 +34,20 @@ public static class XqBot
         _ => new(MaxPly / 8, TimeSpan.FromMilliseconds(2000), Margin: 0, LooseChance: 0, LooseMargin: 0, Enhanced: true),
     };
 
-    public static XqMove ChooseMove(XqPosition position, XqLevel level, Random? rng = null, TimeSpan? budget = null) =>
-        Analyse(position, level, rng, budget).Move;
+    public static XqMove ChooseMove(XqPosition position, XqLevel level, Random? rng = null, TimeSpan? budget = null,
+        XqGameContext? context = null) =>
+        Analyse(position, level, rng, budget, context: context).Move;
+
+    /// <summary>
+    /// What the engine needs to know about the game so far: earlier positions (repeating one counts as a draw
+    /// in the search) and moves to avoid because they lose by a repetition rule. Take it under the game's
+    /// lock; it is a copy.
+    /// </summary>
+    public sealed record XqGameContext(IReadOnlyCollection<ulong> Seen, IReadOnlySet<XqMove> Avoid)
+    {
+        public static XqGameContext Of(XqGame game) =>
+            new(game.RepetitionHistory().ToHashSet(), game.MovesThatLoseByRepetition());
+    }
 
     /// <summary>A move and its score, in points for the side to move (a soldier is 100; near ±100000 means a forced mate).</summary>
     public readonly record struct Analysis(XqMove Move, int Score);
@@ -47,12 +59,16 @@ public static class XqBot
     /// follow the same line); 0 keeps the level's own style.
     /// </summary>
     public static Analysis Analyse(XqPosition position, XqLevel level, Random? rng = null, TimeSpan? budget = null,
-        int variety = 0, int maxChoices = int.MaxValue, XqEval? eval = null)
+        int variety = 0, int maxChoices = int.MaxValue, XqEval? eval = null, XqGameContext? context = null)
     {
         rng ??= Random.Shared;
         var settings = For(level);
         bool fullRootWindow = !settings.Enhanced || variety > 0;
-        var search = new Search(position.Clone(), budget ?? settings.Budget, settings.Enhanced, fullRootWindow, eval ?? XqEval.Default);
+        var search = new Search(position.Clone(), budget ?? settings.Budget, settings.Enhanced, fullRootWindow, eval ?? XqEval.Default)
+        {
+            Seen = context?.Seen.ToHashSet() ?? [],
+            Avoid = context?.Avoid,
+        };
         var scores = search.Run(settings.MaxDepth);
         if (scores.Count == 0) throw new InvalidOperationException("No legal moves");
 
@@ -110,9 +126,26 @@ public static class XqBot
         readonly TtEntry[]? _table = enhanced ? new TtEntry[TableSize] : null;
         readonly XqMove[,] _killers = new XqMove[MaxPly + 1, 2];
         readonly bool[,] _hasKiller = new bool[MaxPly + 1, 2];
+        readonly ulong[] _path = new ulong[MaxPly + 2];
         ulong _hash;
         long _nodes;
         bool _stopped;
+
+        /// <summary>Positions from the game before the root: reaching one again scores as a draw.</summary>
+        public HashSet<ulong> Seen { get; init; } = [];
+        /// <summary>Root moves not to play unless nothing else is legal.</summary>
+        public IReadOnlySet<XqMove>? Avoid { get; init; }
+
+        /// <summary>True if the current position (at ply &gt;= 1) repeats one from the game or the search path.</summary>
+        bool IsRepetition(int ply)
+        {
+            _path[ply] = _hash;
+            if (Seen.Contains(_hash)) return true;
+            // The hash includes the side to move, so only every second ply can match.
+            for (int k = ply - 2; k >= 0; k -= 2)
+                if (_path[k] == _hash) return true;
+            return false;
+        }
 
         /// <summary>The capture-search score of the position (side to move's point of view).</summary>
         public int QuiescenceScore() => Quiesce(-Infinity, Infinity, 0);
@@ -122,8 +155,10 @@ public static class XqBot
             var root = pos.LegalMoves();
             var completed = new List<RootScore>();
             if (root.Count == 0) return completed;
+            if (Avoid is { Count: > 0 } && root.Any(m => !Avoid.Contains(m))) root.RemoveAll(Avoid.Contains);
             if (root.Count == 1) return [new RootScore(root[0], 0)];
             _hash = XqZobrist.Hash(pos);
+            _path[0] = _hash;
             Order(root, default, false, 0);
             for (int depth = 1; depth <= maxDepth; depth++)
             {
@@ -171,6 +206,7 @@ public static class XqBot
         int Negamax(int depth, int alpha, int beta, int ply)
         {
             if (TimeUp()) return 0;
+            if (IsRepetition(ply)) return 0;
             var mover = pos.SideToMove;
             bool inCheck = enhanced && pos.InCheck(mover);
             if (inCheck && ply < MaxPly / 2) depth++; // look further when in check

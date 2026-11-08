@@ -192,6 +192,7 @@
   <data name="Tap a tile to pick it, tap it again to discard." xml:space="preserve"><value>點一張牌選取，再點一次打出。</value></data>
   <data name="Tap again, or press Discard." xml:space="preserve"><value>再點一次，或按「打牌」。</value></data>
   <data name="The host can start another match." xml:space="preserve"><value>房主可以再開一場。</value></data>
+  <data name="The same position came up three times: the game is drawn." xml:space="preserve"><value>同一局面重複出現三次：判和。</value></data>
   <data name="The server is busy right now. Please try again in a few minutes." xml:space="preserve"><value>伺服器現在較忙，請過幾分鐘再試。</value></data>
   <data name="The wall is empty: the hand is a draw" xml:space="preserve"><value>牌牆已摸完：流局</value></data>
   <data name="The wall ran out before anyone completed a hand. The dealer deals again." xml:space="preserve"><value>牌牆摸完，無人食糊。莊家連莊。</value></data>
@@ -250,8 +251,10 @@
   <data name="{0} discarded. Others may claim it…" xml:space="preserve"><value>{0} 打出一張牌，其他玩家可以上碰槓…</value></data>
   <data name="{0} faan" xml:space="preserve"><value>{0} 番</value></data>
   <data name="{0} finished first." xml:space="preserve"><value>{0} 得了第一名。</value></data>
+  <data name="{0} gave perpetual check, which loses." xml:space="preserve"><value>{0}長將，判負。</value></data>
   <data name="{0} is adding to a kong with" xml:space="preserve"><value>{0} 正在加槓：</value></data>
   <data name="{0} is playing" xml:space="preserve"><value>{0} 正在出牌</value></data>
+  <data name="{0} kept chasing a piece (perpetual chase), which loses." xml:space="preserve"><value>{0}長捉，判負。</value></data>
   <data name="{0} kongs {1}" xml:space="preserve"><value>{0} 槓 {1}</value></data>
   <data name="{0} left" xml:space="preserve"><value>剩 {0} 張</value></data>
   <data name="{0} moves played." xml:space="preserve"><value>共走了 {0} 回合。</value></data>

@@ -88,6 +88,9 @@ public sealed class XqText(IStringLocalizer<SharedResource> l)
         XqEndReason.NoCaptureLimit => l["60 moves without a capture: the game is drawn."],
         XqEndReason.NoAttackers => l["Neither side has pieces left that can attack: the game is drawn."],
         XqEndReason.Agreement => l["Draw agreed."],
+        XqEndReason.Repetition => l["The same position came up three times: the game is drawn."],
+        XqEndReason.PerpetualCheck => l["{0} gave perpetual check, which loses.", loserName],
+        XqEndReason.PerpetualChase => l["{0} kept chasing a piece (perpetual chase), which loses.", loserName],
         _ => "",
     };
 }

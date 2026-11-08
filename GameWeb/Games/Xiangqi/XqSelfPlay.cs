@@ -34,7 +34,8 @@ public static class XqSelfPlay
         {
             var (variety, maxChoices) = settings.VarietyFor(game.History.Count);
             var eval = game.SideToMove == XqSide.Red ? redEval : blackEval;
-            var analysis = XqBot.Analyse(game.Position, settings.Level, rng, settings.MoveBudget, variety, maxChoices, eval);
+            var analysis = XqBot.Analyse(game.Position, settings.Level, rng, settings.MoveBudget, variety, maxChoices, eval,
+                XqBot.XqGameContext.Of(game));
             // Score from Red's point of view, for adjudication.
             int redScore = game.SideToMove == XqSide.Red ? analysis.Score : -analysis.Score;
             lastRedScore = redScore;

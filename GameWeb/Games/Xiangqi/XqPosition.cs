@@ -95,6 +95,14 @@ public sealed class XqPosition
 
     public int[] BoardCopy() => (int[])_board.Clone();
 
+    /// <summary>A copy with a different side to move (for asking "what could this side capture here?").</summary>
+    public XqPosition WithSideToMove(XqSide side)
+    {
+        var p = Clone();
+        p.SideToMove = side;
+        return p;
+    }
+
     public static XqPosition Start() => FromFen(StartFen);
 
     public static XqPosition FromFen(string fen)

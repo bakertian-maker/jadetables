@@ -38,6 +38,13 @@
     <h2 id="draws">Draws and other endings</h2>
     <ul>
         <li>60 moves by each side with no capture: the game is drawn.</li>
+        <li><strong>Repetition:</strong> when the same position comes up for the third time (same side to move), the moves since it last appeared decide:
+            <ul>
+                <li>One side gave check with every move and the other didn't: the checking side loses (<em>perpetual check</em>).</li>
+                <li>Otherwise, one side kept threatening to win a piece with every move and the other didn't: the chasing side loses (<em>perpetual chase</em>). A threat counts as a chase when the attacked piece is unprotected, or worth more than the attacker (say, a horse attacking a chariot). Generals and soldiers may chase freely, and a soldier that hasn't crossed the river can't be chased.</li>
+                <li>Otherwise the game is drawn.</li>
+            </ul>
+        </li>
         <li>Neither side has a chariot, horse, cannon or soldier left: the game is drawn, because nobody can attack.</li>
         <li>A player may resign at any time. With a move timer, running out of time loses.</li>
     </ul>

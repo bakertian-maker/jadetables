@@ -74,6 +74,18 @@ public class EvalTests
     }
 
     [Fact]
+    public void TunedWeights_AreTheOnesInUse()
+    {
+        Assert.NotNull(XqEvalTuned.Weights);
+        Assert.Equal(XqEval.Count, XqEvalTuned.Weights!.Length);
+        Assert.Equal(XqEvalTuned.Weights, XqEval.Default.Weights);
+        Assert.Equal(0, XqEval.Default.ScoreForRed(XqPosition.Start()));   // still symmetric
+        // The tuned evaluation prefers the central cannon (炮二平五) to leaving it at home.
+        var central = XqPosition.Start(); central.Make(XqMove.Parse("h2e2"));
+        Assert.True(XqEval.Default.ScoreForRed(central) > XqEval.Default.ScoreForRed(XqPosition.Start()));
+    }
+
+    [Fact]
     public void Evaluation_IsSymmetric_BetweenRedAndBlack()
     {
         // The start position is a mirror image: the score must be zero.
