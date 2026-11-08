@@ -95,7 +95,7 @@
             <li><strong>@L["Draw"]</strong> @L["a tile from the wall on your turn."]</li>
             <li><strong>@L["Discard"]</strong> @L["one tile, so you keep 13."]</li>
             <li><strong>@L["Claim"]</strong> @L["another player's discard to make a pung (three alike), kong (four alike) or, from the player before you, a chow (a run of three)."]</li>
-            <li><strong>@L["Win"]</strong> @L["with four sets and a pair worth at least the minimum faan."] <a href="/mahjong/rules">@L["Read the full rules"]</a></li>
+            <li><strong>@L["Win"]</strong> @L["with four sets and a pair worth at least the minimum faan."] <a href="mahjong/rules">@L["Read the full rules"]</a></li>
         </ol>
     </section>
 </div>
@@ -141,7 +141,7 @@
             return;
         }
         busy = true;
-        Nav.NavigateTo($"/mahjong/room/{room.Code}");
+        Nav.NavigateTo($"mahjong/room/{room.Code}");
     }
 
     void Join()
@@ -149,6 +149,6 @@
         var code = joinCode.Trim().ToUpperInvariant();
         if (code.Length == 0) { joinError = L["Enter a room code."]; return; }
         if (Rooms.Get(code) is null) { joinError = L["No open room with code {0}.", code]; return; }
-        Nav.NavigateTo($"/mahjong/room/{code}");
+        Nav.NavigateTo($"mahjong/room/{code}");
     }
 }

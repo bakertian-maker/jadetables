@@ -3,6 +3,7 @@
 @implements IDisposable
 @inject RoomService Rooms
 @inject IJSRuntime JS
+@inject NavigationManager Nav
 @inject GameText T
 
 <PageTitle>@L["Mahjong room {0} · Jade Tables", Code.ToUpperInvariant()]</PageTitle>
@@ -16,7 +17,7 @@ else if (state == PageState.NotFound)
     <div class="wrap page-pad narrow">
         <h1>@L["Room not found"]</h1>
         <p>@L["Room {0} doesn't exist or has closed. Rooms close after 10 minutes with nobody in them.", Code.ToUpperInvariant()]</p>
-        <a class="btn btn-primary" href="/mahjong">@L["Back to Mahjong"]</a>
+        <a class="btn btn-primary" href="mahjong">@L["Back to Mahjong"]</a>
     </div>
 }
 else if (state == PageState.Full)
@@ -24,7 +25,7 @@ else if (state == PageState.Full)
     <div class="wrap page-pad narrow">
         <h1>@L["This table is full"]</h1>
         <p>@L["All four seats in room {0} are taken.", Code.ToUpperInvariant()]</p>
-        <a class="btn btn-primary" href="/mahjong">@L["Start your own room"]</a>
+        <a class="btn btn-primary" href="mahjong">@L["Start your own room"]</a>
     </div>
 }
 else if (view is { Started: false })
@@ -79,8 +80,7 @@ else if (view is not null)
             return;
         }
         identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
-        var origin = await JS.InvokeAsync<string>("gameweb.origin");
-        inviteUrl = origin + room.Url;
+        inviteUrl = Nav.BaseUri + room.Url;   // keeps the language: https://…/zh-hk/mahjong/room/ABCDE
 
         room.Changed += OnRoomChanged;
         var outcome = room.Connect(identity.Id, identity.Name);

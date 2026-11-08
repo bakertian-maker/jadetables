@@ -51,7 +51,7 @@ public abstract class Room : IDisposable
     public IOpeningBook Book { get; internal set; } = NullGameStore.Instance;
 
     /// <summary>The room's page, e.g. /mahjong/room/K7Q2M.</summary>
-    public string Url => $"/{GameKey}/room/{Code}";
+    public string Url => $"{GameKey}/room/{Code}";
     public Seat[] Seats { get; }
     public string? HostId { get; protected set; }
     public bool Started { get; protected set; }

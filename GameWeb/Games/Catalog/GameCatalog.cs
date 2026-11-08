@@ -13,10 +13,10 @@ public sealed class GameCatalog
     [
         new("mahjong", "Hong Kong Mahjong", "廣東麻雀", "广东麻将", "Four players, 136 tiles, one winning hand.",
             "Classic Cantonese rules with faan scoring. Play the computer straight away, or open a private room and send the link to three friends.",
-            "/mahjong", "4 players", GameStatus.Playable, "Mahjong"),
+            "mahjong", "4 players", GameStatus.Playable, "Mahjong"),
         new("xiangqi", "Xiangqi", "象棋", "象棋", "Chinese chess on the river board.",
             "Two generals, one river. Play a friend or the computer, from beginner level up.",
-            "/xiangqi", "2 players", GameStatus.Playable, "Xiangqi"),
+            "xiangqi", "2 players", GameStatus.Playable, "Xiangqi"),
         new("doudizhu", "Dou Dizhu", "鬥地主", "斗地主", "Fight the landlord.",
             "Three players, one landlord. Bid, team up and empty your hand first.",
             "", "3 players", GameStatus.InDevelopment, "Dou Dizhu"),

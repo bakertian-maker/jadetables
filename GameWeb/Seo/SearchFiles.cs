@@ -13,8 +13,27 @@ public static class SearchFiles
     /// <summary>Public pages, in the order search engines should see them.</summary>
     public static readonly string[] Pages = ["/", "/mahjong", "/mahjong/rules", "/xiangqi", "/xiangqi/rules", "/privacy"];
 
-    /// <summary>Paths crawlers should skip: private rooms, the language switch and Blazor's connection.</summary>
-    public static readonly string[] Blocked = ["/mahjong/room/", "/xiangqi/room/", "/culture/", "/_blazor", "/Error"];
+    /// <summary>Paths crawlers should skip, in every language: private rooms, Blazor's connection, the error page.</summary>
+    static readonly string[] BlockedInEachLanguage = ["/mahjong/room/", "/xiangqi/room/", "/_blazor", "/Error"];
+
+    /// <summary>Paths crawlers should skip: the above under each language prefix, and the language switch.</summary>
+    public static readonly string[] Blocked =
+        [.. Languages.Supported.SelectMany(c => BlockedInEachLanguage.Select(p => LanguagePaths.PrefixFor(c) + p)), "/culture/"];
+
+    /// <summary>hreflang codes for each language version: by script, so Chinese readers anywhere get the right one.</summary>
+    public static readonly (string Culture, string HrefLang)[] HrefLangs =
+    [
+        (Languages.English, "en"),
+        (Languages.SimplifiedChinese, "zh-Hans"),
+        (Languages.TraditionalChinese, "zh-Hant"),
+    ];
+
+    /// <summary>The full address of a page in a language: https://www.jadetables.com/zh-hk/xiangqi.</summary>
+    public static string Address(string baseUrl, string culture, string page)
+    {
+        var prefix = LanguagePaths.PrefixFor(culture);
+        return baseUrl + (prefix.Length > 0 && page == "/" ? prefix + "/" : prefix + page);
+    }
 
     static readonly XNamespace Sm = "http://www.sitemaps.org/schemas/sitemap/0.9";
     static readonly XNamespace Xhtml = "http://www.w3.org/1999/xhtml";
@@ -30,20 +49,19 @@ public static class SearchFiles
     }
 
     /// <summary>
-    /// One entry per page, with the English, Simplified and Traditional Chinese versions linked as
-    /// alternates (the ?culture= query picks the language) and the plain URL as the default.
+    /// Every language version of every page as its own entry (/xiangqi, /zh-cn/xiangqi, /zh-hk/xiangqi),
+    /// each listing all three versions as alternates and the English one as the default, as Google asks.
     /// </summary>
     public static string SitemapXml(string baseUrl)
     {
-        var urls = Pages.Select(page =>
+        var urls = Pages.SelectMany(page => HrefLangs.Select(version =>
         {
-            string plain = baseUrl + page;
-            var url = new XElement(Sm + "url", new XElement(Sm + "loc", plain));
-            foreach (var culture in Languages.Supported)
-                url.Add(Alternate(culture, $"{plain}?culture={culture}"));
-            url.Add(Alternate("x-default", plain));
+            var url = new XElement(Sm + "url", new XElement(Sm + "loc", Address(baseUrl, version.Culture, page)));
+            foreach (var (culture, hreflang) in HrefLangs)
+                url.Add(Alternate(hreflang, Address(baseUrl, culture, page)));
+            url.Add(Alternate("x-default", Address(baseUrl, Languages.English, page)));
             return url;
-        });
+        }));
         var doc = new XDocument(new XDeclaration("1.0", "utf-8", null),
             new XElement(Sm + "urlset", new XAttribute(XNamespace.Xmlns + "xhtml", Xhtml), urls));
         using var writer = new Utf8StringWriter();

@@ -1,0 +1,25 @@
+@* Search-engine tags for the public pages: the canonical address of this language version, and the
+   address of each language version (hreflang). Rooms and error pages get none. *@
+@using GameWeb.Seo
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+
+@if (Page is not null)
+{
+    <link rel="canonical" href="@SearchFiles.Address(BaseUrl, Languages.CurrentCulture, Page)" />
+    @foreach (var (culture, hreflang) in SearchFiles.HrefLangs)
+    {
+        <link rel="alternate" hreflang="@hreflang" href="@SearchFiles.Address(BaseUrl, culture, Page)" />
+    }
+    <link rel="alternate" hreflang="x-default" href="@SearchFiles.Address(BaseUrl, Languages.English, Page)" />
+}
+
+@code {
+    [CascadingParameter] public HttpContext? HttpContext { get; set; }
+
+    string BaseUrl => HttpContext is null ? "" : SearchFiles.BaseUrl(Config, HttpContext.Request);
+
+    /// <summary>This request's page ("/xiangqi") if it is one of the public pages and rendered normally.</summary>
+    string? Page => HttpContext is { Response.StatusCode: 200 } http
+        && SearchFiles.Pages.FirstOrDefault(p => string.Equals(p, http.Request.Path.Value ?? "/", StringComparison.OrdinalIgnoreCase)) is { } page
+        ? page : null;
+}

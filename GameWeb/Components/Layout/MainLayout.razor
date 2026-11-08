@@ -6,12 +6,12 @@
 <div class="site">
     <header class="site-header">
         <div class="wrap header-inner">
-            <a class="brand" href="/">
+            <a class="brand" href="./">
                 <span class="brand-tile" aria-hidden="true">麻</span>
                 <span class="brand-name">@L["Jade Tables"]</span>
             </a>
             <nav class="site-nav" aria-label="@L["Main"]">
-                <NavLink href="/" Match="NavLinkMatch.All">@L["Home"]</NavLink>
+                <NavLink href="./" Match="NavLinkMatch.All">@L["Home"]</NavLink>
                 @foreach (var g in Catalog.Playable)
                 {
                     <NavLink href="@g.Url" Match="NavLinkMatch.Prefix">@L[g.NavName]</NavLink>
@@ -40,7 +40,7 @@
     <footer class="site-footer">
         <div class="wrap footer-inner">
             <span>@L["Jade Tables · Classic Chinese games with friends"]</span>
-            <span>@L["Free to play. No sign-up, no real-money betting."] · <a href="/privacy">@L["Privacy"]</a>
+            <span>@L["Free to play. No sign-up, no real-money betting."] · <a href="privacy">@L["Privacy"]</a>
                 @if (!string.IsNullOrWhiteSpace(Config["Analytics:GtmId"]))
                 {
                     <text> · </text><button type="button" class="footer-link" data-consent-open>@L["Cookie settings"]</button>

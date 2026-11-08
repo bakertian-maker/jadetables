@@ -11,7 +11,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0f3b31" />
-    <base href="/" />
+    @* "/zh-cn/" or "/zh-hk/" for Chinese pages (see LanguagePaths): every link on the site is relative to it. *@
+    <base href="@($"{HttpContext?.Request.PathBase}/")" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["mahjong.css"]" />
     <link rel="stylesheet" href="@Assets["xiangqi.css"]" />
@@ -20,6 +21,7 @@
     {
         <meta name="gtm-id" content="@gtmId" />
     }
+    <LanguageLinks />
     <HeadOutlet />
 </head>
 
@@ -30,7 +32,7 @@
         @* Shown by Scripts/consent.ts until the visitor chooses. *@
         <section id="consent-banner" class="consent" aria-label="@L["Cookie choices"]" hidden>
             <p>@L["May we use analytics cookies (Google Tag Manager) to see how the site is used? Nothing is sent to Google unless you accept."]
-                <a href="/privacy#analytics">@L["Privacy"]</a></p>
+                <a href="privacy#analytics">@L["Privacy"]</a></p>
             <div class="consent-actions">
                 <button type="button" class="btn btn-sm consent-btn" data-consent="denied">@L["Decline"]</button>
                 <button type="button" class="btn btn-sm consent-btn" data-consent="granted">@L["Accept"]</button>
@@ -57,3 +59,7 @@
 </body>
 
 </html>
+
+@code {
+    [CascadingParameter] public HttpContext? HttpContext { get; set; }
+}

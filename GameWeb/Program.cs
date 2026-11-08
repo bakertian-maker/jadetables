@@ -87,20 +87,28 @@ app.UseRewriter(new RewriteOptions()
     .AddRedirectToWwwPermanent()
 );
 
+// Language from the address (/zh-cn/..., /zh-hk/...); see LanguagePaths. Routing must come after it,
+// so pages and files are matched on the address without the prefix.
+app.UseLanguagePaths();
+app.UseRouting();
+
 app.UseCookiePolicy();
 // Render errors at the requested URL, retaining the HTTP status and original language.
 app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
 
 app.MapStaticAssets(); // fingerprinted URLs for CSS/JS so browsers never keep stale files
 
-// Language: the ?culture= query, then the language cookie, then the browser's Accept-Language.
-app.UseRequestLocalization(new RequestLocalizationOptions()
+// Language: from the address only, so each address always shows the same language.
+var localization = new RequestLocalizationOptions()
     .SetDefaultCulture(Languages.English)
     .AddSupportedCultures(Languages.Supported)
-    .AddSupportedUICultures(Languages.Supported));
+    .AddSupportedUICultures(Languages.Supported);
+localization.RequestCultureProviders = [new LanguagePaths.PathCultureProvider()];
+app.UseRequestLocalization(localization);
 app.UseAntiforgery();
 
-// Language switch: stores the choice in the standard ASP.NET Core culture cookie and returns to the page.
+// Language switch: remembers the choice in the standard culture cookie (so English addresses send this
+// visitor to their language later) and goes to the same page in the new language.
 app.MapGet("/culture/set", (string culture, string? redirectUri, HttpContext http) =>
 {
     if (!Languages.Supported.Contains(culture)) culture = Languages.English;
@@ -108,7 +116,8 @@ app.MapGet("/culture/set", (string culture, string? redirectUri, HttpContext htt
         CookieRequestCultureProvider.DefaultCookieName,
         CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
         new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true, SameSite = SameSiteMode.Lax, HttpOnly = true });
-    return Results.LocalRedirect(Languages.IsSafeLocalPath(redirectUri) ? redirectUri! : "/");
+    var page = Languages.IsSafeLocalPath(redirectUri) ? redirectUri! : "/";
+    return Results.LocalRedirect(LanguagePaths.PrefixFor(culture) + page);
 });
 
 // robots.txt and sitemap.xml for search engines.

@@ -12,8 +12,8 @@
         <div class="mj-topbar-links">
             <button type="button" class="mj-link-button" aria-pressed="@(SoundOn ? "true" : "false")" @onclick="OnToggleSound"
                     title="@L["Play a chime when it's your turn and this tab is in the background"]">@(SoundOn ? L["Sound on"] : L["Sound off"])</button>
-            <a href="/mahjong/rules" target="_blank">@L["Rules"]</a>
-            <a href="/mahjong">@L["Leave"]</a>
+            <a href="mahjong/rules" target="_blank">@L["Rules"]</a>
+            <a href="mahjong">@L["Leave"]</a>
         </div>
     </div>
 
@@ -452,7 +452,7 @@
                     {
                         <span class="mj-muted">@L["The host can start another match."]</span>
                     }
-                    <a class="btn btn-ghost" href="/mahjong">@L["Back to lobby"]</a>
+                    <a class="btn btn-ghost" href="mahjong">@L["Back to lobby"]</a>
                 </div>
             </div>
         </div>

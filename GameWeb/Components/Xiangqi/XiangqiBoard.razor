@@ -14,8 +14,8 @@
                     title="@L["Show letters instead of Chinese characters on the pieces"]">@(Letters ? L["Letters"] : L["Characters"])</button>
             <button type="button" class="mj-link-button" aria-pressed="@(SoundOn ? "true" : "false")" @onclick="OnToggleSound"
                     title="@L["Play a chime when it's your turn and this tab is in the background"]">@(SoundOn ? L["Sound on"] : L["Sound off"])</button>
-            <a href="/xiangqi/rules" target="_blank">@L["Rules"]</a>
-            <a href="/xiangqi">@L["Leave"]</a>
+            <a href="xiangqi/rules" target="_blank">@L["Rules"]</a>
+            <a href="xiangqi">@L["Leave"]</a>
         </div>
     </div>
 
@@ -377,7 +377,7 @@
                     {
                         <button class="btn btn-primary" @onclick="OnRematch">@L["Play again (swap sides)"]</button>
                     }
-                    <a class="btn btn-ghost" href="/xiangqi">@L["Back to lobby"]</a>
+                    <a class="btn btn-ghost" href="xiangqi">@L["Back to lobby"]</a>
                 </div>
             </div>
         </div>
