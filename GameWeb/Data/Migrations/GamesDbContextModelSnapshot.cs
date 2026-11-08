@@ -30,6 +30,9 @@ namespace GameWeb.Data.Migrations
                     b.Property<short>("Move")
                         .HasColumnType("smallint");
 
+                    b.Property<byte>("Source")
+                        .HasColumnType("tinyint");
+
                     b.Property<int>("BlackWins")
                         .HasColumnType("int");
 
@@ -39,9 +42,9 @@ namespace GameWeb.Data.Migrations
                     b.Property<int>("RedWins")
                         .HasColumnType("int");
 
-                    b.HasKey("PositionHash", "Move");
+                    b.HasKey("PositionHash", "Move", "Source");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PositionHash", "Move"));
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PositionHash", "Move", "Source"));
 
                     b.ToTable("OpeningBook", (string)null);
                 });
@@ -119,6 +122,48 @@ namespace GameWeb.Data.Migrations
                     b.HasIndex("GameType", "EndedAt");
 
                     b.ToTable("Games", (string)null);
+                });
+
+            modelBuilder.Entity("GameWeb.Data.ImportedGameRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<byte[]>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("binary(32)");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(260)
+                        .HasColumnType("nvarchar(260)");
+
+                    b.Property<DateTime>("ImportedAt")
+                        .HasColumnType("datetime2(0)");
+
+                    b.Property<string>("Moves")
+                        .IsRequired()
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<string>("OpeningName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<short>("PlyCount")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte>("Result")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContentHash")
+                        .IsUnique();
+
+                    b.ToTable("ImportedGames", (string)null);
                 });
 
             modelBuilder.Entity("GameWeb.Data.GamePlayerRecord", b =>

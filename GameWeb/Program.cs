@@ -10,6 +10,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Command-line tools (run instead of the website), e.g.:
+//   dotnet run --project GameWeb -- import-xiangqi <file or folder> [--dry-run]
+if (args.Length > 0 && args[0] == XiangqiImportCommand.Name)
+{
+    Environment.ExitCode = await XiangqiImportCommand.RunAsync(args[1..], builder.Configuration);
+    return;
+}
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

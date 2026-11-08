@@ -21,15 +21,19 @@ public static class XqBook
     /// </summary>
     public static List<(ulong Hash, int Move)> Entries(XqGame game, Func<XqSide, bool> trusted)
     {
-        var result = new List<(ulong, int)>();
-        if (!game.IsOver || game.History.Count < MinGamePlies || game.Reason == XqEndReason.Timeout) return result;
+        if (!game.IsOver || game.History.Count < MinGamePlies || game.Reason == XqEndReason.Timeout) return [];
+        return OpeningEntries(game.History.Select(h => h.Move), trusted);
+    }
 
+    /// <summary>(position hash, move) for the first <see cref="MaxPlies"/> moves of a game from the start position.</summary>
+    public static List<(ulong Hash, int Move)> OpeningEntries(IEnumerable<XqMove> moves, Func<XqSide, bool>? trusted = null)
+    {
+        var result = new List<(ulong, int)>();
         var pos = XqPosition.Start();
         ulong hash = XqZobrist.Hash(pos);
-        foreach (var record in game.History.Take(MaxPlies))
+        foreach (var m in moves.Take(MaxPlies))
         {
-            var m = record.Move;
-            if (trusted(pos.SideToMove)) result.Add((hash, m.From * 90 + m.To));
+            if (trusted is null || trusted(pos.SideToMove)) result.Add((hash, m.From * 90 + m.To));
             hash = XqZobrist.After(hash, pos, m);
             pos.Make(m);
         }

@@ -104,10 +104,13 @@ public sealed class SqlGameStore(IDbContextFactory<GamesDbContext> dbFactory, IL
     internal static async Task<IReadOnlyList<BookMove>> QueryBookAsync(GamesDbContext db, ulong positionHash, CancellationToken cancellationToken)
     {
         long key = unchecked((long)positionHash);
+        // Played and imported games count together.
         var rows = await db.OpeningBook.AsNoTracking()
             .Where(b => b.PositionHash == key)
+            .GroupBy(b => b.Move)
+            .Select(g => new { Move = g.Key, Red = g.Sum(b => b.RedWins), Black = g.Sum(b => b.BlackWins), Draws = g.Sum(b => b.Draws) })
             .ToListAsync(cancellationToken);
-        return rows.Select(r => new BookMove(XqBook.DecodeMove(r.Move), r.RedWins, r.BlackWins, r.Draws)).ToList();
+        return rows.Select(r => new BookMove(XqBook.DecodeMove(r.Move), r.Red, r.Black, r.Draws)).ToList();
     }
 
     /// <summary>Anonymous, stable key for a player: the first 16 bytes of SHA-256 of their browser id.</summary>

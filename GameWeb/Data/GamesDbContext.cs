@@ -38,16 +38,44 @@ public sealed class GamePlayerRecord
     public int? Score { get; set; }
 }
 
-/// <summary>Opening book: how often each move was played from a position, and how those games ended.</summary>
+public enum BookSource : byte
+{
+    /// <summary>Games played on GameWeb.</summary>
+    Played = 0,
+    /// <summary>Games imported from game record files.</summary>
+    Imported = 1,
+}
+
+/// <summary>
+/// Opening book: how often each move was played from a position, and how those games ended.
+/// Counts are kept per source, so imported data can be removed or rebuilt without touching
+/// the statistics of games played on the site; lookups add the sources together.
+/// </summary>
 public sealed class BookEntry
 {
     /// <summary>Zobrist hash of the position (side to move included).</summary>
     public long PositionHash { get; set; }
     /// <summary>from * 90 + to.</summary>
     public short Move { get; set; }
+    public BookSource Source { get; set; }
     public int RedWins { get; set; }
     public int BlackWins { get; set; }
     public int Draws { get; set; }
+}
+
+/// <summary>A game imported from a record file. Kept so the imported book can be rebuilt without the files.</summary>
+public sealed class ImportedGameRecord
+{
+    public long Id { get; set; }
+    /// <summary>SHA-256 of the result and moves: the same game is imported only once.</summary>
+    public byte[] ContentHash { get; set; } = [];
+    public string? FileName { get; set; }
+    public string? OpeningName { get; set; }
+    /// <summary>1 Red wins, 2 Black wins, 3 draw.</summary>
+    public byte Result { get; set; }
+    public short PlyCount { get; set; }
+    public string Moves { get; set; } = "";
+    public DateTime ImportedAt { get; set; }
 }
 
 public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : DbContext(options)
@@ -55,6 +83,7 @@ public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : D
     public DbSet<GameRecord> Games => Set<GameRecord>();
     public DbSet<GamePlayerRecord> GamePlayers => Set<GamePlayerRecord>();
     public DbSet<BookEntry> OpeningBook => Set<BookEntry>();
+    public DbSet<ImportedGameRecord> ImportedGames => Set<ImportedGameRecord>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -85,7 +114,19 @@ public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : D
         {
             e.ToTable("OpeningBook");
             // Clustered on the lookup key: one index seek returns every move for a position.
-            e.HasKey(b => new { b.PositionHash, b.Move }).IsClustered();
+            e.HasKey(b => new { b.PositionHash, b.Move, b.Source }).IsClustered();
+            e.Property(b => b.Source).HasConversion<byte>();
+        });
+
+        model.Entity<ImportedGameRecord>(e =>
+        {
+            e.ToTable("ImportedGames");
+            e.Property(g => g.ContentHash).HasColumnType("binary(32)");
+            e.HasIndex(g => g.ContentHash).IsUnique();
+            e.Property(g => g.FileName).HasMaxLength(260);
+            e.Property(g => g.OpeningName).HasMaxLength(100);
+            e.Property(g => g.Moves).HasColumnType("varchar(max)").IsUnicode(false);
+            e.Property(g => g.ImportedAt).HasColumnType("datetime2(0)");
         });
     }
 }
