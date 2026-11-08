@@ -158,6 +158,11 @@ namespace GameWeb.Data.Migrations
                     b.Property<byte>("Result")
                         .HasColumnType("tinyint");
 
+                    b.Property<byte>("Source")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint")
+                        .HasDefaultValue((byte)1);
+
                     b.HasKey("Id");
 
                     b.HasIndex("ContentHash")

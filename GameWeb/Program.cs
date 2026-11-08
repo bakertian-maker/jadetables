@@ -12,9 +12,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Command-line tools (run instead of the website), e.g.:
 //   dotnet run --project GameWeb -- import-xiangqi <file or folder> [--dry-run]
+//   dotnet run --project GameWeb -- selfplay-xiangqi [--games 100] [--budget 300] [--parallel N] [--dry-run]
+//   dotnet run --project GameWeb -- tune-xiangqi [--iterations 600] [--out weights.json] | --adopt weights.json
+//   dotnet run --project GameWeb -- match-xiangqi --candidate weights.json [--games 200] [--budget 100]
 if (args.Length > 0 && args[0] == XiangqiImportCommand.Name)
 {
     Environment.ExitCode = await XiangqiImportCommand.RunAsync(args[1..], builder.Configuration);
+    return;
+}
+if (args.Length > 0 && args[0] == XiangqiSelfPlayCommand.Name)
+{
+    Environment.ExitCode = await XiangqiSelfPlayCommand.RunAsync(args[1..], builder.Configuration);
+    return;
+}
+if (args.Length > 0 && args[0] == XiangqiTuningCommands.Tune)
+{
+    Environment.ExitCode = await XiangqiTuningCommands.TuneAsync(args[1..], builder.Configuration);
+    return;
+}
+if (args.Length > 0 && args[0] == XiangqiTuningCommands.Match)
+{
+    Environment.ExitCode = await XiangqiTuningCommands.MatchAsync(args[1..]);
     return;
 }
 

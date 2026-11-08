@@ -22,6 +22,7 @@ public static class XqBot
     const int MaxQuiescePly = 8;
     const int MaxPly = 64;
 
+    /// <summary>Rough piece values for move ordering (captures of valuable pieces first); not the evaluation.</summary>
     static readonly int[] PieceValue = [0, 0, 200, 200, 400, 900, 450, 100];
 
     sealed record LevelSettings(int MaxDepth, TimeSpan Budget, int Margin, double LooseChance, int LooseMargin, bool Enhanced);
@@ -33,68 +34,59 @@ public static class XqBot
         _ => new(MaxPly / 8, TimeSpan.FromMilliseconds(2000), Margin: 0, LooseChance: 0, LooseMargin: 0, Enhanced: true),
     };
 
-    public static XqMove ChooseMove(XqPosition position, XqLevel level, Random? rng = null, TimeSpan? budget = null)
+    public static XqMove ChooseMove(XqPosition position, XqLevel level, Random? rng = null, TimeSpan? budget = null) =>
+        Analyse(position, level, rng, budget).Move;
+
+    /// <summary>A move and its score, in points for the side to move (a soldier is 100; near ±100000 means a forced mate).</summary>
+    public readonly record struct Analysis(XqMove Move, int Score);
+
+    /// <summary>
+    /// Chooses a move like <see cref="ChooseMove"/> and also returns its score.
+    /// <paramref name="variety"/> &gt; 0 makes any level pick at random among moves within that many points of
+    /// the best, and among at most <paramref name="maxChoices"/> of them (self-play uses this so games don't all
+    /// follow the same line); 0 keeps the level's own style.
+    /// </summary>
+    public static Analysis Analyse(XqPosition position, XqLevel level, Random? rng = null, TimeSpan? budget = null,
+        int variety = 0, int maxChoices = int.MaxValue, XqEval? eval = null)
     {
         rng ??= Random.Shared;
         var settings = For(level);
-        var search = new Search(position.Clone(), budget ?? settings.Budget, settings.Enhanced);
+        bool fullRootWindow = !settings.Enhanced || variety > 0;
+        var search = new Search(position.Clone(), budget ?? settings.Budget, settings.Enhanced, fullRootWindow, eval ?? XqEval.Default);
         var scores = search.Run(settings.MaxDepth);
         if (scores.Count == 0) throw new InvalidOperationException("No legal moves");
 
         int best = scores.Max(s => s.Score);
-        // Difficult: other moves' scores are only bounds, so take the first move that reached the best score.
-        if (settings.Enhanced) return scores.First(s => s.Score == best).Move;
+        if (!fullRootWindow)
+        {
+            // Difficult: other moves' scores are only bounds, so take the first move that reached the best score.
+            return new Analysis(scores.First(s => s.Score == best).Move, best);
+        }
         // Never throw away a forced win or walk into a forced loss on purpose.
         bool decided = Math.Abs(best) > Mate / 2;
-        int margin = decided ? 0 : settings.Margin;
-        if (!decided && settings.LooseChance > 0 && rng.NextDouble() < settings.LooseChance) margin = settings.LooseMargin;
-        var choices = scores.Where(s => s.Score >= best - margin && s.Score > -Mate / 2).ToList();
+        int margin = decided ? 0 : variety > 0 ? variety : settings.Margin;
+        if (!decided && variety == 0 && settings.LooseChance > 0 && rng.NextDouble() < settings.LooseChance) margin = settings.LooseMargin;
+        var choices = scores.Where(s => s.Score >= best - margin && s.Score > -Mate / 2)
+            .OrderByDescending(s => s.Score)
+            .Take(variety > 0 ? Math.Max(1, maxChoices) : int.MaxValue)
+            .ToList();
         if (choices.Count == 0) choices = scores.Where(s => s.Score == best).ToList();
-        return choices[rng.Next(choices.Count)].Move;
+        var pick = choices[rng.Next(choices.Count)];
+        return new Analysis(pick.Move, pick.Score);
     }
 
-    /// <summary>Static evaluation from the side to move's point of view.</summary>
-    public static int Evaluate(XqPosition pos)
-    {
-        int score = 0;
-        for (int sq = 0; sq < 90; sq++)
-        {
-            int piece = pos[sq];
-            if (piece == 0) continue;
-            int v = PieceScore(piece, sq);
-            score += Pieces.SideOf(piece) == XqSide.Red ? v : -v;
-        }
-        return pos.SideToMove == XqSide.Red ? score : -score;
-    }
+    /// <summary>Static evaluation from the side to move's point of view, with the evaluation in use.</summary>
+    public static int Evaluate(XqPosition pos) => XqEval.Default.Evaluate(pos);
 
-    static int PieceScore(int piece, int sq)
+    /// <summary>
+    /// True if the position is quiet: the side to move isn't in check and the capture search can't
+    /// improve on the static evaluation. Evaluation tuning only learns from quiet positions.
+    /// </summary>
+    public static bool IsQuiet(XqPosition pos, XqEval eval)
     {
-        var side = Pieces.SideOf(piece);
-        int file = Sq.File(sq);
-        int rank = side == XqSide.Red ? Sq.Rank(sq) : 9 - Sq.Rank(sq); // ranks from the owner's side
-        int centre = Math.Abs(file - 4);
-        int type = Pieces.Type(piece);
-        int v = PieceValue[type];
-        switch (type)
-        {
-            case Pieces.Soldier:
-                if (rank >= 5) v += 90 + (rank == 9 ? -40 : (rank - 5) * 12) + (centre <= 1 ? 20 : 0);
-                else if (rank == 4) v += 10;
-                break;
-            case Pieces.Horse:
-                v += -centre * 6 + (rank is >= 2 and <= 7 ? 15 : 0) + (rank >= 5 ? 10 : 0);
-                break;
-            case Pieces.Chariot:
-                v += (rank >= 3 ? 10 : 0) + (centre is 1 ? 6 : 0);
-                break;
-            case Pieces.Cannon:
-                v += (file == 4 ? 15 : 0) + (rank == 2 ? 5 : 0);
-                break;
-            case Pieces.General:
-                v += file == 4 ? 0 : -10;
-                break;
-        }
-        return v;
+        if (pos.InCheck(pos.SideToMove)) return false;
+        var search = new Search(pos.Clone(), TimeSpan.FromSeconds(10), enhanced: false, fullRootWindow: true, eval);
+        return search.QuiescenceScore() == eval.Evaluate(pos);
     }
 
     readonly record struct RootScore(XqMove Move, int Score);
@@ -110,7 +102,7 @@ public static class XqBot
         public Bound Bound;
     }
 
-    sealed class Search(XqPosition pos, TimeSpan budget, bool enhanced)
+    sealed class Search(XqPosition pos, TimeSpan budget, bool enhanced, bool fullRootWindow, XqEval eval)
     {
         const int TableSize = 1 << 16;
 
@@ -121,6 +113,9 @@ public static class XqBot
         ulong _hash;
         long _nodes;
         bool _stopped;
+
+        /// <summary>The capture-search score of the position (side to move's point of view).</summary>
+        public int QuiescenceScore() => Quiesce(-Infinity, Infinity, 0);
 
         public List<RootScore> Run(int maxDepth)
         {
@@ -137,11 +132,11 @@ public static class XqBot
                 foreach (var m in root)
                 {
                     var undo = MakeMove(m);
-                    // Beginner and Medium give every root move a full window, so each has a true score
-                    // to choose from; Difficult only needs the best move and searches the rest against it.
-                    int score = enhanced
-                        ? -Negamax(depth - 1, -Infinity, -alpha, 1)
-                        : -Negamax(depth - 1, -Infinity, Infinity, 1);
+                    // A full window gives every root move a true score to choose from (Beginner, Medium,
+                    // and self-play variety); Difficult on its own only needs the best move.
+                    int score = fullRootWindow
+                        ? -Negamax(depth - 1, -Infinity, Infinity, 1)
+                        : -Negamax(depth - 1, -Infinity, -alpha, 1);
                     UnmakeMove(m, undo);
                     if (_stopped) break;
                     scores.Add(new RootScore(m, score));
@@ -243,7 +238,7 @@ public static class XqBot
         int Quiesce(int alpha, int beta, int qply)
         {
             if (TimeUp()) return 0;
-            int stand = Evaluate(pos);
+            int stand = eval.Evaluate(pos);
             if (stand >= beta || qply >= MaxQuiescePly) return stand;
             if (stand > alpha) alpha = stand;
 

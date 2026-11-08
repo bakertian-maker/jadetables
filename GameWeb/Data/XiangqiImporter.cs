@@ -20,22 +20,39 @@ public sealed class ImportReport
     public int Draws { get; set; }
 }
 
+/// <summary>A game to store: from a record file or from self-play.</summary>
+public sealed record NewGame(string? FileName, string? OpeningName, XqResult Result, IReadOnlyList<XqMove> Moves)
+{
+    public string MovesText => string.Join(' ', Moves.Select(m => m.ToString()));
+    public byte[] Hash() => XqRecordFile.GameHash(Result, MovesText);
+}
+
 /// <summary>
-/// Imports Xiangqi game record files (one game per file, Chinese notation) into ImportedGames and
-/// adds their openings to the book under <see cref="BookSource.Imported"/>.
-/// Games are written in batches; each batch is one transaction, so a failure never leaves a game
-/// saved without its book counts. The same game (same moves and result) is only imported once.
+/// Stores Xiangqi games from outside the site (record files, self-play) in ImportedGames and adds
+/// their openings to the book under their own <see cref="BookSource"/>. Each batch is one transaction,
+/// so a game is never saved without its book counts; the same game (moves and result) is stored once.
 /// </summary>
 public sealed class XiangqiImporter(GamesDbContext db)
 {
     public const int BatchSize = 1000;
 
+    HashSet<string>? _known;
+
+    /// <summary>Loads the hashes of games already stored, for duplicate checks.</summary>
+    public async Task LoadKnownGamesAsync(CancellationToken ct = default) =>
+        _known = (await db.ImportedGames.AsNoTracking().Select(g => g.ContentHash).ToListAsync(ct))
+            .Select(Convert.ToHexString).ToHashSet();
+
+    /// <summary>True (and remembers it) if this game isn't stored yet and hasn't been seen in this run.</summary>
+    public bool IsNew(byte[] hash) => (_known ?? throw new InvalidOperationException("Call LoadKnownGamesAsync first"))
+        .Add(Convert.ToHexString(hash));
+
+    /// <summary>Reads, checks and stores game record files.</summary>
     public async Task<ImportReport> ImportAsync(IEnumerable<string> files, bool dryRun, TextWriter? progress = null, CancellationToken ct = default)
     {
         var report = new ImportReport();
-        var known = (await db.ImportedGames.AsNoTracking().Select(g => g.ContentHash).ToListAsync(ct))
-            .Select(Convert.ToHexString).ToHashSet();
-        var batch = new List<(string File, XqRecordFile Record)>();
+        await LoadKnownGamesAsync(ct);
+        var batch = new List<NewGame>();
 
         foreach (var file in files)
         {
@@ -56,46 +73,48 @@ public sealed class XiangqiImporter(GamesDbContext db)
                 report.Rejected.Add((file, record.Problem));
                 continue;
             }
-            if (!known.Add(Convert.ToHexString(record.ContentHash())))
+            if (!IsNew(record.ContentHash()))
             {
                 report.Duplicates++;
                 continue;
             }
             report.AmbiguousMovesResolved += record.Parsed.Resolved;
-            batch.Add((file, record));
+            batch.Add(new NewGame(Path.GetFileName(file), record.OpeningName, record.Result, record.Moves));
             if (batch.Count >= BatchSize)
             {
-                await FlushAsync(batch, report, dryRun, ct);
+                await SaveAsync(batch, BookSource.Imported, dryRun, report, ct);
+                batch.Clear();
                 progress?.WriteLine($"  {report.Files} files read, {report.Imported} games {(dryRun ? "ready" : "imported")}...");
             }
         }
-        await FlushAsync(batch, report, dryRun, ct);
+        await SaveAsync(batch, BookSource.Imported, dryRun, report, ct);
         return report;
     }
 
-    async Task FlushAsync(List<(string File, XqRecordFile Record)> batch, ImportReport report, bool dryRun, CancellationToken ct)
+    /// <summary>Stores a batch of games and adds their openings to the book under <paramref name="source"/>.</summary>
+    public async Task SaveAsync(IReadOnlyList<NewGame> games, BookSource source, bool dryRun, ImportReport report, CancellationToken ct = default)
     {
-        if (batch.Count == 0) return;
+        if (games.Count == 0) return;
 
         // Add up the book counts for the whole batch: one row per (position, move).
         var counts = new Dictionary<(ulong Hash, int Move), (int Red, int Black, int Draw)>();
-        foreach (var (_, record) in batch)
+        foreach (var game in games)
         {
-            switch (record.Result)
+            switch (game.Result)
             {
                 case XqResult.RedWins: report.RedWins++; break;
                 case XqResult.BlackWins: report.BlackWins++; break;
                 default: report.Draws++; break;
             }
-            if (record.Moves.Count < XqBook.MinGamePlies)
+            if (game.Moves.Count < XqBook.MinGamePlies)
             {
                 report.TooShortForBook++;
                 continue;
             }
-            foreach (var key in XqBook.OpeningEntries(record.Moves).Distinct())
+            foreach (var key in XqBook.OpeningEntries(game.Moves).Distinct())
             {
                 counts.TryGetValue(key, out var c);
-                counts[key] = record.Result switch
+                counts[key] = game.Result switch
                 {
                     XqResult.RedWins => (c.Red + 1, c.Black, c.Draw),
                     XqResult.BlackWins => (c.Red, c.Black + 1, c.Draw),
@@ -111,26 +130,26 @@ public sealed class XiangqiImporter(GamesDbContext db)
             await using var tx = ownTransaction ? await db.Database.BeginTransactionAsync(ct) : null;
 
             var now = DateTime.UtcNow;
-            db.ImportedGames.AddRange(batch.Select(b => new ImportedGameRecord
+            db.ImportedGames.AddRange(games.Select(g => new ImportedGameRecord
             {
-                ContentHash = b.Record.ContentHash(),
-                FileName = Truncate(Path.GetFileName(b.File), 260),
-                OpeningName = b.Record.OpeningName is { } name ? Truncate(name, 100) : null,
-                Result = (byte)b.Record.Result,
-                PlyCount = (short)b.Record.Moves.Count,
-                Moves = b.Record.MovesText,
+                Source = source,
+                ContentHash = g.Hash(),
+                FileName = g.FileName is { } f ? Truncate(f, 260) : null,
+                OpeningName = g.OpeningName is { } name ? Truncate(name, 100) : null,
+                Result = (byte)g.Result,
+                PlyCount = (short)g.Moves.Count,
+                Moves = g.MovesText,
                 ImportedAt = now,
             }));
             await db.SaveChangesAsync(ct);
             db.ChangeTracker.Clear();
-            await AddBookCountsAsync(db, BookSource.Imported, counts, ct);
+            await AddBookCountsAsync(db, source, counts, ct);
 
             if (tx is not null) await tx.CommitAsync(ct);
         }
 
-        report.Imported += batch.Count;
+        report.Imported += games.Count;
         report.BookRows += counts.Count;
-        batch.Clear();
     }
 
     /// <summary>One call to dbo.Book_AddCounts with the batch's counts as a table-valued parameter.</summary>

@@ -44,6 +44,8 @@ public enum BookSource : byte
     Played = 0,
     /// <summary>Games imported from game record files.</summary>
     Imported = 1,
+    /// <summary>Games the computer played against itself.</summary>
+    SelfPlay = 2,
 }
 
 /// <summary>
@@ -63,10 +65,15 @@ public sealed class BookEntry
     public int Draws { get; set; }
 }
 
-/// <summary>A game imported from a record file. Kept so the imported book can be rebuilt without the files.</summary>
+/// <summary>
+/// A game from outside the site: imported from a record file, or played by the computer against itself.
+/// Kept so its part of the book can be rebuilt without the original files.
+/// </summary>
 public sealed class ImportedGameRecord
 {
     public long Id { get; set; }
+    /// <summary><see cref="BookSource.Imported"/> or <see cref="BookSource.SelfPlay"/>.</summary>
+    public BookSource Source { get; set; } = BookSource.Imported;
     /// <summary>SHA-256 of the result and moves: the same game is imported only once.</summary>
     public byte[] ContentHash { get; set; } = [];
     public string? FileName { get; set; }
@@ -127,6 +134,7 @@ public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : D
             e.Property(g => g.OpeningName).HasMaxLength(100);
             e.Property(g => g.Moves).HasColumnType("varchar(max)").IsUnicode(false);
             e.Property(g => g.ImportedAt).HasColumnType("datetime2(0)");
+            e.Property(g => g.Source).HasConversion<byte>().HasDefaultValue(BookSource.Imported).HasSentinel(BookSource.Played);
         });
     }
 }

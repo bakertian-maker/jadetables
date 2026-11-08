@@ -35,7 +35,11 @@ public sealed partial class XqRecordFile
     public string MovesText => string.Join(' ', Moves.Select(m => m.ToString()));
 
     /// <summary>Identifies the game itself (moves and result), so the same game in two files is imported once.</summary>
-    public byte[] ContentHash() => SHA256.HashData(Encoding.ASCII.GetBytes($"{(int)Result}|{MovesText}"));
+    public byte[] ContentHash() => GameHash(Result, MovesText);
+
+    /// <summary>SHA-256 of "result|moves": the identity of a game for duplicate checks.</summary>
+    public static byte[] GameHash(XqResult result, string movesText) =>
+        SHA256.HashData(Encoding.ASCII.GetBytes($"{(int)result}|{movesText}"));
 
     public static XqRecordFile Parse(string text)
     {

@@ -82,6 +82,7 @@ public class RecordFileTests
 }
 
 /// <summary>Imports into the developer's SQL Server inside a rolled-back transaction (skipped without a database).</summary>
+[Collection(DatabaseCollection.Name)]
 public class ImporterIntegrationTests
 {
     const string UserSecretsId = "1ae01199-b626-4a8b-acae-e04d3370f059";
@@ -101,7 +102,11 @@ public class ImporterIntegrationTests
         var dir = Directory.CreateTempSubdirectory("xq-import-");
         try
         {
-            var sample = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "TestData", "xiangqi-sample.txt"));
+            // The first 40 half-moves of the sample game, stated as a draw: a game that won't already be in
+            // the developer's database (the full sample may have been imported for real).
+            var sampleLines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "TestData", "xiangqi-sample.txt"));
+            var moveLines = sampleLines.Where(l => l.StartsWith("* ") && !l.Contains("====")).Take(20);
+            var sample = "棋局结果和棋\n开局中炮对进左马\n" + string.Join("\n", moveLines);
             File.WriteAllText(Path.Combine(dir.FullName, "a.txt"), sample);
             File.WriteAllText(Path.Combine(dir.FullName, "b-copy.txt"), sample);                       // same game again
             File.WriteAllText(Path.Combine(dir.FullName, "c-bad.txt"), "1.炮二平五马8进7 2.车一进九"); // illegal move
@@ -109,7 +114,7 @@ public class ImporterIntegrationTests
 
             ulong startHash = XqZobrist.Hash(XqPosition.Start());
             var before = (await SqlGameStore.QueryBookAsync(db, startHash, default))
-                .Where(m => m.Move == XqMove.Parse("h2e2")).Sum(m => m.RedWins);
+                .Where(m => m.Move == XqMove.Parse("h2e2")).Sum(m => m.Draws);
 
             await using var tx = await db.Database.BeginTransactionAsync();
             var report = await new XiangqiImporter(db).ImportAsync(files, dryRun: false);
@@ -123,11 +128,12 @@ public class ImporterIntegrationTests
 
             var game = await db.ImportedGames.AsNoTracking().SingleAsync(g => g.FileName == "a.txt");
             Assert.Equal("中炮对进左马", game.OpeningName);
-            Assert.Equal(57, game.PlyCount);
+            Assert.Equal(40, game.PlyCount);
+            Assert.Equal(BookSource.Imported, game.Source);
 
             // The first move is now in the book under the imported source, and lookups include it.
             var after = (await SqlGameStore.QueryBookAsync(db, startHash, default))
-                .Where(m => m.Move == XqMove.Parse("h2e2")).Sum(m => m.RedWins);
+                .Where(m => m.Move == XqMove.Parse("h2e2")).Sum(m => m.Draws);
             Assert.Equal(before + 1, after);
             Assert.True(await db.OpeningBook.AnyAsync(b => b.PositionHash == unchecked((long)startHash) && b.Source == BookSource.Imported));
 

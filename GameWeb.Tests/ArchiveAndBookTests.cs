@@ -158,6 +158,7 @@ public class RoomArchiveTests
 /// ConnectionStrings__Games environment variable) inside a transaction that is rolled back, so it
 /// leaves no data behind. Without a database (e.g. in CI) it does nothing.
 /// </summary>
+[Collection(DatabaseCollection.Name)]
 public class SqlGameStoreIntegrationTests
 {
     const string UserSecretsId = "1ae01199-b626-4a8b-acae-e04d3370f059";
