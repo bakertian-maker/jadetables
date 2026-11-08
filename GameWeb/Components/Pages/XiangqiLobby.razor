@@ -3,6 +3,7 @@
 @inject RoomService Rooms
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject XqText X
 
 <PageTitle>@L["Xiangqi · GameWeb"]</PageTitle>
 <HeadContent>
@@ -45,8 +46,9 @@
                 <label>
                     @L["Level"]
                     <select @bind="quickLevel">
-                        <option value="@XqLevel.Easy">@L["Easy"]</option>
-                        <option value="@XqLevel.Medium">@L["Medium"]</option>
+                        <option value="@XqLevel.Beginner">@X.LevelName(XqLevel.Beginner)</option>
+                        <option value="@XqLevel.Medium">@X.LevelName(XqLevel.Medium)</option>
+                        <option value="@XqLevel.Difficult">@X.LevelName(XqLevel.Difficult)</option>
                     </select>
                 </label>
             </div>
@@ -76,8 +78,9 @@
                 <label>
                     @L["Computer level (if a seat stays empty)"]
                     <select @bind="roomLevel">
-                        <option value="@XqLevel.Easy">@L["Easy"]</option>
-                        <option value="@XqLevel.Medium">@L["Medium"]</option>
+                        <option value="@XqLevel.Beginner">@X.LevelName(XqLevel.Beginner)</option>
+                        <option value="@XqLevel.Medium">@X.LevelName(XqLevel.Medium)</option>
+                        <option value="@XqLevel.Difficult">@X.LevelName(XqLevel.Difficult)</option>
                     </select>
                 </label>
             </div>
@@ -111,7 +114,7 @@
 
 @code {
     string nickname = "";
-    XqLevel quickLevel = XqLevel.Easy;
+    XqLevel quickLevel = XqLevel.Beginner;
     XqLevel roomLevel = XqLevel.Medium;
     XqRedChoice red = XqRedChoice.Host;
     int moveSeconds = 60;

@@ -38,7 +38,7 @@ else if (view is { Started: false })
         <Summary>
             @RedSummary() ·
             @(view.Settings.MoveSeconds == 0 ? L["No move timer"] : L["{0}s per move", view.Settings.MoveSeconds]) ·
-            @L["Computer: {0}", L[view.Settings.BotLevel == XqLevel.Easy ? "Easy" : "Medium"]]
+            @L["Computer: {0}", X.LevelName(view.Settings.BotLevel)]
         </Summary>
     </WaitingRoom>
 }

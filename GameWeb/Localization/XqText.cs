@@ -32,6 +32,13 @@ public sealed class XqText(IStringLocalizer<SharedResource> l)
 
     public string SideName(XqSide side) => side == XqSide.Red ? l["Red"] : l["Black"];
 
+    public string LevelName(XqLevel level) => level switch
+    {
+        XqLevel.Beginner => l["Beginner"],
+        XqLevel.Medium => l["Medium"],
+        _ => l["Difficult"],
+    };
+
     public static string SquareName(int sq) => Sq.Name(sq);
 
     /// <summary>"炮二平五" / "马8进7" in Chinese, "C2.5" / "H8+7" (WXF style) in English.</summary>

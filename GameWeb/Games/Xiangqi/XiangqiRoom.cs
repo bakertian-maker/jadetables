@@ -152,7 +152,7 @@ public sealed class XiangqiRoom : Room
         return true;
     }
 
-    /// <summary>A suggested move for a beginner, from the Easy engine. Null when it is not their turn.</summary>
+    /// <summary>A suggested move, from the Medium engine with a short think. Null when it is not their turn.</summary>
     public XqMove? Hint(string playerId)
     {
         XqPosition position;
@@ -162,7 +162,7 @@ public sealed class XiangqiRoom : Room
             if (_game is not { IsOver: false } g || seat < 0 || SideOfSeat(seat) != g.SideToMove) return null;
             position = g.Position.Clone();
         }
-        return XqBot.ChooseMove(position, XqLevel.Easy, budget: TimeSpan.FromMilliseconds(250));
+        return XqBot.ChooseMove(position, XqLevel.Medium, budget: TimeSpan.FromMilliseconds(400));
     }
 
     protected override bool Tick(DateTime now)

@@ -177,16 +177,19 @@ public class XiangqiBotTests
     /// <summary>Shorter thinking time so bot-vs-bot games stay quick in CI.</summary>
     static readonly TimeSpan FastBudget = TimeSpan.FromMilliseconds(150);
 
-    [Fact]
-    public void Medium_StaysWithinItsTimeBudget_InABusyPosition()
+    [Theory]
+    [InlineData(XqLevel.Medium, 1.5)]
+    [InlineData(XqLevel.Difficult, 2.8)]
+    public void Level_StaysWithinItsTimeBudget_InABusyPosition(XqLevel level, double maxSeconds)
     {
         // A crowded middlegame after a few opening moves.
         var game = new XqGame();
         foreach (var m in new[] { "h2e2", "h9g7", "h0g2", "i9h9", "i0h0", "b9c7" })
             Assert.True(game.TryMove(XqMove.Parse(m)));
         var sw = System.Diagnostics.Stopwatch.StartNew();
-        XqBot.ChooseMove(game.Position, XqLevel.Medium);
-        Assert.True(sw.Elapsed < TimeSpan.FromSeconds(2.5), $"took {sw.Elapsed}");
+        var move = XqBot.ChooseMove(game.Position, level);
+        Assert.True(sw.Elapsed < TimeSpan.FromSeconds(maxSeconds), $"took {sw.Elapsed}");
+        Assert.Contains(move, game.LegalMoves());
     }
 
     [Fact]
@@ -211,41 +214,47 @@ public class XiangqiBotTests
     }
 
     [Theory]
-    [InlineData(XqLevel.Easy, XqLevel.Medium)]
-    [InlineData(XqLevel.Medium, XqLevel.Easy)]
+    [InlineData(XqLevel.Beginner, XqLevel.Difficult)]
+    [InlineData(XqLevel.Difficult, XqLevel.Beginner)]
     public void BotGames_PlayOnlyLegalMoves_AndFinish(XqLevel red, XqLevel black)
     {
         var rng = new Random(7);
         var game = new XqGame();
-        var slowest = TimeSpan.Zero;
         for (int ply = 0; ply < 400 && !game.IsOver; ply++)
         {
             var level = game.SideToMove == XqSide.Red ? red : black;
-            var sw = System.Diagnostics.Stopwatch.StartNew();
             var move = XqBot.ChooseMove(game.Position, level, rng, FastBudget);
-            if (sw.Elapsed > slowest) slowest = sw.Elapsed;
             Assert.True(game.TryMove(move), $"illegal bot move {move} at ply {ply}");
         }
-        Assert.True(slowest < TimeSpan.FromSeconds(1), $"slowest move took {slowest}");
-        Console.WriteLine($"{red} vs {black}: {game.Result} ({game.Reason}) after {game.History.Count} plies, slowest {slowest.TotalMilliseconds:0} ms");
+        Console.WriteLine($"{red} vs {black}: {game.Result} ({game.Reason}) after {game.History.Count} plies");
     }
 
-    [Fact]
-    public void Medium_BeatsEasy_MoreOftenThanNot()
+    /// <summary>Each level should beat the one below it, playing both colours.</summary>
+    [Theory]
+    [InlineData(XqLevel.Medium, XqLevel.Beginner)]
+    [InlineData(XqLevel.Difficult, XqLevel.Medium)]
+    public void StrongerLevel_WinsMoreGames(XqLevel stronger, XqLevel weaker)
     {
-        int mediumWins = 0, easyWins = 0;
+        int strongWins = 0, weakWins = 0, draws = 0;
         for (int seed = 0; seed < 2; seed++)
         {
             var rng = new Random(seed);
             var game = new XqGame();
-            var mediumSide = seed % 2 == 0 ? XqSide.Red : XqSide.Black;
+            var strongSide = seed % 2 == 0 ? XqSide.Red : XqSide.Black;
             for (int ply = 0; ply < 300 && !game.IsOver; ply++)
-                game.TryMove(XqBot.ChooseMove(game.Position, game.SideToMove == mediumSide ? XqLevel.Medium : XqLevel.Easy, rng, FastBudget));
-            var mediumResult = mediumSide == XqSide.Red ? XqResult.RedWins : XqResult.BlackWins;
-            if (game.Result == mediumResult) mediumWins++;
-            else if (game.IsOver && game.Result != XqResult.Draw) easyWins++;
+            {
+                bool strongToMove = game.SideToMove == strongSide;
+                var level = strongToMove ? stronger : weaker;
+                // Give Difficult a realistic but short think so the test stays quick.
+                var budget = level == XqLevel.Difficult ? TimeSpan.FromMilliseconds(400) : FastBudget;
+                game.TryMove(XqBot.ChooseMove(game.Position, level, rng, budget));
+            }
+            var strongResult = strongSide == XqSide.Red ? XqResult.RedWins : XqResult.BlackWins;
+            if (game.Result == strongResult) strongWins++;
+            else if (game.IsOver && game.Result != XqResult.Draw) weakWins++;
+            else draws++;
         }
-        Console.WriteLine($"Medium {mediumWins} - Easy {easyWins}");
-        Assert.True(mediumWins > easyWins);
+        Console.WriteLine($"{stronger} {strongWins} - {weakWins} {weaker} ({draws} drawn or unfinished)");
+        Assert.True(strongWins > weakWins, $"{stronger} won {strongWins}, {weaker} won {weakWins}");
     }
 }

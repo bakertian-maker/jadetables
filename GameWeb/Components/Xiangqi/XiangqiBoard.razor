@@ -275,7 +275,7 @@
             }
             @if (s.IsBot)
             {
-                <span class="mj-tag">@L["Computer · {0}", L[View.Settings.BotLevel == XqLevel.Easy ? "Easy" : "Medium"]]</span>
+                <span class="mj-tag">@L["Computer · {0}", X.LevelName(View.Settings.BotLevel)]</span>
             }
             else if (s.Connections == 0)
             {

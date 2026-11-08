@@ -233,7 +233,6 @@ ZH_HANS = {
     "Two armies face each other across the river. Checkmate the enemy general to win.": "两军隔河对峙，将死对方的将帅即可获胜。",
     "You play Red and move first. No timer.": "你执红先走，不限时。",
     "Level": "难度",
-    "Easy": "简单",
     "Medium": "中等",
     "Get a link for a friend. If nobody joins, the computer takes the other seat.": "生成链接邀请朋友。没人加入时，由电脑坐另一边。",
     "Who plays Red (moves first)": "谁执红（先走）",
@@ -305,4 +304,8 @@ ZH_HANS = {
     "Chariot": "车",
     "Cannon": "炮",
     "Soldier": "兵卒",
+
+    # Xiangqi computer levels
+    "Beginner": "入门",
+    "Difficult": "困难",
 }

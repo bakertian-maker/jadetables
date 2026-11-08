@@ -21,6 +21,7 @@
   <data name="Back to Xiangqi" xml:space="preserve"><value>返回象棋大厅</value></data>
   <data name="Back to home" xml:space="preserve"><value>返回首页</value></data>
   <data name="Back to lobby" xml:space="preserve"><value>返回大厅</value></data>
+  <data name="Beginner" xml:space="preserve"><value>入门</value></data>
   <data name="Black" xml:space="preserve"><value>黑方</value></data>
   <data name="Bot" xml:space="preserve"><value>电脑</value></data>
   <data name="Both seats in room {0} are taken." xml:space="preserve"><value>房间 {0} 的两个座位都已有人。</value></data>
@@ -50,6 +51,7 @@
   <data name="Copy link" xml:space="preserve"><value>复制链接</value></data>
   <data name="Create room" xml:space="preserve"><value>创建房间</value></data>
   <data name="Dealer" xml:space="preserve"><value>庄家</value></data>
+  <data name="Difficult" xml:space="preserve"><value>困难</value></data>
   <data name="Discard" xml:space="preserve"><value>打牌</value></data>
   <data name="Dou Dizhu" xml:space="preserve"><value>斗地主</value></data>
   <data name="Draw" xml:space="preserve"><value>摸牌</value></data>
@@ -60,7 +62,6 @@
   <data name="East" xml:space="preserve"><value>东</value></data>
   <data name="East round" xml:space="preserve"><value>东风圈</value></data>
   <data name="East round (about 4–8 hands)" xml:space="preserve"><value>东风圈（约 4–8 局）</value></data>
-  <data name="Easy" xml:space="preserve"><value>简单</value></data>
   <data name="Elephant" xml:space="preserve"><value>象</value></data>
   <data name="Enter a room code." xml:space="preserve"><value>请输入房间号。</value></data>
   <data name="Error reference: {0}" xml:space="preserve"><value>错误编号：{0}</value></data>

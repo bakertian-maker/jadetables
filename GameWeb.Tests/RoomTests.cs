@@ -153,7 +153,7 @@ public class XiangqiRoomTests
     [Fact]
     public async Task QuickPlay_ComputerAnswersTheFirstMove()
     {
-        using var room = new XiangqiRoom("XQ005", new XqRoomSettings { QuickPlay = true, BotLevel = XqLevel.Easy });
+        using var room = new XiangqiRoom("XQ005", new XqRoomSettings { QuickPlay = true, BotLevel = XqLevel.Beginner });
         room.Connect("me", "Me");
         Assert.True(room.Move("me", M("h2e2")));
         for (int i = 0; i < 50 && room.GetView("me").History.Count < 2; i++) await Task.Delay(100);
