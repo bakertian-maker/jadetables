@@ -212,6 +212,12 @@ public abstract class Room : IDisposable
 
     protected virtual void OnPlayerSeated(int seat) { }
 
+    /// <summary>The time source for game clocks. Tests replace it to move time forward.</summary>
+    internal Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
+
+    /// <summary>Runs one timer tick now (tests).</summary>
+    internal void TickNow() => SafeTick();
+
     void SafeTick()
     {
         bool changed;
@@ -219,7 +225,7 @@ public abstract class Room : IDisposable
         {
             lock (Sync)
             {
-                var now = DateTime.UtcNow;
+                var now = Clock();
                 if (!Seats.Any(s => s.IsHuman && s.Connections > 0)) return; // pause while nobody is here
                 LastActivity = now;
                 changed = MaintainSeats(now);

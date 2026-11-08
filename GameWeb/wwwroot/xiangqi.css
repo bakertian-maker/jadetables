@@ -136,3 +136,15 @@ button.xq-piece:focus-visible { outline: 3px solid #f2c94c; outline-offset: 2px;
     .xq-rules-piece { white-space: normal; }
     .xq-rules-icons .xq-disc { width: 24px; height: 24px; }
 }
+
+/* Game clocks and draw offers */
+.xq-clock {
+    font-variant-numeric: tabular-nums; font-weight: 700; font-size: 1.05rem; padding: 2px 8px; border-radius: 8px;
+    background: rgba(255, 255, 255, .1); color: #f3ead4; margin-left: auto;
+}
+.xq-clock + .xq-captured { margin-left: 0; }
+.xq-clock.is-running { background: #f2c94c; color: #1d1a10; }
+.xq-clock.is-running.is-low { background: #e05a47; color: #fff; }
+.xq-draw-offer { background: rgba(242, 201, 76, .14); border: 1px solid rgba(242, 201, 76, .5); border-radius: 10px; padding: 10px 12px; }
+.xq-draw-offer p { margin: 0 0 8px; font-weight: 600; }
+.xq-draw-note { margin: 0; }

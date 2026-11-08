@@ -79,6 +79,12 @@ public sealed class XqText(IStringLocalizer<SharedResource> l)
         return $"{tandem}{piece}{chineseOp}{Num(n.Dest)}";
     }
 
+    /// <summary>The room's time limit in a few words, e.g. "10 min each, +5s per move".</summary>
+    public string TimeControl(XqRoomSettings s) =>
+        s.HasClock ? l["{0} min each, +{1}s per move", s.ClockMinutes, s.IncrementSeconds]
+        : s.MoveSeconds > 0 ? l["{0}s per move", s.MoveSeconds]
+        : l["No move timer"];
+
     public string ReasonText(XqEndReason reason, string loserName) => reason switch
     {
         XqEndReason.Checkmate => l["Checkmate."],

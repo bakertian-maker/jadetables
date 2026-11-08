@@ -1,0 +1,82 @@
+@page "/privacy"
+
+<PageTitle>@L["Privacy · GameWeb"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@L["What GameWeb stores about you: no accounts, a random player id in your browser, and finished games without names."]" />
+</HeadContent>
+
+@if (Languages.Current == Script.Traditional)
+{
+    <div class="wrap page-pad rules narrow">
+        <h1>私隱</h1>
+        <p class="lead">GameWeb 不用註冊，不收集電郵、電話或真實姓名，也沒有廣告和追蹤程式。</p>
+
+        <h2>存在你瀏覽器裏的資料</h2>
+        <ul>
+            <li><strong>玩家編號和暱稱：</strong>第一次來時，瀏覽器會產生一個隨機編號，讓你斷線後可以回到同一個座位。暱稱是你自己填的。兩者都只存在你的瀏覽器（localStorage）。</li>
+            <li><strong>偏好設定：</strong>聲音開關、棋子顯示漢字或字母。</li>
+            <li><strong>語言 cookie：</strong>記住你選的語言，一年後過期。這是網站運作必需的 cookie，不用來追蹤。</li>
+        </ul>
+        <p>清除這個網站的瀏覽器資料，就會全部刪除。</p>
+
+        <h2>存在伺服器上的資料</h2>
+        <ul>
+            <li><strong>進行中的房間</strong>只存在伺服器記憶體裏，包括暱稱。房間無人 10 分鐘後就會關閉並刪除。</li>
+            <li><strong>下完的棋局</strong>會存進資料庫：遊戲種類、房間號、開始和結束時間、每一步棋、結果、電腦等級。玩家只記為玩家編號的單向雜湊值（無法還原成編號），<strong>不存暱稱</strong>。這些記錄用來改進電腦棋力（例如象棋開局庫）。</li>
+            <li>和任何網站一樣，伺服器可能短暫記錄 IP 位址等技術資料，用於維持網站運作和安全。</li>
+        </ul>
+
+        <h2>分享</h2>
+        <p>我們不出售或分享你的資料。棋局記錄沒有名字，可能用於統計或改進遊戲。</p>
+    </div>
+}
+else if (Languages.Current == Script.Simplified)
+{
+    <div class="wrap page-pad rules narrow">
+        <h1>隐私</h1>
+        <p class="lead">GameWeb 不用注册，不收集邮箱、电话或真实姓名，也没有广告和跟踪程序。</p>
+
+        <h2>存在你浏览器里的数据</h2>
+        <ul>
+            <li><strong>玩家编号和昵称：</strong>第一次来时，浏览器会生成一个随机编号，让你断线后可以回到同一个座位。昵称是你自己填的。两者都只存在你的浏览器（localStorage）。</li>
+            <li><strong>偏好设置：</strong>声音开关、棋子显示汉字或字母。</li>
+            <li><strong>语言 cookie：</strong>记住你选的语言，一年后过期。这是网站运行必需的 cookie，不用来跟踪。</li>
+        </ul>
+        <p>清除这个网站的浏览器数据，就会全部删除。</p>
+
+        <h2>存在服务器上的数据</h2>
+        <ul>
+            <li><strong>进行中的房间</strong>只存在服务器内存里，包括昵称。房间无人 10 分钟后就会关闭并删除。</li>
+            <li><strong>下完的棋局</strong>会存进数据库：游戏种类、房间号、开始和结束时间、每一步棋、结果、电脑等级。玩家只记为玩家编号的单向哈希值（无法还原成编号），<strong>不存昵称</strong>。这些记录用来提高电脑棋力（例如象棋开局库）。</li>
+            <li>和任何网站一样，服务器可能短暂记录 IP 地址等技术信息，用于维持网站运行和安全。</li>
+        </ul>
+
+        <h2>分享</h2>
+        <p>我们不出售或分享你的数据。棋局记录没有名字，可能用于统计或改进游戏。</p>
+    </div>
+}
+else
+{
+    <div class="wrap page-pad rules narrow">
+        <h1>Privacy</h1>
+        <p class="lead">GameWeb has no sign-up. We don't collect email addresses, phone numbers or real names, and there are no ads or trackers.</p>
+
+        <h2>Stored in your browser</h2>
+        <ul>
+            <li><strong>Player id and nickname:</strong> on your first visit your browser makes up a random id, so you can get back to your seat after losing connection. The nickname is whatever you type. Both stay in your browser (localStorage).</li>
+            <li><strong>Preferences:</strong> sound on or off, and Chinese characters or letters on the pieces.</li>
+            <li><strong>Language cookie:</strong> remembers the language you picked, for a year. It's needed for the site to work and isn't used for tracking.</li>
+        </ul>
+        <p>Clearing this site's data in your browser removes all of it.</p>
+
+        <h2>Stored on the server</h2>
+        <ul>
+            <li><strong>Open rooms</strong>, including nicknames, are kept only in the server's memory. A room closes and is deleted 10 minutes after everyone leaves.</li>
+            <li><strong>Finished games</strong> are saved to a database: the game, room code, start and end times, every move, the result and the computer's level. Players are recorded only as a one-way hash of their player id (it can't be turned back into the id), and <strong>nicknames are not saved</strong>. These records are used to make the computer play better (for example, the Xiangqi opening book).</li>
+            <li>Like any website, the server may briefly log technical details such as IP addresses to keep the site running and secure.</li>
+        </ul>
+
+        <h2>Sharing</h2>
+        <p>We don't sell or share your data. Game records carry no names and may be used for statistics or to improve the games.</p>
+    </div>
+}

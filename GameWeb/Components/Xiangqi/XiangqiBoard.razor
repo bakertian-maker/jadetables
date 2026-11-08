@@ -7,7 +7,7 @@
     <div class="xq-topbar">
         <div class="mj-topbar-info">
             <span class="mj-chip">@L["Room"] @View.Code</span>
-            <span class="mj-chip mj-hide-sm">@(View.Settings.MoveSeconds == 0 ? L["No move timer"] : L["{0}s per move", View.Settings.MoveSeconds])</span>
+            <span class="mj-chip mj-hide-sm">@X.TimeControl(View.Settings)</span>
         </div>
         <div class="mj-topbar-links">
             <button type="button" class="mj-link-button" aria-pressed="@(Letters ? "true" : "false")" @onclick="OnToggleLetters"
@@ -112,12 +112,18 @@
                 }
             </div>
 
+            @DrawNotice()
+
             @if (View.MySide is not null && !View.IsOver)
             {
                 <div class="mj-buttons xq-actions">
                     @if (View.MyTurn)
                     {
                         <button class="btn btn-ghost btn-sm" @onclick="OnHint">@L["Hint"]</button>
+                    }
+                    @if (View.CanOfferDraw)
+                    {
+                        <button class="btn btn-ghost btn-sm" @onclick="OnOfferDraw">@L["Offer draw"]</button>
                     }
                     @if (confirmResign)
                     {
@@ -168,6 +174,8 @@
     [Parameter] public EventCallback OnResign { get; set; }
     [Parameter] public EventCallback OnHint { get; set; }
     [Parameter] public EventCallback OnRematch { get; set; }
+    [Parameter] public EventCallback OnOfferDraw { get; set; }
+    [Parameter] public EventCallback<bool> OnAnswerDraw { get; set; }
     [Parameter] public XqMove? HintMove { get; set; }
     [Parameter] public bool Letters { get; set; }
     [Parameter] public EventCallback OnToggleLetters { get; set; }
@@ -285,6 +293,10 @@
             {
                 <span class="mj-thinking xq-thinking">@L["Thinking"]</span>
             }
+            @if (View.Settings.HasClock && View.Started)
+            {
+                <XqClock Seconds="View.ClockOf(side)" At="View.ClockAt" Running="toMove" />
+            }
             <span class="xq-captured" aria-label="@L["Captured pieces"]">
                 @foreach (var p in captured)
                 {
@@ -292,6 +304,36 @@
                 }
             </span>
         </div>
+    };
+
+    RenderFragment DrawNotice() => __builder =>
+    {
+        if (View.IsOver) return;
+        if (View.DrawOfferBy is XqSide offerer)
+        {
+            if (View.MySide is XqSide mine && mine != offerer)
+            {
+                <div class="xq-draw-offer" role="alert">
+                    <p>@L["{0} offers a draw.", NameOf(offerer)]</p>
+                    <div class="mj-buttons">
+                        <button class="btn btn-primary btn-sm" @onclick="() => OnAnswerDraw.InvokeAsync(true)">@L["Accept draw"]</button>
+                        <button class="btn btn-ghost btn-sm" @onclick="() => OnAnswerDraw.InvokeAsync(false)">@L["Decline"]</button>
+                    </div>
+                </div>
+            }
+            else if (View.MySide == offerer)
+            {
+                <p class="xq-draw-note mj-muted" aria-live="polite">@L["Draw offered. Waiting for an answer…"]</p>
+            }
+            else
+            {
+                <p class="xq-draw-note mj-muted">@L["{0} offers a draw.", NameOf(offerer)]</p>
+            }
+        }
+        else if (View.MyDrawDeclined)
+        {
+            <p class="xq-draw-note mj-muted" aria-live="polite">@L["Your draw offer was declined."]</p>
+        }
     };
 
     RenderFragment StatusLine() => __builder =>

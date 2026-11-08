@@ -37,7 +37,7 @@ else if (view is { Started: false })
         </SeatBadge>
         <Summary>
             @RedSummary() ·
-            @(view.Settings.MoveSeconds == 0 ? L["No move timer"] : L["{0}s per move", view.Settings.MoveSeconds]) ·
+            @X.TimeControl(view.Settings) ·
             @L["Computer: {0}", X.LevelName(view.Settings.BotLevel)]
         </Summary>
     </WaitingRoom>
@@ -45,6 +45,7 @@ else if (view is { Started: false })
 else if (view is not null)
 {
     <XiangqiBoard View="view" OnMove="Move" OnResign="Resign" OnHint="Hint" OnRematch="Rematch" HintMove="hint"
+                  OnOfferDraw="() => room?.OfferDraw(identity.Id)" OnAnswerDraw="accept => room?.AnswerDraw(identity.Id, accept)"
                   Letters="letters" OnToggleLetters="ToggleLetters" SoundOn="soundOn" OnToggleSound="ToggleSound" />
 }
 

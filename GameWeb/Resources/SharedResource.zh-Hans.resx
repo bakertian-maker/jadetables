@@ -12,6 +12,7 @@
   <data name="3 players" xml:space="preserve"><value>3 人</value></data>
   <data name="4 players" xml:space="preserve"><value>4 人</value></data>
   <data name="60 moves without a capture: the game is drawn." xml:space="preserve"><value>60 回合没有吃子，判为和棋。</value></data>
+  <data name="Accept draw" xml:space="preserve"><value>同意和棋</value></data>
   <data name="Add computer player" xml:space="preserve"><value>添加电脑玩家</value></data>
   <data name="Add kong" xml:space="preserve"><value>加杠</value></data>
   <data name="Advisor" xml:space="preserve"><value>士</value></data>
@@ -51,12 +52,14 @@
   <data name="Copy link" xml:space="preserve"><value>复制链接</value></data>
   <data name="Create room" xml:space="preserve"><value>创建房间</value></data>
   <data name="Dealer" xml:space="preserve"><value>庄家</value></data>
+  <data name="Decline" xml:space="preserve"><value>拒绝</value></data>
   <data name="Difficult" xml:space="preserve"><value>困难</value></data>
   <data name="Discard" xml:space="preserve"><value>打牌</value></data>
   <data name="Dou Dizhu" xml:space="preserve"><value>斗地主</value></data>
   <data name="Draw" xml:space="preserve"><value>摸牌</value></data>
   <data name="Draw agreed." xml:space="preserve"><value>双方同意和棋。</value></data>
   <data name="Draw game" xml:space="preserve"><value>流局</value></data>
+  <data name="Draw offered. Waiting for an answer…" xml:space="preserve"><value>已提和，等待对方回应…</value></data>
   <data name="Draw, discard and claim your way to a winning hand of four sets and a pair. Faan scoring, 136 tiles, no flowers." xml:space="preserve"><value>摸牌、打牌、吃碰杠，凑成四组牌加一对将即可和牌。按番计分，136 张牌，不用花牌。</value></data>
   <data name="Drawn game" xml:space="preserve"><value>和棋</value></data>
   <data name="East" xml:space="preserve"><value>东</value></data>
@@ -121,7 +124,6 @@
   <data name="Min {0} faan" xml:space="preserve"><value>{0} 番起和</value></data>
   <data name="Minimum faan" xml:space="preserve"><value>起和番数</value></data>
   <data name="Move" xml:space="preserve"><value>走棋</value></data>
-  <data name="Move timer" xml:space="preserve"><value>每步限时</value></data>
   <data name="Move to {0}" xml:space="preserve"><value>走到 {0}</value></data>
   <data name="Moves" xml:space="preserve"><value>棋谱</value></data>
   <data name="My friend" xml:space="preserve"><value>我的朋友</value></data>
@@ -134,6 +136,7 @@
   <data name="No timer" xml:space="preserve"><value>不限时</value></data>
   <data name="North" xml:space="preserve"><value>北</value></data>
   <data name="Not ready" xml:space="preserve"><value>未准备</value></data>
+  <data name="Offer draw" xml:space="preserve"><value>提和</value></data>
   <data name="On {0}'s discard" xml:space="preserve"><value>{0} 点炮</value></data>
   <data name="Open a private room, send the link to friends and play on any phone or laptop. Short a player? A computer player takes the empty seat." xml:space="preserve"><value>开一个私人房间，把链接发给朋友，用手机或电脑都能玩。人不够？空位由电脑玩家补上。</value></data>
   <data name="Open seat" xml:space="preserve"><value>空位</value></data>
@@ -152,6 +155,8 @@
   <data name="Play the computer" xml:space="preserve"><value>和电脑对局</value></data>
   <data name="Player" xml:space="preserve"><value>玩家</value></data>
   <data name="Practise alone, or fill empty seats. If someone drops out, a computer player keeps their seat warm for them." xml:space="preserve"><value>可以独自练习，也可以用电脑补空位。有人掉线时，电脑玩家会替他暂时坐着。</value></data>
+  <data name="Privacy" xml:space="preserve"><value>隐私</value></data>
+  <data name="Privacy · GameWeb" xml:space="preserve"><value>隐私 · GameWeb</value></data>
   <data name="Private room" xml:space="preserve"><value>私人房间</value></data>
   <data name="Private rooms" xml:space="preserve"><value>私人房间</value></data>
   <data name="Protect" xml:space="preserve"><value>保护</value></data>
@@ -202,6 +207,7 @@
   <data name="This table is full" xml:space="preserve"><value>这桌已满</value></data>
   <data name="Three players, one landlord. Bid, team up and empty your hand first." xml:space="preserve"><value>三人一局，一个地主。叫分、组队，谁先出完手牌谁赢。</value></data>
   <data name="Tile numbers in the corner, a hint button and plain-English rules with the Chinese names alongside." xml:space="preserve"><value>牌角标有数字，有提示按钮，规则说明简单易懂。</value></data>
+  <data name="Time limit" xml:space="preserve"><value>限时</value></data>
   <data name="Total" xml:space="preserve"><value>合计</value></data>
   <data name="Try again" xml:space="preserve"><value>重试</value></data>
   <data name="Turn timer" xml:space="preserve"><value>出牌限时</value></data>
@@ -214,6 +220,7 @@
   <data name="Waiting room {0}" xml:space="preserve"><value>房间 {0} 等待开始</value></data>
   <data name="Wall" xml:space="preserve"><value>牌墙</value></data>
   <data name="West" xml:space="preserve"><value>西</value></data>
+  <data name="What GameWeb stores about you: no accounts, a random player id in your browser, and finished games without names." xml:space="preserve"><value>GameWeb 保存哪些数据：没有账号，浏览器里一个随机玩家编号，以及不含名字的棋局记录。</value></data>
   <data name="Who plays Red (moves first)" xml:space="preserve"><value>谁执红（先走）</value></data>
   <data name="Win" xml:space="preserve"><value>和牌</value></data>
   <data name="Win the game" xml:space="preserve"><value>获胜</value></data>
@@ -232,6 +239,7 @@
   <data name="You win!" xml:space="preserve"><value>你和牌了！</value></data>
   <data name="You won!" xml:space="preserve"><value>你赢了！</value></data>
   <data name="You're watching this game." xml:space="preserve"><value>你正在观战。</value></data>
+  <data name="Your draw offer was declined." xml:space="preserve"><value>对方拒绝了你的提和。</value></data>
   <data name="Your name at the table" xml:space="preserve"><value>你的昵称</value></data>
   <data name="Your turn" xml:space="preserve"><value>轮到你了</value></data>
   <data name="Your turn." xml:space="preserve"><value>轮到你了。</value></data>
@@ -257,7 +265,10 @@
   <data name="{0} kept chasing a piece (perpetual chase), which loses." xml:space="preserve"><value>{0}长捉，判负。</value></data>
   <data name="{0} kongs {1}" xml:space="preserve"><value>{0} 杠 {1}</value></data>
   <data name="{0} left" xml:space="preserve"><value>剩 {0} 张</value></data>
+  <data name="{0} min each, +{1}s per move" xml:space="preserve"><value>每方 {0} 分钟，每步加 {1} 秒</value></data>
   <data name="{0} moves played." xml:space="preserve"><value>共走了 {0} 回合。</value></data>
+  <data name="{0} offers a draw." xml:space="preserve"><value>{0}提议和棋。</value></data>
+  <data name="{0} on the clock" xml:space="preserve"><value>棋钟剩余 {0}</value></data>
   <data name="{0} pungs {1}" xml:space="preserve"><value>{0} 碰 {1}</value></data>
   <data name="{0} ran out of time." xml:space="preserve"><value>{0} 超时。</value></data>
   <data name="{0} resigned." xml:space="preserve"><value>{0} 认输。</value></data>

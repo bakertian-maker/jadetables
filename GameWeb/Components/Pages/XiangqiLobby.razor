@@ -68,11 +68,13 @@
                     </select>
                 </label>
                 <label>
-                    @L["Move timer"]
-                    <select @bind="moveSeconds">
-                        <option value="60">@L["{0} seconds", 60]</option>
-                        <option value="30">@L["{0} seconds", 30]</option>
-                        <option value="0">@L["No timer"]</option>
+                    @L["Time limit"]
+                    <select @bind="timeControl">
+                        <option value="m60">@L["{0}s per move", 60]</option>
+                        <option value="m30">@L["{0}s per move", 30]</option>
+                        <option value="c10+5">@L["{0} min each, +{1}s per move", 10, 5]</option>
+                        <option value="c5+3">@L["{0} min each, +{1}s per move", 5, 3]</option>
+                        <option value="none">@L["No timer"]</option>
                     </select>
                 </label>
                 <label>
@@ -117,7 +119,7 @@
     XqLevel quickLevel = XqLevel.Beginner;
     XqLevel roomLevel = XqLevel.Medium;
     XqRedChoice red = XqRedChoice.Host;
-    int moveSeconds = 60;
+    string timeControl = "m60";
     string joinCode = "";
     string? joinError;
     string? createError;
@@ -141,7 +143,18 @@
 
     void QuickPlay() => Open(new XqRoomSettings { QuickPlay = true, BotLevel = quickLevel, Red = XqRedChoice.Host, MoveSeconds = 0 });
 
-    void CreateRoom() => Open(new XqRoomSettings { BotLevel = roomLevel, Red = red, MoveSeconds = moveSeconds });
+    void CreateRoom()
+    {
+        var settings = new XqRoomSettings { BotLevel = roomLevel, Red = red, MoveSeconds = 0 };
+        switch (timeControl)
+        {
+            case "m60": settings.MoveSeconds = 60; break;
+            case "m30": settings.MoveSeconds = 30; break;
+            case "c10+5": settings.ClockMinutes = 10; settings.IncrementSeconds = 5; break;
+            case "c5+3": settings.ClockMinutes = 5; settings.IncrementSeconds = 3; break;
+        }
+        Open(settings);
+    }
 
     void Open(XqRoomSettings settings)
     {

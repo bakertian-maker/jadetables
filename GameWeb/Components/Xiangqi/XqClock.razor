@@ -1,0 +1,36 @@
+@* A player's game clock. It counts down on its own between server updates while Running. *@
+@implements IDisposable
+
+<span class="xq-clock @(Running ? "is-running" : "") @(Left < 20 ? "is-low" : "")" role="timer"
+      aria-label="@L["{0} on the clock", Format(Left)]">@Format(Left)</span>
+
+@code {
+    /// <summary>Seconds left as of <see cref="At"/>.</summary>
+    [Parameter, EditorRequired] public double Seconds { get; set; }
+    [Parameter, EditorRequired] public DateTime At { get; set; }
+    [Parameter] public bool Running { get; set; }
+
+    Timer? timer;
+
+    double Left => Running ? Math.Max(0, Seconds - (DateTime.UtcNow - At).TotalSeconds) : Seconds;
+
+    protected override void OnParametersSet()
+    {
+        if (Running && timer is null)
+            timer = new Timer(_ => InvokeAsync(StateHasChanged), null, 250, 250);
+        else if (!Running && timer is not null)
+        {
+            timer.Dispose();
+            timer = null;
+        }
+    }
+
+    /// <summary>m:ss, rounding up so the clock reads 0:00 only when time has run out.</summary>
+    static string Format(double seconds)
+    {
+        int s = (int)Math.Ceiling(seconds);
+        return $"{s / 60}:{s % 60:00}";
+    }
+
+    public void Dispose() => timer?.Dispose();
+}

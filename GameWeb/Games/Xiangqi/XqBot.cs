@@ -91,6 +91,12 @@ public static class XqBot
         return new Analysis(pick.Move, pick.Score);
     }
 
+    /// <summary>
+    /// Whether the computer takes a draw offer, given its own score (from a short search) and how many
+    /// half-moves have been played: yes when it is clearly worse, or when the game is long and level.
+    /// </summary>
+    public static bool AcceptsDraw(int score, int plies) => score <= -150 || (plies >= 60 && score <= 50);
+
     /// <summary>Static evaluation from the side to move's point of view, with the evaluation in use.</summary>
     public static int Evaluate(XqPosition pos) => XqEval.Default.Evaluate(pos);
 
