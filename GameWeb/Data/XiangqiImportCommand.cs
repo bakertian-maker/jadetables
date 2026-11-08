@@ -33,6 +33,8 @@ public static class XiangqiImportCommand
             else
             {
                 Console.Error.WriteLine($"Not found: {path}");
+                if (!Path.IsPathRooted(path))
+                    Console.Error.WriteLine($"Relative paths are read from {Environment.CurrentDirectory} (dotnet run uses the project folder); use a full path instead.");
                 return 2;
             }
         }
