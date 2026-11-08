@@ -1,9 +1,12 @@
 using GameWeb.Components;
+using GameWeb.Data;
+using GameWeb.Games.Archive;
 using GameWeb.Games.Catalog;
 using GameWeb.Games.Rooms;
 using GameWeb.Localization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +15,37 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSingleton<GameCatalog>();
 builder.Services.AddSingleton<RoomService>();
+
+// Game archive and opening book in SQL Server. The connection string comes from user secrets in
+// development and from the environment in production; without one, games simply aren't saved.
+var gamesDb = builder.Configuration.GetConnectionString("Games");
+if (!string.IsNullOrWhiteSpace(gamesDb))
+{
+    builder.Services.AddPooledDbContextFactory<GamesDbContext>(o =>
+        o.UseSqlServer(gamesDb, sql => sql.EnableRetryOnFailure(maxRetryCount: 3).CommandTimeout(15)));
+    builder.Services.AddSingleton<SqlGameStore>();
+    builder.Services.AddSingleton<IGameArchive>(sp => sp.GetRequiredService<SqlGameStore>());
+    builder.Services.AddSingleton<IOpeningBook>(sp => sp.GetRequiredService<SqlGameStore>());
+    builder.Services.AddHostedService(sp => sp.GetRequiredService<SqlGameStore>());
+}
+else
+{
+    builder.Services.AddSingleton<IGameArchive>(NullGameStore.Instance);
+    builder.Services.AddSingleton<IOpeningBook>(NullGameStore.Instance);
+}
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.AddScoped<GameText>();
 builder.Services.AddScoped<XqText>();
 
 var app = builder.Build();
+
+// Development: bring the database schema up to date on startup. In production, apply migrations
+// as a deployment step instead (dotnet ef migrations script).
+if (!string.IsNullOrWhiteSpace(gamesDb) && app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+{
+    using var db = app.Services.GetRequiredService<IDbContextFactory<GamesDbContext>>().CreateDbContext();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,3 +1,5 @@
+using System.Text.Json;
+using GameWeb.Games.Archive;
 using GameWeb.Games.Rooms;
 
 namespace GameWeb.Games.Mahjong;
@@ -84,10 +86,33 @@ public sealed class MahjongRoom : Room
     void StartLocked()
     {
         FillEmptySeatsWithBots();
+        NewMatch();
+        Started = true;
+    }
+
+    DateTime _matchStartedAt;
+    bool _matchArchived;
+
+    void NewMatch()
+    {
         _game = new MahjongGame(new MjSettings { MinFaan = Settings.MinFaan, Rounds = Settings.Rounds });
         _game.StartMatch();
-        Started = true;
+        _matchStartedAt = DateTime.UtcNow;
+        _matchArchived = false;
         _lastPhaseVersion = -1;
+    }
+
+    /// <summary>Queues the match for saving the first time it is seen finished. Call under the lock.</summary>
+    void ArchiveIfOver()
+    {
+        if (_game is not { Phase: MjPhase.MatchOver } g || _matchArchived) return;
+        _matchArchived = true;
+        var players = Enumerable.Range(0, 4).Select(seat => new FinishedPlayer(
+            seat, null, Seats[seat].PlayerId, Seats[seat].IsBot, null, g.Players[seat].Score)).ToList();
+        string details = JsonSerializer.Serialize(new { minFaan = Settings.MinFaan, rounds = Settings.Rounds });
+        Archive.Save(new FinishedGame(
+            GameType.Mahjong, Code, _matchStartedAt, DateTime.UtcNow,
+            Result: 1, Reason: 0, g.HandNumber, Moves: null, details, players, BookMoves: []));
     }
 
     public override bool IsFinished
@@ -100,9 +125,7 @@ public sealed class MahjongRoom : Room
         lock (Sync)
         {
             if (_game is not { Phase: MjPhase.MatchOver } || playerId != HostId) return false;
-            _game = new MahjongGame(new MjSettings { MinFaan = Settings.MinFaan, Rounds = Settings.Rounds });
-            _game.StartMatch();
-            _lastPhaseVersion = -1;
+            NewMatch();
         }
         NotifyChanged();
         return true;
@@ -116,6 +139,7 @@ public sealed class MahjongRoom : Room
             int seat = Array.FindIndex(Seats, s => s.PlayerId == playerId);
             if (_game is null || seat < 0) return false;
             ok = _game.Apply(seat, action);
+            if (ok) ArchiveIfOver();
         }
         if (ok) NotifyChanged();
         return ok;
@@ -176,6 +200,7 @@ public sealed class MahjongRoom : Room
                 break;
             }
         }
+        if (changed) ArchiveIfOver();
         return changed;
     }
 

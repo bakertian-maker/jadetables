@@ -99,31 +99,6 @@ public static class XqBot
 
     readonly record struct RootScore(XqMove Move, int Score);
 
-    // ---- Zobrist hashing for the transposition table ----
-
-    static readonly ulong[,] PieceKeys = BuildKeys();
-    static readonly ulong BlackToMoveKey = 0x9E3779B97F4A7C15UL;
-
-    static ulong[,] BuildKeys()
-    {
-        var rng = new Random(20261108); // fixed seed: hashes are only compared within one search
-        var keys = new ulong[15, 90];
-        for (int p = 0; p < 15; p++)
-            for (int sq = 0; sq < 90; sq++)
-                keys[p, sq] = (ulong)rng.NextInt64() ^ ((ulong)rng.NextInt64() << 1);
-        return keys;
-    }
-
-    static ulong Key(int piece, int sq) => PieceKeys[piece + 7, sq];
-
-    static ulong Hash(XqPosition pos)
-    {
-        ulong h = pos.SideToMove == XqSide.Black ? BlackToMoveKey : 0;
-        for (int sq = 0; sq < 90; sq++)
-            if (pos[sq] != 0) h ^= Key(pos[sq], sq);
-        return h;
-    }
-
     enum Bound : byte { None, Exact, Lower, Upper }
 
     struct TtEntry
@@ -153,7 +128,7 @@ public static class XqBot
             var completed = new List<RootScore>();
             if (root.Count == 0) return completed;
             if (root.Count == 1) return [new RootScore(root[0], 0)];
-            _hash = Hash(pos);
+            _hash = XqZobrist.Hash(pos);
             Order(root, default, false, 0);
             for (int depth = 1; depth <= maxDepth; depth++)
             {
@@ -182,18 +157,14 @@ public static class XqBot
 
         XqUndo MakeMove(XqMove m)
         {
-            int piece = pos[m.From], captured = pos[m.To];
-            _hash ^= Key(piece, m.From) ^ Key(piece, m.To) ^ BlackToMoveKey;
-            if (captured != 0) _hash ^= Key(captured, m.To);
+            _hash = XqZobrist.After(_hash, pos, m);
             return pos.Make(m);
         }
 
         void UnmakeMove(XqMove m, XqUndo undo)
         {
             pos.Unmake(m, undo);
-            int piece = pos[m.From];
-            _hash ^= Key(piece, m.From) ^ Key(piece, m.To) ^ BlackToMoveKey;
-            if (undo.Captured != 0) _hash ^= Key(undo.Captured, m.To);
+            _hash = XqZobrist.After(_hash, pos, m); // XOR is its own inverse
         }
 
         bool TimeUp()

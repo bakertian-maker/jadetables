@@ -1,3 +1,4 @@
+using GameWeb.Games.Archive;
 using GameWeb.Games.Rooms;
 
 namespace GameWeb.Games.Xiangqi;
@@ -59,6 +60,8 @@ public sealed class XiangqiRoom : Room
     DateTime _turnStart;
     DateTime _lastTick = DateTime.UtcNow;
     bool _botThinking;
+    DateTime _gameStartedAt;
+    int _archivedGame;
 
     public XiangqiRoom(string code, XqRoomSettings settings) : base(code, 2)
     {
@@ -107,8 +110,34 @@ public sealed class XiangqiRoom : Room
     {
         _game = new XqGame();
         _gameNumber++;
+        _gameStartedAt = DateTime.UtcNow;
         _clockVersion = -1;
         _botThinking = false;
+    }
+
+    /// <summary>Queues the game for saving the first time it is seen finished. Call under the lock.</summary>
+    void ArchiveIfOver()
+    {
+        if (_game is not { IsOver: true } g || _archivedGame == _gameNumber) return;
+        _archivedGame = _gameNumber;
+        var players = Enumerable.Range(0, Seats.Length).Select(seat => new FinishedPlayer(
+            seat,
+            (byte)SideOfSeat(seat),
+            Seats[seat].PlayerId,
+            Seats[seat].IsBot,
+            Seats[seat].IsBot ? (byte)Settings.BotLevel : null,
+            null)).ToList();
+        // Book moves come from people and the Difficult computer only; weaker bots would teach bad habits.
+        bool Trusted(XqSide side)
+        {
+            var s = Seats[SeatOfSide(side)];
+            return !s.IsBot || Settings.BotLevel == XqLevel.Difficult;
+        }
+        Archive.Save(new FinishedGame(
+            GameType.Xiangqi, Code, _gameStartedAt, DateTime.UtcNow,
+            (byte)g.Result, (byte)g.Reason, g.History.Count,
+            string.Join(' ', g.History.Select(h => h.Move.ToString())),
+            null, players, XqBook.Entries(g, Trusted)));
     }
 
     XqSide SideOfSeat(int seat) => seat == _redSeat ? XqSide.Red : XqSide.Black;
@@ -122,6 +151,7 @@ public sealed class XiangqiRoom : Room
         {
             int seat = SeatOfPlayer(playerId);
             ok = _game is { IsOver: false } g && seat >= 0 && SideOfSeat(seat) == g.SideToMove && g.TryMove(move);
+            if (ok) ArchiveIfOver();
         }
         if (ok) NotifyChanged();
         return ok;
@@ -134,6 +164,7 @@ public sealed class XiangqiRoom : Room
             int seat = SeatOfPlayer(playerId);
             if (_game is not { IsOver: false } || seat < 0) return false;
             _game.Resign(SideOfSeat(seat));
+            ArchiveIfOver();
         }
         NotifyChanged();
         return true;
@@ -184,6 +215,7 @@ public sealed class XiangqiRoom : Room
         if (Settings.MoveSeconds > 0 && (now - _turnStart).TotalSeconds >= Settings.MoveSeconds)
         {
             g.LoseOnTime(g.SideToMove);
+            ArchiveIfOver();
             return true;
         }
         return false;
@@ -203,13 +235,36 @@ public sealed class XiangqiRoom : Room
         var position = g.Position.Clone();
         int version = g.Version;
         var level = Settings.BotLevel;
-        Task.Run(() => XqBot.ChooseMove(position, level)).ContinueWith(t =>
+        bool inOpening = g.History.Count < XqBook.MaxPlies;
+        var book = Book;
+        Task.Run(async () =>
+        {
+            // In the opening, a well-tested book move beats a 2-second search.
+            if (inOpening && level != XqLevel.Beginner)
+            {
+                try
+                {
+                    using var timeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(400));
+                    var entries = await book.LookupAsync(XqZobrist.Hash(position), timeout.Token);
+                    if (XqBook.Pick(position, entries, level, Random.Shared) is XqMove bookMove) return bookMove;
+                }
+                catch (Exception)
+                {
+                    // Database slow or down: just search.
+                }
+            }
+            return XqBot.ChooseMove(position, level);
+        }).ContinueWith(t =>
         {
             lock (Sync)
             {
                 if (_game != g) return;
                 _botThinking = false;
-                if (t.IsCompletedSuccessfully && g.Version == version && !g.IsOver) g.TryMove(t.Result);
+                if (t.IsCompletedSuccessfully && g.Version == version && !g.IsOver)
+                {
+                    g.TryMove(t.Result);
+                    ArchiveIfOver();
+                }
             }
             NotifyChanged();
         }, TaskScheduler.Default);

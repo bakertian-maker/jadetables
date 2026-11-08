@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
+using GameWeb.Games.Archive;
 
 namespace GameWeb.Games.Rooms;
 
@@ -16,10 +17,14 @@ public sealed class RoomService : IDisposable
     readonly ConcurrentDictionary<string, Room> _rooms = new(StringComparer.OrdinalIgnoreCase);
     readonly Timer _cleanup;
     readonly ILogger<RoomService> _logger;
+    readonly IGameArchive _archive;
+    readonly IOpeningBook _book;
 
-    public RoomService(ILogger<RoomService> logger)
+    public RoomService(ILogger<RoomService> logger, IGameArchive? archive = null, IOpeningBook? book = null)
     {
         _logger = logger;
+        _archive = archive ?? NullGameStore.Instance;
+        _book = book ?? NullGameStore.Instance;
         _cleanup = new Timer(_ => Cleanup(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
     }
 
@@ -41,6 +46,8 @@ public sealed class RoomService : IDisposable
         {
             var code = RandomNumberGenerator.GetString(CodeChars, 5);
             var room = create(code);
+            room.Archive = _archive;
+            room.Book = _book;
             if (_rooms.TryAdd(code, room))
             {
                 _logger.LogInformation("Created {Game} room {Code}", room.GameKey, code);

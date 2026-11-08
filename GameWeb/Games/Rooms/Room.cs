@@ -1,3 +1,5 @@
+using GameWeb.Games.Archive;
+
 namespace GameWeb.Games.Rooms;
 
 public sealed class Seat
@@ -41,6 +43,12 @@ public abstract class Room : IDisposable
 
     public string Code { get; }
     public abstract string GameKey { get; }
+
+    /// <summary>Where finished games are saved. Set by <see cref="RoomService"/>; does nothing in tests.</summary>
+    public IGameArchive Archive { get; internal set; } = NullGameStore.Instance;
+
+    /// <summary>The opening book (Xiangqi). Set by <see cref="RoomService"/>; empty in tests.</summary>
+    public IOpeningBook Book { get; internal set; } = NullGameStore.Instance;
 
     /// <summary>The room's page, e.g. /mahjong/room/K7Q2M.</summary>
     public string Url => $"/{GameKey}/room/{Code}";
