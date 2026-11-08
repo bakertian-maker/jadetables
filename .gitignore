@@ -30,3 +30,6 @@ __pycache__/
 
 # TypeScript output (compiled from GameWeb/Scripts on every build)
 GameWeb/wwwroot/js/
+
+# Database backups
+*.bak

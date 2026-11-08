@@ -1,3 +1,4 @@
+using GameWeb.Seo;
 using GameWeb.Components;
 using GameWeb.Data;
 using GameWeb.Games.Archive;
@@ -109,6 +110,9 @@ app.MapGet("/culture/set", (string culture, string? redirectUri, HttpContext htt
         new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true, SameSite = SameSiteMode.Lax, HttpOnly = true });
     return Results.LocalRedirect(Languages.IsSafeLocalPath(redirectUri) ? redirectUri! : "/");
 });
+
+// robots.txt and sitemap.xml for search engines.
+app.MapSearchFiles();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
