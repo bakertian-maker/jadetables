@@ -1,4 +1,29 @@
 /* GameWeb site styles: jade, ivory and cinnabar. */
+
+/* Fonts are served from this site (wwwroot/fonts), so no visitor data goes to Google Fonts.
+   Noto Serif SC is cut down to the characters the site uses: rebuild it with
+   GameWeb/Fonts/subset_fonts.py after adding Chinese text. Licences: wwwroot/fonts/*-OFL.txt. */
+@font-face {
+    font-family: 'Outfit';
+    src: url('fonts/outfit-variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Noto Serif SC';
+    src: url('fonts/noto-serif-sc-600.woff') format('woff');
+    font-weight: 500 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Noto Serif SC';
+    src: url('fonts/noto-serif-sc-900.woff') format('woff');
+    font-weight: 800 900;
+    font-style: normal;
+    font-display: swap;
+}
 :root {
     --jade-900: #0b2e26;
     --jade-800: #0f3b31;
