@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Nav
 @inject GameCatalog Catalog
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
 
 <div class="site">
     <header class="site-header">
@@ -39,7 +40,12 @@
     <footer class="site-footer">
         <div class="wrap footer-inner">
             <span>@L["Jade Tables · Classic Chinese games with friends"]</span>
-            <span>@L["Free to play. No sign-up, no real-money betting."] · <a href="/privacy">@L["Privacy"]</a></span>
+            <span>@L["Free to play. No sign-up, no real-money betting."] · <a href="/privacy">@L["Privacy"]</a>
+                @if (!string.IsNullOrWhiteSpace(Config["Analytics:GtmId"]))
+                {
+                    <text> · </text><button type="button" class="footer-link" data-consent-open>@L["Cookie settings"]</button>
+                }
+            </span>
         </div>
     </footer>
 </div>

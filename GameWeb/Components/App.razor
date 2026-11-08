@@ -1,3 +1,9 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+@{
+    // Google Tag Manager container (production only). Nothing loads until the visitor accepts.
+    var gtmId = Config["Analytics:GtmId"];
+    bool analytics = !string.IsNullOrWhiteSpace(gtmId);
+}
 <!DOCTYPE html>
 <html lang="@Languages.HtmlLang">
 
@@ -13,11 +19,27 @@
     <link rel="stylesheet" href="@Assets["mahjong.css"]" />
     <link rel="stylesheet" href="@Assets["xiangqi.css"]" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    @if (analytics)
+    {
+        <meta name="gtm-id" content="@gtmId" />
+    }
     <HeadOutlet />
 </head>
 
 <body>
     <Routes />
+    @if (analytics)
+    {
+        @* Shown by Scripts/consent.ts until the visitor chooses. *@
+        <section id="consent-banner" class="consent" aria-label="@L["Cookie choices"]" hidden>
+            <p>@L["May we use analytics cookies (Google Tag Manager) to see how the site is used? Nothing is sent to Google unless you accept."]
+                <a href="/privacy#analytics">@L["Privacy"]</a></p>
+            <div class="consent-actions">
+                <button type="button" class="btn btn-sm consent-btn" data-consent="denied">@L["Decline"]</button>
+                <button type="button" class="btn btn-sm consent-btn" data-consent="granted">@L["Accept"]</button>
+            </div>
+        </section>
+    }
     @* Blazor drives this element while the live connection is down (see Scripts/gameweb.ts). *@
     <dialog id="components-reconnect-modal" class="reconnect" data-state="retrying" aria-live="assertive" data-nosnippet>
         <div class="reconnect-inner">
@@ -30,6 +52,10 @@
     </dialog>
     <script type="module" src="@Assets["js/gameweb.js"]"></script>
     <script type="module" src="@Assets["js/reconnect.js"]"></script>
+    @if (analytics)
+    {
+        <script type="module" src="@Assets["js/consent.js"]"></script>
+    }
     <script src="_framework/blazor.web.js"></script>
 </body>
 

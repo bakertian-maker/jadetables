@@ -172,6 +172,7 @@ public class XiangqiRulesTests
     }
 }
 
+[Collection(StrengthCollection.Name)]
 public class XiangqiBotTests
 {
     /// <summary>Shorter thinking time so bot-vs-bot games stay quick in CI.</summary>

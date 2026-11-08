@@ -12,6 +12,7 @@
   <data name="3 players" xml:space="preserve"><value>3 人</value></data>
   <data name="4 players" xml:space="preserve"><value>4 人</value></data>
   <data name="60 moves without a capture: the game is drawn." xml:space="preserve"><value>60 回合沒有食子，判為和棋。</value></data>
+  <data name="Accept" xml:space="preserve"><value>接受</value></data>
   <data name="Accept draw" xml:space="preserve"><value>同意和棋</value></data>
   <data name="Add computer player" xml:space="preserve"><value>加入電腦玩家</value></data>
   <data name="Add kong" xml:space="preserve"><value>加槓</value></data>
@@ -48,6 +49,8 @@
   <data name="Connection lost. Reconnecting…" xml:space="preserve"><value>連線中斷，正在重新連線…</value></data>
   <data name="Continue" xml:space="preserve"><value>繼續</value></data>
   <data name="Continue your game" xml:space="preserve"><value>繼續你的牌局</value></data>
+  <data name="Cookie choices" xml:space="preserve"><value>Cookie 選擇</value></data>
+  <data name="Cookie settings" xml:space="preserve"><value>Cookie 設定</value></data>
   <data name="Copied" xml:space="preserve"><value>已複製</value></data>
   <data name="Copy link" xml:space="preserve"><value>複製連結</value></data>
   <data name="Create room" xml:space="preserve"><value>建立房間</value></data>
@@ -120,6 +123,7 @@
   <data name="Mahjong! Win · {0} faan" xml:space="preserve"><value>食糊！· {0} 番</value></data>
   <data name="Main" xml:space="preserve"><value>主選單</value></data>
   <data name="Match over" xml:space="preserve"><value>對局結束</value></data>
+  <data name="May we use analytics cookies (Google Tag Manager) to see how the site is used? Nothing is sent to Google unless you accept." xml:space="preserve"><value>可以使用分析 cookie（Google Tag Manager）了解網站的使用情況嗎？除非你接受，否則不會向 Google 傳送任何資料。</value></data>
   <data name="Me" xml:space="preserve"><value>我</value></data>
   <data name="Medium" xml:space="preserve"><value>中等</value></data>
   <data name="Min {0} faan" xml:space="preserve"><value>{0} 番起糊</value></data>

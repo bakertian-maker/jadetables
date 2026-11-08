@@ -323,4 +323,8 @@ ZH_HANS = {
     "Privacy": "隐私",
     "Privacy · Jade Tables": "隐私 · 玉桌",
     "What Jade Tables stores about you: no accounts, a random player id in your browser, and finished games without names.": "玉桌保存哪些数据：没有账号，浏览器里一个随机玩家编号，以及不含名字的棋局记录。",
+    "Cookie choices": "Cookie 选择",
+    "May we use analytics cookies (Google Tag Manager) to see how the site is used? Nothing is sent to Google unless you accept.": "可以使用分析 cookie（Google Tag Manager）了解网站的使用情况吗？除非你接受，否则不会向 Google 发送任何数据。",
+    "Accept": "接受",
+    "Cookie settings": "Cookie 设置",
 }

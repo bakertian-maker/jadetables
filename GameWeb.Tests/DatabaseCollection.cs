@@ -10,3 +10,13 @@ public sealed class DatabaseCollection
 {
     public const string Name = "Database";
 }
+
+/// <summary>
+/// Tests that compare engine strength under a time limit run on their own: with other tests using the
+/// CPU at the same time, the timed searches get shallower and the results become a coin toss.
+/// </summary>
+[CollectionDefinition(Name, DisableParallelization = true)]
+public sealed class StrengthCollection
+{
+    public const string Name = "Strength";
+}

@@ -322,4 +322,8 @@ ZH_HANT = {
     "Privacy": "私隱",
     "Privacy · Jade Tables": "私隱 · 玉桌",
     "What Jade Tables stores about you: no accounts, a random player id in your browser, and finished games without names.": "玉桌保存哪些資料：沒有帳戶，瀏覽器裏一個隨機玩家編號，以及不含名字的棋局記錄。",
+    "Cookie choices": "Cookie 選擇",
+    "May we use analytics cookies (Google Tag Manager) to see how the site is used? Nothing is sent to Google unless you accept.": "可以使用分析 cookie（Google Tag Manager）了解網站的使用情況嗎？除非你接受，否則不會向 Google 傳送任何資料。",
+    "Accept": "接受",
+    "Cookie settings": "Cookie 設定",
 }
