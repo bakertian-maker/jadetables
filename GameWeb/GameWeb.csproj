@@ -43,4 +43,8 @@
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Build-time only; keep it out of the published site. -->
+    <Content Update="tsconfig.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 </Project>

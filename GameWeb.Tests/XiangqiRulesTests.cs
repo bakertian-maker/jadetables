@@ -247,7 +247,9 @@ public class XiangqiBotTests
                 var level = strongToMove ? stronger : weaker;
                 // Give Difficult a realistic but short think so the test stays quick.
                 var budget = level == XqLevel.Difficult ? TimeSpan.FromMilliseconds(400) : FastBudget;
-                game.TryMove(XqBot.ChooseMove(game.Position, level, rng, budget));
+                // Pass the game so far, as the site does: without it the engine can walk into a
+                // perpetual-check or perpetual-chase loss.
+                game.TryMove(XqBot.ChooseMove(game.Position, level, rng, budget, XqBot.XqGameContext.Of(game)));
             }
             var strongResult = strongSide == XqSide.Red ? XqResult.RedWins : XqResult.BlackWins;
             if (game.Result == strongResult) strongWins++;

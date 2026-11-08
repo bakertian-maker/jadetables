@@ -77,7 +77,6 @@
   <data name="Full game, four rounds" xml:space="preserve"><value>完整一場，四圈</value></data>
   <data name="Game in progress in room {0}" xml:space="preserve"><value>房間 {0} 的牌局進行中</value></data>
   <data name="Game log" xml:space="preserve"><value>牌局紀錄</value></data>
-  <data name="GameWeb · Classic Chinese games with friends" xml:space="preserve"><value>GameWeb · 與朋友一起玩經典中國遊戲</value></data>
   <data name="Games" xml:space="preserve"><value>遊戲</value></data>
   <data name="General" xml:space="preserve"><value>將帥</value></data>
   <data name="Get a link for a friend. If nobody joins, the computer takes the other seat." xml:space="preserve"><value>取得連結邀請朋友。沒有人加入時，由電腦坐另一邊。</value></data>
@@ -90,9 +89,9 @@
   <data name="Hint" xml:space="preserve"><value>提示</value></data>
   <data name="Home" xml:space="preserve"><value>首頁</value></data>
   <data name="Hong Kong Mahjong" xml:space="preserve"><value>港式麻雀</value></data>
-  <data name="Hong Kong Mahjong rules · GameWeb" xml:space="preserve"><value>港式麻雀規則 · GameWeb</value></data>
-  <data name="Hong Kong Mahjong · GameWeb" xml:space="preserve"><value>港式麻雀 · GameWeb</value></data>
-  <data name="Hong Kong mahjong rules as played on GameWeb: tiles, claiming, winning hands and the faan scoring table." xml:space="preserve"><value>GameWeb 採用的港式麻雀規則：牌張、上碰槓、食糊牌型及番數表。</value></data>
+  <data name="Hong Kong Mahjong rules · Jade Tables" xml:space="preserve"><value>港式麻雀規則 · 玉桌</value></data>
+  <data name="Hong Kong Mahjong · Jade Tables" xml:space="preserve"><value>港式麻雀 · 玉桌</value></data>
+  <data name="Hong Kong mahjong rules as played on Jade Tables: tiles, claiming, winning hands and the faan scoring table." xml:space="preserve"><value>玉桌採用的港式麻雀規則：牌張、上碰槓、食糊牌型及番數表。</value></data>
   <data name="Hong Kong rules · minimum {0} faan" xml:space="preserve"><value>港式規則 · {0} 番起糊</value></data>
   <data name="Horse" xml:space="preserve"><value>馬</value></data>
   <data name="Host plays Red" xml:space="preserve"><value>房主執紅</value></data>
@@ -100,6 +99,8 @@
   <data name="How to play" xml:space="preserve"><value>怎樣下</value></data>
   <data name="In development" xml:space="preserve"><value>開發中</value></data>
   <data name="Invite link" xml:space="preserve"><value>邀請連結</value></data>
+  <data name="Jade Tables" xml:space="preserve"><value>玉桌</value></data>
+  <data name="Jade Tables · Classic Chinese games with friends" xml:space="preserve"><value>玉桌 · 與朋友一起玩經典中國遊戲</value></data>
   <data name="Join" xml:space="preserve"><value>加入</value></data>
   <data name="Join a room" xml:space="preserve"><value>加入房間</value></data>
   <data name="Joining room…" xml:space="preserve"><value>正在加入房間…</value></data>
@@ -114,7 +115,7 @@
   <data name="Limit" xml:space="preserve"><value>滿貫</value></data>
   <data name="Made for beginners too" xml:space="preserve"><value>新手也能上手</value></data>
   <data name="Mahjong" xml:space="preserve"><value>麻雀</value></data>
-  <data name="Mahjong room {0} · GameWeb" xml:space="preserve"><value>麻雀房間 {0} · GameWeb</value></data>
+  <data name="Mahjong room {0} · Jade Tables" xml:space="preserve"><value>麻雀房間 {0} · 玉桌</value></data>
   <data name="Mahjong! Self-drawn · {0} faan" xml:space="preserve"><value>自摸！· {0} 番</value></data>
   <data name="Mahjong! Win · {0} faan" xml:space="preserve"><value>食糊！· {0} 番</value></data>
   <data name="Main" xml:space="preserve"><value>主選單</value></data>
@@ -141,7 +142,7 @@
   <data name="Open a private room, send the link to friends and play on any phone or laptop. Short a player? A computer player takes the empty seat." xml:space="preserve"><value>開一個私人房間，把連結傳給朋友，手機或電腦都能玩。人數不夠？空位由電腦玩家補上。</value></data>
   <data name="Open seat" xml:space="preserve"><value>空位</value></data>
   <data name="Page not found" xml:space="preserve"><value>找不到頁面</value></data>
-  <data name="Page not found · GameWeb" xml:space="preserve"><value>找不到頁面 · GameWeb</value></data>
+  <data name="Page not found · Jade Tables" xml:space="preserve"><value>找不到頁面 · 玉桌</value></data>
   <data name="Pass" xml:space="preserve"><value>過</value></data>
   <data name="Play" xml:space="preserve"><value>開始</value></data>
   <data name="Play Hong Kong mahjong online for free. Play the computer straight away or open a private room for friends." xml:space="preserve"><value>免費在網上玩港式麻雀。可以直接與電腦對局，也可以為朋友開私人房間。</value></data>
@@ -156,7 +157,7 @@
   <data name="Player" xml:space="preserve"><value>玩家</value></data>
   <data name="Practise alone, or fill empty seats. If someone drops out, a computer player keeps their seat warm for them." xml:space="preserve"><value>可以獨自練習，也可以用電腦補空位。有人斷線時，電腦玩家會暫時替他坐著。</value></data>
   <data name="Privacy" xml:space="preserve"><value>私隱</value></data>
-  <data name="Privacy · GameWeb" xml:space="preserve"><value>私隱 · GameWeb</value></data>
+  <data name="Privacy · Jade Tables" xml:space="preserve"><value>私隱 · 玉桌</value></data>
   <data name="Private room" xml:space="preserve"><value>私人房間</value></data>
   <data name="Private rooms" xml:space="preserve"><value>私人房間</value></data>
   <data name="Protect" xml:space="preserve"><value>保護</value></data>
@@ -183,7 +184,7 @@
   <data name="Sides chosen at random" xml:space="preserve"><value>隨機分紅黑</value></data>
   <data name="Soldier" xml:space="preserve"><value>兵卒</value></data>
   <data name="Something went wrong" xml:space="preserve"><value>出現錯誤</value></data>
-  <data name="Something went wrong · GameWeb" xml:space="preserve"><value>出現錯誤 · GameWeb</value></data>
+  <data name="Something went wrong · Jade Tables" xml:space="preserve"><value>出現錯誤 · 玉桌</value></data>
   <data name="Something went wrong." xml:space="preserve"><value>出現了一些問題。</value></data>
   <data name="Sorry, the server ran into a problem. Please try again in a moment." xml:space="preserve"><value>抱歉，伺服器出現問題。請稍後再試。</value></data>
   <data name="Sound off" xml:space="preserve"><value>聲音：關</value></data>
@@ -220,16 +221,16 @@
   <data name="Waiting room {0}" xml:space="preserve"><value>房間 {0} 等待開始</value></data>
   <data name="Wall" xml:space="preserve"><value>牌牆</value></data>
   <data name="West" xml:space="preserve"><value>西</value></data>
-  <data name="What GameWeb stores about you: no accounts, a random player id in your browser, and finished games without names." xml:space="preserve"><value>GameWeb 保存哪些資料：沒有帳戶，瀏覽器裏一個隨機玩家編號，以及不含名字的棋局記錄。</value></data>
+  <data name="What Jade Tables stores about you: no accounts, a random player id in your browser, and finished games without names." xml:space="preserve"><value>玉桌保存哪些資料：沒有帳戶，瀏覽器裏一個隨機玩家編號，以及不含名字的棋局記錄。</value></data>
   <data name="Who plays Red (moves first)" xml:space="preserve"><value>誰執紅（先走）</value></data>
   <data name="Win" xml:space="preserve"><value>食糊</value></data>
   <data name="Win the game" xml:space="preserve"><value>獲勝</value></data>
   <data name="Xiangqi" xml:space="preserve"><value>象棋</value></data>
   <data name="Xiangqi (Chinese chess) rules: the board, how each piece moves, check, checkmate and draws." xml:space="preserve"><value>中國象棋規則：棋盤、各棋子走法、將軍、將死與和棋。</value></data>
   <data name="Xiangqi board" xml:space="preserve"><value>象棋棋盤</value></data>
-  <data name="Xiangqi room {0} · GameWeb" xml:space="preserve"><value>象棋房間 {0} · GameWeb</value></data>
-  <data name="Xiangqi rules · GameWeb" xml:space="preserve"><value>象棋規則 · GameWeb</value></data>
-  <data name="Xiangqi · GameWeb" xml:space="preserve"><value>象棋 · GameWeb</value></data>
+  <data name="Xiangqi room {0} · Jade Tables" xml:space="preserve"><value>象棋房間 {0} · 玉桌</value></data>
+  <data name="Xiangqi rules · Jade Tables" xml:space="preserve"><value>象棋規則 · 玉桌</value></data>
+  <data name="Xiangqi · Jade Tables" xml:space="preserve"><value>象棋 · 玉桌</value></data>
   <data name="Yes, resign" xml:space="preserve"><value>確定認輸</value></data>
   <data name="You" xml:space="preserve"><value>你</value></data>
   <data name="You and three computer players, East round. Starts straight away." xml:space="preserve"><value>你與三位電腦玩家，打東圈，立即開始。</value></data>

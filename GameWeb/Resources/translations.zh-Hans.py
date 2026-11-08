@@ -9,7 +9,7 @@ ZH_HANS = {
     "Home": "首页",
     "Mahjong": "麻将",
     "Rules": "规则",
-    "GameWeb · Classic Chinese games with friends": "GameWeb · 和朋友一起玩经典中国游戏",
+    "Jade Tables · Classic Chinese games with friends": "玉桌 · 和朋友一起玩经典中国游戏",
     "Free to play. No sign-up, no real-money betting.": "免费游玩，无需注册，不涉及任何真钱赌注。",
     "Something went wrong.": "出了点问题。",
     "Reload": "重新加载",
@@ -50,7 +50,7 @@ ZH_HANS = {
     "3 players": "3 人",
 
     # Lobby
-    "Hong Kong Mahjong · GameWeb": "港式麻将 · GameWeb",
+    "Hong Kong Mahjong · Jade Tables": "港式麻将 · 玉桌",
     "Play Hong Kong mahjong online for free. Play the computer straight away or open a private room for friends.":
         "免费在线玩港式麻将。可以直接和电脑对局，也可以为朋友开私人房间。",
     "廣東麻雀 · Hong Kong rules": "广东麻将 · 港式规则",
@@ -94,7 +94,7 @@ ZH_HANS = {
     "No open room with code {0}.": "没有房间号为 {0} 的房间。",
 
     # Room page
-    "Mahjong room {0} · GameWeb": "麻将房间 {0} · GameWeb",
+    "Mahjong room {0} · Jade Tables": "麻将房间 {0} · 玉桌",
     "Joining room…": "正在加入房间…",
     "Room not found": "找不到房间",
     "Room {0} doesn't exist or has closed. Rooms close after 10 minutes with nobody in them.": "房间 {0} 不存在或已关闭。房间无人 10 分钟后会自动关闭。",
@@ -177,9 +177,9 @@ ZH_HANS = {
     "Hidden tile": "未翻开的牌",
 
     # Rules page
-    "Hong Kong Mahjong rules · GameWeb": "港式麻将规则 · GameWeb",
-    "Hong Kong mahjong rules as played on GameWeb: tiles, claiming, winning hands and the faan scoring table.":
-        "GameWeb 使用的港式麻将规则：牌张、吃碰杠、和牌牌型和番种表。",
+    "Hong Kong Mahjong rules · Jade Tables": "港式麻将规则 · 玉桌",
+    "Hong Kong mahjong rules as played on Jade Tables: tiles, claiming, winning hands and the faan scoring table.":
+        "玉桌使用的港式麻将规则：牌张、吃碰杠、和牌牌型和番种表。",
 
     # Winds (dynamic keys from Tiles.WindNames)
     "East": "东",
@@ -201,8 +201,8 @@ ZH_HANS = {
 
     # Lobby busy message and error page
     "The server is busy right now. Please try again in a few minutes.": "服务器现在比较忙，请几分钟后再试。",
-    "Page not found · GameWeb": "找不到页面 · GameWeb",
-    "Something went wrong · GameWeb": "出错了 · GameWeb",
+    "Page not found · Jade Tables": "找不到页面 · 玉桌",
+    "Something went wrong · Jade Tables": "出错了 · 玉桌",
     "Page not found": "找不到页面",
     "This page doesn't exist. The link may be mistyped, or a room may have closed.": "这个页面不存在。链接可能输错了，或者房间已经关闭。",
     "Something went wrong": "出错了",
@@ -227,7 +227,7 @@ ZH_HANS = {
     "Continue": "继续",
 
     # Xiangqi
-    "Xiangqi · GameWeb": "象棋 · GameWeb",
+    "Xiangqi · Jade Tables": "象棋 · 玉桌",
     "Play Xiangqi (Chinese chess) online for free, against the computer or a friend with a private link.": "免费在线下中国象棋，可以和电脑对弈，也可以用私人链接邀请朋友。",
     "象棋 · Chinese chess": "象棋 · 中国象棋",
     "Two armies face each other across the river. Checkmate the enemy general to win.": "两军隔河对峙，将死对方的将帅即可获胜。",
@@ -258,7 +258,7 @@ ZH_HANS = {
     "your general: it stays in its palace, and the two generals may never face each other on an open line.": "你的将帅：它只能在九宫里活动，而且将帅不能在中间无子的直线上照面。",
     "Win the game": "获胜",
     "by checkmate, or when your opponent has no legal move.": "：将死对方，或者对方无子可走。",
-    "Xiangqi room {0} · GameWeb": "象棋房间 {0} · GameWeb",
+    "Xiangqi room {0} · Jade Tables": "象棋房间 {0} · 玉桌",
     "Back to Xiangqi": "返回象棋大厅",
     "Both seats in room {0} are taken.": "房间 {0} 的两个座位都已有人。",
     "Send the link to a friend. If nobody joins, the computer takes the other seat when the game starts.": "把链接发给朋友。开局时如果没人加入，由电脑坐另一边。",
@@ -268,7 +268,7 @@ ZH_HANS = {
     "Host plays Red": "房主执红",
     "Guest plays Red": "朋友执红",
     "Sides chosen at random": "随机分红黑",
-    "Xiangqi rules · GameWeb": "象棋规则 · GameWeb",
+    "Xiangqi rules · Jade Tables": "象棋规则 · 玉桌",
     "Xiangqi (Chinese chess) rules: the board, how each piece moves, check, checkmate and draws.": "中国象棋规则：棋盘、各棋子走法、将军、将死与和棋。",
     "Show letters instead of Chinese characters on the pieces": "棋子上显示字母而不是汉字",
     "Letters": "字母",
@@ -319,7 +319,8 @@ ZH_HANS = {
     # Xiangqi computer levels
     "Beginner": "入门",
     "Difficult": "困难",
+    "Jade Tables": "玉桌",
     "Privacy": "隐私",
-    "Privacy · GameWeb": "隐私 · GameWeb",
-    "What GameWeb stores about you: no accounts, a random player id in your browser, and finished games without names.": "GameWeb 保存哪些数据：没有账号，浏览器里一个随机玩家编号，以及不含名字的棋局记录。",
+    "Privacy · Jade Tables": "隐私 · 玉桌",
+    "What Jade Tables stores about you: no accounts, a random player id in your browser, and finished games without names.": "玉桌保存哪些数据：没有账号，浏览器里一个随机玩家编号，以及不含名字的棋局记录。",
 }
