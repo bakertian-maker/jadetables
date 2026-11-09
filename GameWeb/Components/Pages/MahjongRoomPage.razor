@@ -5,6 +5,7 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 @inject GameWeb.Accounts.PlayerAccountLinker Links
+@inject GameWeb.Accounts.AccountPrefs Prefs
 @inject GameText T
 
 <PageTitle>@L["Mahjong room {0} · Jade Tables", Code.ToUpperInvariant()]</PageTitle>
@@ -81,7 +82,9 @@ else if (view is not null)
             return;
         }
         identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
-        // Signed in: games played in this browser belong to the account (see AccountStore.LinkAsync).
+        // Signed in: play under the account's name, and games played in this browser belong to the
+        // account (see AccountStore.LinkAsync).
+        if (await Links.CurrentAsync() is { DisplayName.Length: > 0 } me) identity = identity with { Name = me.DisplayName };
         _ = Links.LinkCurrentAsync(identity.Id);
         inviteUrl = Nav.BaseUri + room.Url;   // keeps the language: https://…/zh-hk/mahjong/room/ABCDE
 
@@ -91,6 +94,12 @@ else if (view is not null)
         state = outcome == JoinOutcome.Full ? PageState.Full : PageState.Ready;
         view = room.GetView(identity.Id);
         soundOn = await JS.InvokeAsync<bool>("gameweb.soundEnabled");
+        // Signed in: the account's chime setting wins, and this browser takes it on.
+        if (await Links.CurrentAsync() is { } account && await Prefs.PrefsAsync(account.UserId) is { } prefs)
+        {
+            soundOn = prefs.SoundOn;
+            await JS.InvokeVoidAsync("gameweb.syncPrefs", soundOn, null);
+        }
         StateHasChanged();
     }
 
@@ -115,6 +124,7 @@ else if (view is not null)
     {
         soundOn = !soundOn;
         await JS.InvokeVoidAsync("gameweb.setSound", soundOn);
+        if (await Links.CurrentAsync() is { } me) await Prefs.SavePrefsAsync(me.UserId, soundOn: soundOn);
     }
 
     void OnRoomChanged()

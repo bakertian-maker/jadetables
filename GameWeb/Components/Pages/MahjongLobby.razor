@@ -3,6 +3,7 @@
 @inject RoomService Rooms
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject GameWeb.Accounts.PlayerAccountLinker Links
 
 <PageTitle>@L["Hong Kong Mahjong · Jade Tables"]</PageTitle>
 <HeadContent>
@@ -29,7 +30,16 @@
 
     <div class="name-row">
         <label for="nickname">@L["Your name at the table"]</label>
-        <input id="nickname" maxlength="20" value="@nickname" @onchange="SaveName" placeholder="@L["Guest"]" />
+        @if (account is not null)
+        {
+            @* Signed in: the account's display name is used at the table. *@
+            <input id="nickname" value="@account.DisplayName" readonly aria-describedby="nickname-hint" />
+            <a id="nickname-hint" class="name-hint" href="account">@L["Change it in My games"]</a>
+        }
+        else
+        {
+            <input id="nickname" maxlength="20" value="@nickname" @onchange="SaveName" placeholder="@L["Guest"]" />
+        }
     </div>
 
     @if (createError is not null)
@@ -102,6 +112,7 @@
 
 @code {
     string nickname = "";
+    GameWeb.Accounts.SignedInPlayer? account;
     string id = "";
     int minFaan = 3;
     int rounds = 1;
@@ -119,6 +130,7 @@
         var identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
         id = identity.Id;
         nickname = identity.Name;
+        account = await Links.CurrentAsync();
         StateHasChanged();
     }
 

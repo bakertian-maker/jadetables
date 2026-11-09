@@ -73,10 +73,14 @@ public static class AccountSetup
             .AddErrorDescriber<LocalizedIdentityErrors>()
             .AddClaimsPrincipalFactory<DisplayNameClaimsFactory>();
 
+        services.ConfigureExternalCookie(o => o.Cookie.Path = "/");
         services.ConfigureApplicationCookie(o =>
         {
             o.LoginPath = "/account/login";
             o.Cookie.Name = "jt.auth";
+            // Without this the cookie would only cover the language the player signed in under (/zh-cn),
+            // because the language prefix is the request's PathBase.
+            o.Cookie.Path = "/";
             o.ExpireTimeSpan = TimeSpan.FromDays(30);
             o.SlidingExpiration = true;
         });
@@ -154,7 +158,16 @@ public static class AccountSetup
                     return Results.LocalRedirect(prefix + "/account/login?error=external");
                 await signIn.SignInAsync(user, isPersistent: true, info.LoginProvider);
             }
-            if (user is not null) await store.LinkAsync(user.Id, playerId);
+            if (user is not null)
+            {
+                await store.LinkAsync(user.Id, playerId);
+                // Continue in the player's own language (their account remembers it).
+                if (Languages.Supported.Contains(user.Culture))
+                {
+                    LanguagePaths.RememberChoice(http.Response, user.Culture);
+                    back = LanguagePaths.InLanguage(back, user.Culture);
+                }
+            }
             return Results.LocalRedirect(back);
         });
     }

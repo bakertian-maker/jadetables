@@ -1,0 +1,141 @@
+@page "/account/game/{Id:long}"
+@inherits AccountPageBase
+@using GameWeb.Games.Archive
+@inject XqText X
+
+<PageTitle>@L["Replay · Jade Tables"]</PageTitle>
+
+<div class="wrap page-pad replay-page">
+    <p class="replay-back"><a href="account">← @L["My games"]</a></p>
+    @if (!Features.Enabled)
+    {
+        <AccountsUnavailable />
+    }
+    else if (view is null)
+    {
+        <h1>@L["Game not found"]</h1>
+        <div class="card"><p>@L["This game doesn't exist, or it isn't one of yours."]</p></div>
+    }
+    else
+    {
+        <XiangqiBoard View="view" Letters="Letters" ReplayPanel="Panel()" ReplayMoves="moves" ReplayPly="Ply" MoveHref="Href" />
+    }
+</div>
+
+@code {
+    [Parameter] public long Id { get; set; }
+    /// <summary>Half-moves played so far in the replay: 0 is the start, the last is the final position.</summary>
+    [SupplyParameterFromQuery(Name = "ply")] public int? PlyQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "letters")] public int? LettersQuery { get; set; }
+
+    XqView? view;
+    IReadOnlyList<XqMoveRecord> moves = [];
+    GameRecord? record;
+    int Ply;
+    bool accountLetters;
+    /// <summary>Letter pieces: the link's choice, else the account's setting.</summary>
+    bool Letters => LettersQuery is int q ? q == 1 : accountLetters;
+
+    string Href(int ply) => $"account/game/{Id}?ply={ply}" + (LettersQuery is int q ? $"&letters={q}" : "");
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Features.Enabled) return;
+        var user = SignedIn ? await Users.GetUserAsync(HttpContext!.User) : null;
+        if (user is null)
+        {
+            Go($"account/login?returnUrl=account/game/{Id}");
+            return;
+        }
+        accountLetters = user.LetterPieces;
+        if (await Store.GameForUserAsync(user.Id, Id) is not var (game, mySeat) || game.GameType != GameType.Xiangqi) return;
+        record = game;
+
+        // Play the whole game once for the move list, then again up to the chosen move for the board.
+        var all = Replay(game.Moves, int.MaxValue);
+        moves = all.History.ToList();
+        Ply = Math.Clamp(PlyQuery ?? moves.Count, 0, moves.Count);
+        var shown = Ply == moves.Count ? all : Replay(game.Moves, Ply);
+
+        var seats = game.Players.OrderBy(p => p.Seat).ToList();
+        int redSeat = seats.FindIndex(p => p.Side == 0);
+        if (redSeat < 0) redSeat = 0;
+        var mine = seats[mySeat];
+        bool final = Ply == moves.Count;
+        view = new XqView
+        {
+            Code = game.RoomCode,
+            Settings = new XqRoomSettings
+            {
+                BotLevel = (XqLevel)(seats.FirstOrDefault(p => p.IsBot)?.BotLevel ?? (byte)XqLevel.Medium),
+                MoveSeconds = 0,
+            },
+            Seats = seats.Select(p => new Seat
+            {
+                IsBot = p.IsBot,
+                Name = p.Seat == mySeat ? user.DisplayName : L["Player"],
+                PlayerId = p.IsBot ? null : "replay",
+                Connections = 1,
+            }).ToList(),
+            MySeat = mySeat,
+            MySide = mine.Side == 1 ? XqSide.Black : XqSide.Red,
+            Started = true,
+            RedSeat = redSeat,
+            Board = shown.Position.BoardCopy(),
+            SideToMove = shown.SideToMove,
+            LastMove = shown.History.Count > 0 ? shown.History[^1].Move : null,
+            CheckSquare = shown.InCheck ? shown.Position.GeneralSquare(shown.SideToMove) : -1,
+            History = shown.History.ToList(),
+            // Only the final position shows the result.
+            Result = final ? (XqResult)game.Result : XqResult.Ongoing,
+            Reason = final ? (XqEndReason)game.Reason : XqEndReason.None,
+        };
+    }
+
+    static XqGame Replay(string? movesText, int plies)
+    {
+        var game = new XqGame();
+        foreach (var m in (movesText ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(plies))
+            if (!game.TryMove(XqMove.Parse(m))) break;
+        return game;
+    }
+
+    RenderFragment Panel() => __builder =>
+    {
+        <div class="replay-panel">
+            <h1 class="replay-title">@L["Replay"]</h1>
+            <p class="mj-muted">@record!.EndedAt.ToString(Languages.IsChinese ? "yyyy-MM-dd" : "d MMM yyyy")
+                · @(view!.MySide == XqSide.Red ? X.SideName(XqSide.Red) : X.SideName(XqSide.Black))</p>
+            <p class="replay-position" aria-live="polite">
+                @if (Ply == 0)
+                {
+                    @L["Starting position"]
+                }
+                else
+                {
+                    @L["Move {0} of {1}", Ply, moves.Count]
+                }
+            </p>
+            @if (Ply == moves.Count && record.Result is >= 1 and <= 3)
+            {
+                <p class="replay-result"><strong>@ResultTitle()</strong> · @X.ShortReason((XqEndReason)record.Reason)</p>
+            }
+            <nav class="replay-controls" aria-label="@L["Replay controls"]">
+                <a class="btn btn-ghost btn-sm @(Ply == 0 ? "is-disabled" : "")" href="@Href(0)" aria-label="@L["Start"]">⏮</a>
+                <a class="btn btn-ghost btn-sm @(Ply == 0 ? "is-disabled" : "")" href="@Href(Math.Max(0, Ply - 1))" aria-label="@L["Previous move"]">◀</a>
+                <a class="btn btn-primary btn-sm @(Ply == moves.Count ? "is-disabled" : "")" href="@Href(Math.Min(moves.Count, Ply + 1))" aria-label="@L["Next move"]">▶</a>
+                <a class="btn btn-ghost btn-sm @(Ply == moves.Count ? "is-disabled" : "")" href="@Href(moves.Count)" aria-label="@L["End"]">⏭</a>
+            </nav>
+            <p class="replay-letters">
+                <a href="@($"account/game/{Id}?ply={Ply}&letters={(Letters ? 0 : 1)}")">@(Letters ? L["Characters"] : L["Letters"])</a>
+            </p>
+        </div>
+    };
+
+    string ResultTitle()
+    {
+        if (record!.Result == 3) return L["Drawn game"];
+        var winner = record.Result == 1 ? XqSide.Red : XqSide.Black;
+        return view!.MySide == winner ? L["You won!"] : L["You lose"];
+    }
+}

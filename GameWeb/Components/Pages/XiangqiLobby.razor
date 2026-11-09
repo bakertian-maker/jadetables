@@ -4,6 +4,7 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @inject XqText X
+@inject GameWeb.Accounts.PlayerAccountLinker Links
 
 <PageTitle>@L["Xiangqi · Jade Tables"]</PageTitle>
 <HeadContent>
@@ -30,7 +31,16 @@
 
     <div class="name-row">
         <label for="nickname">@L["Your name at the table"]</label>
-        <input id="nickname" maxlength="20" value="@nickname" @onchange="SaveName" placeholder="@L["Guest"]" />
+        @if (account is not null)
+        {
+            @* Signed in: the account's display name is used at the table. *@
+            <input id="nickname" value="@account.DisplayName" readonly aria-describedby="nickname-hint" />
+            <a id="nickname-hint" class="name-hint" href="account">@L["Change it in My games"]</a>
+        }
+        else
+        {
+            <input id="nickname" maxlength="20" value="@nickname" @onchange="SaveName" placeholder="@L["Guest"]" />
+        }
     </div>
 
     @if (createError is not null)
@@ -110,12 +120,14 @@
             <li><strong>@L["Capture"]</strong> @L["by moving onto an enemy piece. Cannons must jump exactly one piece to capture."]</li>
             <li><strong>@L["Protect"]</strong> @L["your general: it stays in its palace, and the two generals may never face each other on an open line."]</li>
             <li><strong>@L["Win the game"]</strong> @L["by checkmate, or when your opponent has no legal move."] <a href="xiangqi/rules">@L["Read the full rules"]</a></li>
+            <li><strong>@L["Get a rating"]</strong> @L["by playing with an account, and see the best players on the"] <a href="leaderboard">@L["leaderboard"]</a>.</li>
         </ol>
     </section>
 </div>
 
 @code {
     string nickname = "";
+    GameWeb.Accounts.SignedInPlayer? account;
     XqLevel quickLevel = XqLevel.Beginner;
     XqLevel roomLevel = XqLevel.Medium;
     XqRedChoice red = XqRedChoice.Host;
@@ -132,6 +144,7 @@
         if (!firstRender) return;
         var identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
         nickname = identity.Name;
+        account = await Links.CurrentAsync();
         StateHasChanged();
     }
 

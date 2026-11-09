@@ -1,6 +1,7 @@
 using System.Text;
 using GameWeb.Accounts;
 using GameWeb.Data;
+using GameWeb.Localization;
 using GameWeb.Seo;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
@@ -33,6 +34,18 @@ public abstract class AccountPageBase : ComponentBase
 
     /// <summary>Goes to a page of the site in the current language ("account", "xiangqi/room/ABCDE").</summary>
     protected void Go(string relative) => Nav.NavigateTo(relative.Length == 0 ? "./" : relative);
+
+    /// <summary>
+    /// After signing in: switch to the player's own language (their account remembers it) and go on to
+    /// <paramref name="relative"/> in that language.
+    /// </summary>
+    protected void GoAfterSignIn(ApplicationUser user, string relative)
+    {
+        var culture = Languages.Supported.Contains(user.Culture) ? user.Culture : Languages.CurrentCulture;
+        GameWeb.Localization.LanguagePaths.RememberChoice(HttpContext!.Response, culture);
+        if (culture == Languages.CurrentCulture) Go(relative);
+        else Nav.NavigateTo(GameWeb.Localization.LanguagePaths.InLanguage("/" + relative, culture));
+    }
 
     /// <summary>A return address from the query, if it is a page of this site; otherwise <paramref name="fallback"/>.</summary>
     protected static string SafeRelative(string? returnUrl, string fallback)

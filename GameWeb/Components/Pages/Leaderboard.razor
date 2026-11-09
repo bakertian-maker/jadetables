@@ -1,0 +1,69 @@
+@page "/leaderboard"
+@using GameWeb.Accounts
+@using GameWeb.Data
+@using GameWeb.Games.Archive
+@inject AccountFeatures Features
+@inject IServiceProvider Services
+
+<PageTitle>@L["Xiangqi leaderboard · Jade Tables"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@L["The best-rated Xiangqi (Chinese chess) players on Jade Tables."]" />
+</HeadContent>
+
+<div class="wrap page-pad leaderboard-page">
+    <p class="eyebrow">@L["Xiangqi"]</p>
+    <h1>@L["Leaderboard"]</h1>
+    <p class="lead">@L["Ratings start at {0}. Games against the computer count against a fixed rating for its level (Beginner {1}, Medium {2}, Difficult {3}), and games between players with accounts count too. Players appear here after {4} rated games.",
+        Ratings.Start, Ratings.BotRating(XqLevel.Beginner), Ratings.BotRating(XqLevel.Medium), Ratings.BotRating(XqLevel.Difficult), Ratings.LeaderboardMinGames]</p>
+
+    @if (!Features.Enabled)
+    {
+        <div class="card"><p>@L["Accounts aren't available right now. You can still play as a guest."]</p></div>
+    }
+    else if (rows.Count == 0)
+    {
+        <div class="card">
+            <p>@L["Nobody is on the leaderboard yet. Create an account and play a few games to be the first."]</p>
+            <a class="btn btn-primary" href="xiangqi">@L["Play Xiangqi"]</a>
+        </div>
+    }
+    else
+    {
+        <div class="history-wrap">
+            <table class="rules-table leaderboard">
+                <thead><tr><th>#</th><th>@L["Player"]</th><th>@L["Rating"]</th><th>@L["Games"]</th><th>@L["Won – drawn – lost"]</th></tr></thead>
+                <tbody>
+                    @foreach (var r in rows)
+                    {
+                        <tr class="@(r.IsMe ? "is-me" : "")">
+                            <td>@r.Rank</td>
+                            <td>@r.DisplayName @if (r.IsMe) { <span class="mj-tag">@L["You"]</span> }</td>
+                            <td><strong>@r.Rating</strong></td>
+                            <td>@r.Games</td>
+                            <td>@r.Wins – @r.Draws – @r.Losses</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    @if (Features.Enabled && !signedIn)
+    {
+        <p class="leaderboard-join"><a href="account/register?returnUrl=leaderboard">@L["Create an account"]</a> @L["to get a rating."]</p>
+    }
+</div>
+
+@code {
+    [CascadingParameter] HttpContext? HttpContext { get; set; }
+
+    IReadOnlyList<LeaderboardRow> rows = [];
+    bool signedIn;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Features.Enabled || Services.GetService<AccountStore>() is not { } store) return;
+        signedIn = HttpContext?.User.Identity?.IsAuthenticated == true;
+        var me = HttpContext?.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        rows = await store.LeaderboardAsync(GameType.Xiangqi, 50, me);
+    }
+}

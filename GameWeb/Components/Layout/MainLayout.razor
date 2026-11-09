@@ -41,6 +41,26 @@
                         }
                     }
                 </span>
+                @* Phones: the same choice as a compact drop-down (plain HTML, works before the page is live). *@
+                <details class="lang-menu">
+                    <summary aria-label="Language / 語言">
+                        @Languages.Menu.First(m => m.Culture == Languages.CurrentCulture).Short
+                        <span class="lang-menu-caret" aria-hidden="true">▾</span>
+                    </summary>
+                    <div class="lang-menu-list" role="menu">
+                        @foreach (var (culture, _, name) in Languages.Menu)
+                        {
+                            if (culture == Languages.CurrentCulture)
+                            {
+                                <span class="lang-menu-item is-current" lang="@culture" aria-current="true">@name</span>
+                            }
+                            else
+                            {
+                                <a class="lang-menu-item" role="menuitem" href="@SwitchHref(culture)" data-enhance-nav="false" hreflang="@culture" lang="@culture">@name</a>
+                            }
+                        }
+                    </div>
+                </details>
             </nav>
         </div>
     </header>

@@ -18,6 +18,19 @@
 
         <div class="account-stats">
             <div><strong>@summary.Games</strong><span>@L["Games played"]</span></div>
+            <div>
+                <strong>@(rating?.Rating.ToString() ?? "–")</strong>
+                <span>@L["Xiangqi rating"]
+                    @if (rank is int place)
+                    {
+                        <text> · </text><a href="leaderboard">@L["#{0} on the leaderboard", place]</a>
+                    }
+                    else
+                    {
+                        <text> · </text><a href="leaderboard">@L["Leaderboard"]</a>
+                    }
+                </span>
+            </div>
             <div><strong>@summary.XiangqiWins – @summary.XiangqiDraws – @summary.XiangqiLosses</strong><span>@L["Xiangqi: won – drawn – lost"]</span></div>
             <div><strong>@summary.MahjongFirsts / @summary.MahjongMatches</strong><span>@L["Mahjong: matches won / played"]</span></div>
         </div>
@@ -55,7 +68,12 @@
                                     }
                                 </td>
                                 <td>@Opponents(g)</td>
-                                <td>@(g.Type == GameType.Xiangqi ? L["{0} moves", (g.Length + 1) / 2] : L["{0} hands", g.Length])</td>
+                                <td>@(g.Type == GameType.Xiangqi ? L["{0} moves", (g.Length + 1) / 2] : L["{0} hands", g.Length])
+                                    @if (g.Type == GameType.Xiangqi && g.Length > 0)
+                                    {
+                                        <a class="history-replay" href="@($"account/game/{g.Id}")">@L["Replay"]</a>
+                                    }
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -80,6 +98,18 @@
                 <EditForm Model="NameForm" FormName="name" OnSubmit="SaveName" class="auth-form" method="post">
                     <InputText @bind-Value="NameForm.DisplayName" maxlength="20" aria-label="@L["Display name"]" />
                     @if (nameSaved)
+                    {
+                        <p class="auth-ok">@L["Saved."]</p>
+                    }
+                    <button type="submit" class="btn btn-ghost btn-sm">@L["Save"]</button>
+                </EditForm>
+                <EditForm Model="BoardForm" FormName="board" OnSubmit="SaveBoard" class="auth-form account-board" method="post">
+                    <input type="hidden" name="BoardForm.Posted" value="true" />
+                    <label class="auth-check">
+                        <InputCheckbox @bind-Value="BoardForm.Show" />
+                        @L["Show me on the leaderboard"]
+                    </label>
+                    @if (boardSaved)
                     {
                         <p class="auth-ok">@L["Saved."]</p>
                     }
@@ -154,12 +184,15 @@
     [SupplyParameterFromForm(FormName = "name")] NameInput NameForm { get; set; } = new();
     [SupplyParameterFromForm(FormName = "password")] PasswordInput PasswordForm { get; set; } = new();
     [SupplyParameterFromForm(FormName = "delete")] DeleteInput DeleteForm { get; set; } = new();
+    [SupplyParameterFromForm(FormName = "board")] BoardInput BoardForm { get; set; } = new();
 
     ApplicationUser? user;
     bool hasPassword;
     IReadOnlyList<HistoryEntry> history = [];
     HistorySummary summary = new(0, 0, 0, 0, 0, 0);
-    bool nameSaved, passwordSaved;
+    bool nameSaved, passwordSaved, boardSaved;
+    PlayerRating? rating;
+    int? rank;
     readonly List<string> passwordErrors = [], deleteErrors = [];
 
     protected override async Task OnInitializedAsync()
@@ -174,8 +207,25 @@
         if (Page < 1) Page = 1;
         hasPassword = await Users.HasPasswordAsync(user);
         NameForm.DisplayName ??= user.DisplayName;
+        if (!BoardForm.Posted) BoardForm.Show = user.ShowOnLeaderboard;
         history = await Store.HistoryAsync(user.Id, (Page - 1) * PageSize, PageSize);
         summary = await Store.SummaryAsync(user.Id);
+        await LoadRatingAsync();
+    }
+
+    async Task LoadRatingAsync()
+    {
+        rating = await Store.RatingAsync(user!.Id, GameType.Xiangqi);
+        rank = await Store.RankAsync(user.Id, GameType.Xiangqi);
+    }
+
+    async Task SaveBoard()
+    {
+        if (user is null) return;
+        user.ShowOnLeaderboard = BoardForm.Show;
+        await Users.UpdateAsync(user);
+        boardSaved = true;
+        await LoadRatingAsync();
     }
 
     async Task SaveName()
@@ -243,4 +293,6 @@
     sealed class NameInput { public string? DisplayName { get; set; } }
     sealed class PasswordInput { public string? Current { get; set; } public string? New { get; set; } }
     sealed class DeleteInput { public string? Password { get; set; } public bool Confirm { get; set; } }
+    /// <summary>Posted is always sent, so an unticked box (which browsers don't send) still counts as an answer.</summary>
+    sealed class BoardInput { public bool Show { get; set; } public bool Posted { get; set; } }
 }

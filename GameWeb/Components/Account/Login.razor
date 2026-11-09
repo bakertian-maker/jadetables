@@ -84,7 +84,7 @@
         if (result.Succeeded)
         {
             await Store.LinkAsync(user.Id, Input.PlayerId);
-            Go(ReturnPath);
+            GoAfterSignIn(user, ReturnPath);
         }
         else if (result.IsNotAllowed) needsConfirmation = true;
         else if (result.IsLockedOut) Errors.Add(L["Too many attempts. Please try again in 15 minutes."]);

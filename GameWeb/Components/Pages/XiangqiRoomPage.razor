@@ -5,6 +5,7 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 @inject GameWeb.Accounts.PlayerAccountLinker Links
+@inject GameWeb.Accounts.AccountPrefs Prefs
 @inject XqText X
 
 <PageTitle>@L["Xiangqi room {0} · Jade Tables", Code.ToUpperInvariant()]</PageTitle>
@@ -83,11 +84,14 @@ else if (view is not null)
             return;
         }
         identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
-        // Signed in: games played in this browser belong to the account (see AccountStore.LinkAsync).
+        // Signed in: play under the account's name, and games played in this browser belong to the
+        // account (see AccountStore.LinkAsync).
+        if (await Links.CurrentAsync() is { DisplayName.Length: > 0 } me) identity = identity with { Name = me.DisplayName };
         _ = Links.LinkCurrentAsync(identity.Id);
         inviteUrl = Nav.BaseUri + room.Url;   // keeps the language: https://…/zh-hk/xiangqi/room/ABCDE
         soundOn = await JS.InvokeAsync<bool>("gameweb.soundEnabled");
         letters = await JS.InvokeAsync<string?>("gameweb.getPref", "xq.letters") == "1";
+        await UseAccountPrefs();
 
         room.Changed += OnRoomChanged;
         var outcome = room.Connect(identity.Id, identity.Name);
@@ -150,12 +154,23 @@ else if (view is not null)
     {
         letters = !letters;
         await JS.InvokeVoidAsync("gameweb.setPref", "xq.letters", letters ? "1" : "0");
+        if (await Links.CurrentAsync() is { } me) await Prefs.SavePrefsAsync(me.UserId, letterPieces: letters);
     }
 
     async Task ToggleSound()
     {
         soundOn = !soundOn;
         await JS.InvokeVoidAsync("gameweb.setSound", soundOn);
+        if (await Links.CurrentAsync() is { } me) await Prefs.SavePrefsAsync(me.UserId, soundOn: soundOn);
+    }
+
+    /// <summary>Signed in: the account's settings win over this browser's, and this browser takes them on.</summary>
+    async Task UseAccountPrefs()
+    {
+        if (await Links.CurrentAsync() is not { } me || await Prefs.PrefsAsync(me.UserId) is not { } prefs) return;
+        soundOn = prefs.SoundOn;
+        letters = prefs.LetterPieces;
+        await JS.InvokeVoidAsync("gameweb.syncPrefs", soundOn, letters);
     }
 
     /// <summary>Seat 0 is the room's creator (the host) until the game starts.</summary>

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GameWeb.Accounts;
 using GameWeb.Seo;
 using GameWeb.Components;
@@ -44,6 +45,10 @@ builder.Services.AddRazorComponents()
 builder.Services.AddSingleton<GameCatalog>();
 builder.Services.AddSingleton<RoomService>();
 builder.Services.AddScoped<PlayerAccountLinker>();
+builder.Services.AddScoped<AccountPrefs>();
+// One antiforgery cookie for the whole site, not one per language prefix: forms such as "Continue with
+// Google" post from /zh-cn/... to an address at the root.
+builder.Services.AddAntiforgery(o => o.Cookie.Path = "/");
 
 // Game archive and opening book in SQL Server. The connection string comes from user secrets in
 // development and from the environment in production; without one, games simply aren't saved.
@@ -120,13 +125,14 @@ app.UseAntiforgery();
 
 // Language switch: remembers the choice in the standard culture cookie (so English addresses send this
 // visitor to their language later) and goes to the same page in the new language.
-app.MapGet("/culture/set", (string culture, string? redirectUri, HttpContext http) =>
+app.MapGet("/culture/set", async (string culture, string? redirectUri, HttpContext http) =>
 {
     if (!Languages.Supported.Contains(culture)) culture = Languages.English;
-    http.Response.Cookies.Append(
-        CookieRequestCultureProvider.DefaultCookieName,
-        CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-        new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true, SameSite = SameSiteMode.Lax, HttpOnly = true });
+    LanguagePaths.RememberChoice(http.Response, culture);
+    // Signed in: the choice follows the account to other devices.
+    if (http.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) is { Length: > 0 } userId
+        && http.RequestServices.GetService<AccountStore>() is { } store)
+        await store.SaveCultureAsync(userId, culture);
     var page = Languages.IsSafeLocalPath(redirectUri) ? redirectUri! : "/";
     return Results.LocalRedirect(LanguagePaths.PrefixFor(culture) + page);
 });

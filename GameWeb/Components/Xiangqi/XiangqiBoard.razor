@@ -4,20 +4,23 @@
 @inject GameText T
 
 <div class="xq-table">
-    <div class="xq-topbar">
-        <div class="mj-topbar-info">
-            <span class="mj-chip">@L["Room"] @View.Code</span>
-            <span class="mj-chip mj-hide-sm">@X.TimeControl(View.Settings)</span>
+    @if (ReplayPanel is null)
+    {
+        <div class="xq-topbar">
+            <div class="mj-topbar-info">
+                <span class="mj-chip">@L["Room"] @View.Code</span>
+                <span class="mj-chip mj-hide-sm">@X.TimeControl(View.Settings)</span>
+            </div>
+            <div class="mj-topbar-links">
+                <button type="button" class="mj-link-button" aria-pressed="@(Letters ? "true" : "false")" @onclick="OnToggleLetters"
+                        title="@L["Show letters instead of Chinese characters on the pieces"]">@(Letters ? L["Letters"] : L["Characters"])</button>
+                <button type="button" class="mj-link-button" aria-pressed="@(SoundOn ? "true" : "false")" @onclick="OnToggleSound"
+                        title="@L["Play a chime when it's your turn and this tab is in the background"]">@(SoundOn ? L["Sound on"] : L["Sound off"])</button>
+                <a href="xiangqi/rules" target="_blank">@L["Rules"]</a>
+                <a href="xiangqi">@L["Leave"]</a>
+            </div>
         </div>
-        <div class="mj-topbar-links">
-            <button type="button" class="mj-link-button" aria-pressed="@(Letters ? "true" : "false")" @onclick="OnToggleLetters"
-                    title="@L["Show letters instead of Chinese characters on the pieces"]">@(Letters ? L["Letters"] : L["Characters"])</button>
-            <button type="button" class="mj-link-button" aria-pressed="@(SoundOn ? "true" : "false")" @onclick="OnToggleSound"
-                    title="@L["Play a chime when it's your turn and this tab is in the background"]">@(SoundOn ? L["Sound on"] : L["Sound off"])</button>
-            <a href="xiangqi/rules" target="_blank">@L["Rules"]</a>
-            <a href="xiangqi">@L["Leave"]</a>
-        </div>
-    </div>
+    }
 
     <div class="xq-layout">
         <div class="xq-board-col">
@@ -102,6 +105,12 @@
         </div>
 
         <aside class="xq-side">
+            @if (ReplayPanel is not null)
+            {
+                @ReplayPanel
+            }
+            else
+            {
             <div class="xq-status" aria-live="polite">
                 @StatusLine()
                 @if (View.SecondsLeft is not null && View.SecondsTotal > 0 && !View.IsOver)
@@ -136,23 +145,24 @@
                     }
                 </div>
             }
+            }
 
             <h2 class="xq-moves-title">@L["Moves"]</h2>
             <div class="xq-moves-scroll">
-                @if (View.History.Count == 0)
+                @if (Moves.Count == 0)
                 {
                     <p class="mj-muted xq-moves-empty">@L["Red moves first."]</p>
                 }
                 else
                 {
                     <ol class="xq-moves">
-                        @for (int i = 0; i < View.History.Count; i += 2)
+                        @for (int i = 0; i < Moves.Count; i += 2)
                         {
                             <li>
-                                <span class="xq-move-red">@X.Notation(View.History[i].Notation)</span>
-                                @if (i + 1 < View.History.Count)
+                                @MoveItem(i, "xq-move-red")
+                                @if (i + 1 < Moves.Count)
                                 {
-                                    <span class="xq-move-black">@X.Notation(View.History[i + 1].Notation)</span>
+                                    @MoveItem(i + 1, "xq-move-black")
                                 }
                             </li>
                         }
@@ -162,7 +172,7 @@
         </aside>
     </div>
 
-    @if (View.IsOver && !hideResult)
+    @if (View.IsOver && !hideResult && ReplayPanel is null)
     {
         @ResultDialog()
     }
@@ -181,6 +191,29 @@
     [Parameter] public EventCallback OnToggleLetters { get; set; }
     [Parameter] public bool SoundOn { get; set; } = true;
     [Parameter] public EventCallback OnToggleSound { get; set; }
+
+    // Replay of a finished game: the panel replaces the status and buttons, the move list shows every
+    // move of the game as links (MoveHref), and the current one is highlighted.
+    [Parameter] public RenderFragment? ReplayPanel { get; set; }
+    [Parameter] public IReadOnlyList<XqMoveRecord>? ReplayMoves { get; set; }
+    [Parameter] public int ReplayPly { get; set; }
+    [Parameter] public Func<int, string>? MoveHref { get; set; }
+
+    IReadOnlyList<XqMoveRecord> Moves => ReplayMoves ?? View.History;
+
+    RenderFragment MoveItem(int index, string css) => __builder =>
+    {
+        var text = X.Notation(Moves[index].Notation);
+        if (MoveHref is null)
+        {
+            <span class="@css">@text</span>
+        }
+        else
+        {
+            bool current = index + 1 == ReplayPly;
+            <a class="@css xq-move-link @(current ? "is-current" : "")" href="@MoveHref(index + 1)" aria-current="@(current ? "step" : null)">@text</a>
+        }
+    };
 
     int? selected;
     bool confirmResign;

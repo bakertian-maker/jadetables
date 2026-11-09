@@ -17,6 +17,7 @@ interface GameWebApi {
     setSound(on: boolean): void;
     getPref(key: string): string | null;
     setPref(key: string, value: string): void;
+    syncPrefs(soundOn: boolean, letters: boolean | null): void;
 }
 
 declare global {
@@ -185,6 +186,12 @@ window.gameweb = {
 
     setPref(key: string, value: string): void {
         write("gw.pref." + key, value);
+    },
+
+    /** Takes on the signed-in account's settings, quietly (no test chime). */
+    syncPrefs(soundOn: boolean, letters: boolean | null): void {
+        write(SOUND_KEY, soundOn ? "on" : "off");
+        if (letters !== null) write("gw.pref.xq.letters", letters ? "1" : "0");
     },
 
     setSound(on: boolean): void {

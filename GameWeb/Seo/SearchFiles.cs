@@ -11,7 +11,7 @@ namespace GameWeb.Seo;
 public static class SearchFiles
 {
     /// <summary>Public pages, in the order search engines should see them.</summary>
-    public static readonly string[] Pages = ["/", "/mahjong", "/mahjong/rules", "/xiangqi", "/xiangqi/rules", "/privacy"];
+    public static readonly string[] Pages = ["/", "/mahjong", "/mahjong/rules", "/xiangqi", "/xiangqi/rules", "/leaderboard", "/privacy"];
 
     /// <summary>Paths crawlers should skip, in every language: private rooms, Blazor's connection, the error page.</summary>
     static readonly string[] BlockedInEachLanguage = ["/mahjong/room/", "/xiangqi/room/", "/_blazor", "/Error"];

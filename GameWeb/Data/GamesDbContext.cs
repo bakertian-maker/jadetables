@@ -94,6 +94,7 @@ public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : I
     public DbSet<BookEntry> OpeningBook => Set<BookEntry>();
     public DbSet<ImportedGameRecord> ImportedGames => Set<ImportedGameRecord>();
     public DbSet<PlayerLink> PlayerLinks => Set<PlayerLink>();
+    public DbSet<PlayerRating> PlayerRatings => Set<PlayerRating>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -104,6 +105,19 @@ public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : I
             e.Property(u => u.DisplayName).HasMaxLength(20).IsRequired();
             e.Property(u => u.CreatedAt).HasColumnType("datetime2(0)");
             e.Property(u => u.Culture).HasMaxLength(10).IsRequired();
+            e.Property(u => u.SoundOn).HasDefaultValue(true).HasSentinel(false);
+            e.Property(u => u.ShowOnLeaderboard).HasDefaultValue(true).HasSentinel(false);
+        });
+
+        model.Entity<PlayerRating>(e =>
+        {
+            e.ToTable("PlayerRatings");
+            e.HasKey(r => new { r.UserId, r.GameType });
+            e.Property(r => r.GameType).HasConversion<byte>();
+            e.Property(r => r.UpdatedAt).HasColumnType("datetime2(0)");
+            // The leaderboard: best ratings in a game.
+            e.HasIndex(r => new { r.GameType, r.Rating });
+            e.HasOne<ApplicationUser>().WithMany().HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Cascade);
         });
 
         model.Entity<PlayerLink>(e =>

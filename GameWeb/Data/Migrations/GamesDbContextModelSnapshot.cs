@@ -54,6 +54,9 @@ namespace GameWeb.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("LetterPieces")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -79,6 +82,16 @@ namespace GameWeb.Data.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ShowOnLeaderboard")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("SoundOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -268,6 +281,39 @@ namespace GameWeb.Data.Migrations
                     b.ToTable("PlayerLinks", (string)null);
                 });
 
+            modelBuilder.Entity("GameWeb.Data.PlayerRating", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte>("GameType")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("Draws")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Games")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Losses")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2(0)");
+
+                    b.Property<int>("Wins")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "GameType");
+
+                    b.HasIndex("GameType", "Rating");
+
+                    b.ToTable("PlayerRatings", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -411,6 +457,15 @@ namespace GameWeb.Data.Migrations
                 });
 
             modelBuilder.Entity("GameWeb.Data.PlayerLink", b =>
+                {
+                    b.HasOne("GameWeb.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GameWeb.Data.PlayerRating", b =>
                 {
                     b.HasOne("GameWeb.Data.ApplicationUser", null)
                         .WithMany()

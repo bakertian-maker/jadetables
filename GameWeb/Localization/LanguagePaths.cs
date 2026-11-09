@@ -142,6 +142,22 @@ public static class LanguagePaths
         }
     }
 
+    /// <summary>Stores the visitor's language choice in the standard culture cookie, for a year.</summary>
+    public static void RememberChoice(HttpResponse response, string culture) =>
+        response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+            new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true, SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax, HttpOnly = true });
+
+    /// <summary>The same local address in another language: "/zh-cn/xiangqi" → "/zh-hk/xiangqi".</summary>
+    public static string InLanguage(string localPath, string culture)
+    {
+        PathString path = localPath.Split('?')[0];
+        string query = localPath.Contains('?') ? localPath[localPath.IndexOf('?')..] : "";
+        var rest = TrySplit(path, out _, out var r, out _) ? (r.HasValue ? r.Value! : "/") : (path.HasValue ? path.Value! : "/");
+        return PrefixFor(culture) + rest + query;
+    }
+
     /// <summary>The site-relative address of the current page with no language prefix ("/xiangqi").</summary>
     public static string PathWithoutLanguage(string baseRelativePath)
     {

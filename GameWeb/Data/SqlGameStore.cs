@@ -53,7 +53,7 @@ public sealed class SqlGameStore(IDbContextFactory<GamesDbContext> dbFactory, IL
     async Task WriteAsync(FinishedGame game)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
-        db.Games.Add(new GameRecord
+        var record = new GameRecord
         {
             GameType = game.Type,
             RoomCode = game.RoomCode,
@@ -73,8 +73,19 @@ public sealed class SqlGameStore(IDbContextFactory<GamesDbContext> dbFactory, IL
                 BotLevel = p.BotLevel,
                 Score = p.Score,
             }).ToList(),
-        });
+        };
+        db.Games.Add(record);
         await db.SaveChangesAsync();
+
+        // Ratings for the accounts that played (a failure here doesn't lose the saved game).
+        try
+        {
+            await Ratings.ApplyAsync(db, record);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Could not update ratings for the game from room {Code}", game.RoomCode);
+        }
 
         if (game.BookMoves.Count > 0) await RecordBookAsync(db, game.BookMoves, game.Result);
         logger.LogInformation("Saved {Type} game from room {Code} ({Plies} plies, {Book} book moves)",
