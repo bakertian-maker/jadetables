@@ -18,7 +18,6 @@ ZH_HANS = {
     "Open a private room, send the link to friends and play on any phone or laptop. Short a player? A computer player takes the empty seat.":
         "开一个私人房间，把链接发给朋友，用手机或电脑都能玩。人不够？空位由电脑玩家补上。",
     "Play Mahjong": "开始打麻将",
-    "Learn the rules": "学习规则",
     "Games": "游戏",
     "In development": "开发中",
     "Play": "开始",
@@ -46,7 +45,6 @@ ZH_HANS = {
     "3 players": "3 人",
 
     # Lobby
-    "Hong Kong Mahjong · Jade Tables": "港式麻将 · 玉桌",
     "Play Hong Kong mahjong online for free. Play the computer straight away or open a private room for friends.":
         "免费在线玩港式麻将。可以直接和电脑对局，也可以为朋友开私人房间。",
     "廣東麻雀 · Hong Kong rules": "广东麻将 · 港式规则",
@@ -173,7 +171,6 @@ ZH_HANS = {
     "Hidden tile": "未翻开的牌",
 
     # Rules page
-    "Hong Kong Mahjong rules · Jade Tables": "港式麻将规则 · 玉桌",
     "Hong Kong mahjong rules as played on Jade Tables: tiles, claiming, winning hands and the faan scoring table.":
         "玉桌使用的港式麻将规则：牌张、吃碰杠、和牌牌型和番种表。",
 
@@ -223,7 +220,6 @@ ZH_HANS = {
     "Continue": "继续",
 
     # Xiangqi
-    "Xiangqi · Jade Tables": "象棋 · 玉桌",
     "Play Xiangqi (Chinese chess) online for free, against the computer or a friend with a private link.": "免费在线下中国象棋，可以和电脑对弈，也可以用私人链接邀请朋友。",
     "象棋 · Chinese chess": "象棋 · 中国象棋",
     "Two armies face each other across the river. Checkmate the enemy general to win.": "两军隔河对峙，将死对方的将帅即可获胜。",
@@ -264,7 +260,6 @@ ZH_HANS = {
     "Host plays Red": "房主执红",
     "Guest plays Red": "朋友执红",
     "Sides chosen at random": "随机分红黑",
-    "Xiangqi rules · Jade Tables": "象棋规则 · 玉桌",
     "Xiangqi (Chinese chess) rules: the board, how each piece moves, check, checkmate and draws.": "中国象棋规则：棋盘、各棋子走法、将军、将死与和棋。",
     "Show letters instead of Chinese characters on the pieces": "棋子上显示字母而不是汉字",
     "Letters": "字母",
@@ -462,4 +457,14 @@ ZH_HANS = {
     "by playing with an account, and see the best players on the": "：登录账号下棋即可获得，最强玩家都在",
     "leaderboard": "排行榜",
     "to get a rating.": "，获得你的等级分。",
+    # Page titles and link previews
+    "Hong Kong Mahjong Rules and Faan Scoring | Jade Tables": "港式麻将规则与番数表 | 玉桌",
+    "Jade Tables: free Mahjong and Xiangqi online": "玉桌：免费在线麻将和象棋",
+    "Join my Mahjong table on Jade Tables": "来玉桌和我一起打麻将",
+    "Join my Xiangqi game on Jade Tables": "来玉桌和我下一盘象棋",
+    "Play Hong Kong Mahjong Online Free – vs the Computer or Friends | Jade Tables": "免费在线玩港式麻将 – 和电脑或朋友一起打 | 玉桌",
+    "Play Xiangqi Online Free – Chinese Chess vs the Computer or Friends | Jade Tables": "免费在线下象棋 – 和电脑或朋友对弈 | 玉桌",
+    "Room {0}: play Hong Kong mahjong with me in your browser. Free, no download or account needed.": "房间 {0}：在浏览器里和我一起打港式麻将。免费，免下载，无需注册。",
+    "Room {0}: play Xiangqi (Chinese chess) with me in your browser. Free, no download or account needed.": "房间 {0}：在浏览器里和我下象棋。免费，免下载，无需注册。",
+    "Xiangqi Rules: How to Play Chinese Chess | Jade Tables": "象棋规则：中国象棋怎么下 | 玉桌",
 }

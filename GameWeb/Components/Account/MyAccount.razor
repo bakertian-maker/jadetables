@@ -224,6 +224,7 @@
         if (user is null) return;
         user.ShowOnLeaderboard = BoardForm.Show;
         await Users.UpdateAsync(user);
+        Store.RefreshLeaderboard();
         boardSaved = true;
         await LoadRatingAsync();
     }
@@ -266,6 +267,7 @@
             return;
         }
         Store.Forget(id);
+        Store.RefreshLeaderboard();
         await SignIn.SignOutAsync();
         Go("./?deleted=1");
     }

@@ -8,7 +8,7 @@
 @inject GameWeb.Accounts.AccountPrefs Prefs
 @inject GameText T
 
-<PageTitle>@L["Mahjong room {0} · Jade Tables", Code.ToUpperInvariant()]</PageTitle>
+<PageMeta Title="@L["Mahjong room {0} · Jade Tables", Code.ToUpperInvariant()]" ShareTitle="@L["Join my Mahjong table on Jade Tables"]" ShareDescription="@L["Room {0}: play Hong Kong mahjong with me in your browser. Free, no download or account needed.", Code.ToUpperInvariant()]" />
 
 @if (state == PageState.Loading)
 {

@@ -1,0 +1,50 @@
+@* A page's title and description, plus the tags that link previews use (Open Graph for WhatsApp, WeChat,
+   Facebook, LinkedIn…; Twitter/X cards). Rendered on the server, so previews work without scripts. *@
+@inject NavigationManager Nav
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+
+<PageTitle>@Title</PageTitle>
+<HeadContent>
+    @if (Description is not null)
+    {
+        <meta name="description" content="@Description" />
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@L["Jade Tables"]" />
+    <meta property="og:title" content="@(ShareTitle ?? Title)" />
+    @if ((ShareDescription ?? Description) is { } description)
+    {
+        <meta property="og:description" content="@description" />
+    }
+    <meta property="og:url" content="@PageUrl" />
+    <meta property="og:image" content="@($"{Origin}/og-image.png")" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="@L["Jade Tables: free Mahjong and Xiangqi online"]" />
+    <meta property="og:locale" content="@Locale" />
+    <meta name="twitter:card" content="summary_large_image" />
+</HeadContent>
+
+@code {
+    /// <summary>The browser tab and search-result title.</summary>
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string? Description { get; set; }
+    /// <summary>A different title for link previews (e.g. "Join my game" on a room invite).</summary>
+    [Parameter] public string? ShareTitle { get; set; }
+    [Parameter] public string? ShareDescription { get; set; }
+
+    /// <summary>The site's public address (Site:BaseUrl in production), else this request's.</summary>
+    string Origin => Config["Site:BaseUrl"] is { Length: > 0 } configured
+        ? configured.TrimEnd('/')
+        : new Uri(Nav.BaseUri).GetLeftPart(UriPartial.Authority);
+
+    /// <summary>This page's address without the query, on the public host.</summary>
+    string PageUrl => Origin + new Uri(Nav.Uri).AbsolutePath;
+
+    static string Locale => Languages.Current switch
+    {
+        Script.Simplified => "zh_CN",
+        Script.Traditional => "zh_HK",
+        _ => "en_GB",
+    };
+}

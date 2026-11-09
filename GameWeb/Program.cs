@@ -49,6 +49,8 @@ builder.Services.AddScoped<AccountPrefs>();
 // One antiforgery cookie for the whole site, not one per language prefix: forms such as "Continue with
 // Google" post from /zh-cn/... to an address at the root.
 builder.Services.AddAntiforgery(o => o.Cookie.Path = "/");
+// Browsers remember to use HTTPS for a year (the default is 30 days).
+builder.Services.AddHsts(o => o.MaxAge = TimeSpan.FromDays(365));
 
 // Game archive and opening book in SQL Server. The connection string comes from user secrets in
 // development and from the environment in production; without one, games simply aren't saved.
@@ -94,6 +96,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// Basic security headers on every response. (IIS's own Server and X-Powered-By headers are removed in web.config.)
+app.Use((http, next) =>
+{
+    var headers = http.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()";
+    return next(http);
+});
 app.UseRewriter(new RewriteOptions()
     .AddRedirectToWwwPermanent()
 );

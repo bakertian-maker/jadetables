@@ -139,15 +139,30 @@ public sealed class AccountStore(IDbContextFactory<GamesDbContext> factory, ILog
     /// <summary>The best-rated players who have played enough rated games and chose to be listed.</summary>
     public async Task<IReadOnlyList<LeaderboardRow>> LeaderboardAsync(GameType type, int take, string? myUserId, CancellationToken ct = default)
     {
-        await using var db = await factory.CreateDbContextAsync(ct);
-        var rows = await (from r in db.PlayerRatings.AsNoTracking()
-                          join u in db.Users on r.UserId equals u.Id
-                          where r.GameType == type && r.Games >= Ratings.LeaderboardMinGames && u.ShowOnLeaderboard
-                          orderby r.Rating descending, r.Games descending
-                          select new { u.Id, u.DisplayName, r.Rating, r.Games, r.Wins, r.Draws, r.Losses })
-                         .Take(take).ToListAsync(ct);
-        return rows.Select((x, i) => new LeaderboardRow(i + 1, x.DisplayName, x.Rating, x.Games, x.Wins, x.Draws, x.Losses, x.Id == myUserId)).ToList();
+        // The board changes only when rated games finish, so it is read from the database at most once a
+        // minute; "is this me" is worked out per visitor from the cached rows.
+        var key = (type, take);
+        if (!_leaderboard.TryGetValue(key, out var cached) || DateTime.UtcNow - cached.At > LeaderboardCacheTime)
+        {
+            await using var db = await factory.CreateDbContextAsync(ct);
+            var rows = await (from r in db.PlayerRatings.AsNoTracking()
+                              join u in db.Users on r.UserId equals u.Id
+                              where r.GameType == type && r.Games >= Ratings.LeaderboardMinGames && u.ShowOnLeaderboard
+                              orderby r.Rating descending, r.Games descending
+                              select new LeaderboardEntry(u.Id, u.DisplayName, r.Rating, r.Games, r.Wins, r.Draws, r.Losses))
+                             .Take(take).ToListAsync(ct);
+            cached = (DateTime.UtcNow, rows);
+            _leaderboard[key] = cached;
+        }
+        return cached.Rows.Select((x, i) => new LeaderboardRow(i + 1, x.DisplayName, x.Rating, x.Games, x.Wins, x.Draws, x.Losses, x.UserId == myUserId)).ToList();
     }
+
+    /// <summary>Forgets the cached leaderboard, e.g. after a player hides themselves or deletes their account.</summary>
+    public void RefreshLeaderboard() => _leaderboard.Clear();
+
+    static readonly TimeSpan LeaderboardCacheTime = TimeSpan.FromMinutes(1);
+    readonly ConcurrentDictionary<(GameType, int), (DateTime At, List<LeaderboardEntry> Rows)> _leaderboard = new();
+    sealed record LeaderboardEntry(string UserId, string DisplayName, int Rating, int Games, int Wins, int Draws, int Losses);
 
     /// <summary>The account's place on the leaderboard, or null if it isn't listed.</summary>
     public async Task<int?> RankAsync(string userId, GameType type, CancellationToken ct = default)

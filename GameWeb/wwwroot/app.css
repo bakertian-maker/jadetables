@@ -421,3 +421,10 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
 .xq-move-link:hover { background: rgba(255, 255, 255, .1); }
 .xq-move-link.is-current { background: #f2c94c; color: #1d1a10; }
 .leaderboard .mj-tag { margin-left: 6px; }
+
+/* Phones: a smaller cookie banner, so it doesn't cover the page's main buttons on a first visit. */
+@media (max-width: 560px) {
+    .consent { left: 10px; right: 10px; bottom: 10px; padding: 10px 12px; gap: 8px; border-radius: 12px; }
+    .consent p { font-size: .82rem; line-height: 1.4; }
+    .consent-actions .consent-btn { min-width: 0; flex: 1; padding: 8px 10px; }
+}

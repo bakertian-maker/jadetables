@@ -8,7 +8,7 @@
 @inject GameWeb.Accounts.AccountPrefs Prefs
 @inject XqText X
 
-<PageTitle>@L["Xiangqi room {0} · Jade Tables", Code.ToUpperInvariant()]</PageTitle>
+<PageMeta Title="@L["Xiangqi room {0} · Jade Tables", Code.ToUpperInvariant()]" ShareTitle="@L["Join my Xiangqi game on Jade Tables"]" ShareDescription="@L["Room {0}: play Xiangqi (Chinese chess) with me in your browser. Free, no download or account needed.", Code.ToUpperInvariant()]" />
 
 @if (state == PageState.Loading)
 {

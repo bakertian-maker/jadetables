@@ -133,8 +133,7 @@
   <data name="Hint" xml:space="preserve"><value>提示</value></data>
   <data name="Home" xml:space="preserve"><value>首页</value></data>
   <data name="Hong Kong Mahjong" xml:space="preserve"><value>港式麻将</value></data>
-  <data name="Hong Kong Mahjong rules · Jade Tables" xml:space="preserve"><value>港式麻将规则 · 玉桌</value></data>
-  <data name="Hong Kong Mahjong · Jade Tables" xml:space="preserve"><value>港式麻将 · 玉桌</value></data>
+  <data name="Hong Kong Mahjong Rules and Faan Scoring | Jade Tables" xml:space="preserve"><value>港式麻将规则与番数表 | 玉桌</value></data>
   <data name="Hong Kong Mahjong · Xiangqi (Chinese chess)" xml:space="preserve"><value>港式麻将 · 中国象棋</value></data>
   <data name="Hong Kong mahjong rules as played on Jade Tables: tiles, claiming, winning hands and the faan scoring table." xml:space="preserve"><value>玉桌使用的港式麻将规则：牌张、吃碰杠、和牌牌型和番种表。</value></data>
   <data name="Hong Kong rules · minimum {0} faan" xml:space="preserve"><value>港式规则 · {0} 番起和</value></data>
@@ -150,15 +149,17 @@
   <data name="Invite link" xml:space="preserve"><value>邀请链接</value></data>
   <data name="Jade Tables" xml:space="preserve"><value>玉桌</value></data>
   <data name="Jade Tables · Classic Chinese games with friends" xml:space="preserve"><value>玉桌 · 和朋友一起玩经典中国游戏</value></data>
+  <data name="Jade Tables: free Mahjong and Xiangqi online" xml:space="preserve"><value>玉桌：免费在线麻将和象棋</value></data>
   <data name="Join" xml:space="preserve"><value>加入</value></data>
   <data name="Join a room" xml:space="preserve"><value>加入房间</value></data>
+  <data name="Join my Mahjong table on Jade Tables" xml:space="preserve"><value>来玉桌和我一起打麻将</value></data>
+  <data name="Join my Xiangqi game on Jade Tables" xml:space="preserve"><value>来玉桌和我下一盘象棋</value></data>
   <data name="Joining room…" xml:space="preserve"><value>正在加入房间…</value></data>
   <data name="Keep me logged in on this device" xml:space="preserve"><value>在这台设备上保持登录</value></data>
   <data name="Keep playing" xml:space="preserve"><value>继续下</value></data>
   <data name="Kong" xml:space="preserve"><value>杠</value></data>
   <data name="Kong 槓" xml:space="preserve"><value>杠</value></data>
   <data name="Leaderboard" xml:space="preserve"><value>排行榜</value></data>
-  <data name="Learn the rules" xml:space="preserve"><value>学习规则</value></data>
   <data name="Leave" xml:space="preserve"><value>离开</value></data>
   <data name="Length" xml:space="preserve"><value>局数</value></data>
   <data name="Letters" xml:space="preserve"><value>字母</value></data>
@@ -218,11 +219,13 @@
   <data name="Passwords need at least {0} characters." xml:space="preserve"><value>密码至少需要 {0} 个字符。</value></data>
   <data name="Place {0} · {1} points" xml:space="preserve"><value>第 {0} 名 · {1} 分</value></data>
   <data name="Play" xml:space="preserve"><value>开始</value></data>
+  <data name="Play Hong Kong Mahjong Online Free – vs the Computer or Friends | Jade Tables" xml:space="preserve"><value>免费在线玩港式麻将 – 和电脑或朋友一起打 | 玉桌</value></data>
   <data name="Play Hong Kong mahjong and Xiangqi (Chinese chess) free in your browser: no download, no account needed. Invite friends with a link or play the computer." xml:space="preserve"><value>在浏览器里免费玩港式麻将和中国象棋：免下载，无需注册。发个链接邀请朋友，或者和电脑对战。</value></data>
   <data name="Play Hong Kong mahjong online for free. Play the computer straight away or open a private room for friends." xml:space="preserve"><value>免费在线玩港式麻将。可以直接和电脑对局，也可以为朋友开私人房间。</value></data>
   <data name="Play Mahjong" xml:space="preserve"><value>开始打麻将</value></data>
   <data name="Play Xiangqi" xml:space="preserve"><value>下象棋</value></data>
   <data name="Play Xiangqi (Chinese chess) online for free, against the computer or a friend with a private link." xml:space="preserve"><value>免费在线下中国象棋，可以和电脑对弈，也可以用私人链接邀请朋友。</value></data>
+  <data name="Play Xiangqi Online Free – Chinese Chess vs the Computer or Friends | Jade Tables" xml:space="preserve"><value>免费在线下象棋 – 和电脑或朋友对弈 | 玉桌</value></data>
   <data name="Play a chime when it's your turn and this tab is in the background" xml:space="preserve"><value>轮到你而此页在后台时播放提示音</value></data>
   <data name="Play again" xml:space="preserve"><value>再来一场</value></data>
   <data name="Play again (swap sides)" xml:space="preserve"><value>再来一局（交换红黑）</value></data>
@@ -262,6 +265,8 @@
   <data name="Room code" xml:space="preserve"><value>房间号</value></data>
   <data name="Room not found" xml:space="preserve"><value>找不到房间</value></data>
   <data name="Room {0} doesn't exist or has closed. Rooms close after 10 minutes with nobody in them." xml:space="preserve"><value>房间 {0} 不存在或已关闭。房间无人 10 分钟后会自动关闭。</value></data>
+  <data name="Room {0}: play Hong Kong mahjong with me in your browser. Free, no download or account needed." xml:space="preserve"><value>房间 {0}：在浏览器里和我一起打港式麻将。免费，免下载，无需注册。</value></data>
+  <data name="Room {0}: play Xiangqi (Chinese chess) with me in your browser. Free, no download or account needed." xml:space="preserve"><value>房间 {0}：在浏览器里和我下象棋。免费，免下载，无需注册。</value></data>
   <data name="Rules" xml:space="preserve"><value>规则</value></data>
   <data name="Save" xml:space="preserve"><value>保存</value></data>
   <data name="Save password" xml:space="preserve"><value>保存密码</value></data>
@@ -341,12 +346,11 @@
   <data name="Wrong email or password." xml:space="preserve"><value>邮箱或密码不正确。</value></data>
   <data name="Xiangqi" xml:space="preserve"><value>象棋</value></data>
   <data name="Xiangqi (Chinese chess) rules: the board, how each piece moves, check, checkmate and draws." xml:space="preserve"><value>中国象棋规则：棋盘、各棋子走法、将军、将死与和棋。</value></data>
+  <data name="Xiangqi Rules: How to Play Chinese Chess | Jade Tables" xml:space="preserve"><value>象棋规则：中国象棋怎么下 | 玉桌</value></data>
   <data name="Xiangqi board" xml:space="preserve"><value>象棋棋盘</value></data>
   <data name="Xiangqi leaderboard · Jade Tables" xml:space="preserve"><value>象棋排行榜 · 玉桌</value></data>
   <data name="Xiangqi rating" xml:space="preserve"><value>象棋等级分</value></data>
   <data name="Xiangqi room {0} · Jade Tables" xml:space="preserve"><value>象棋房间 {0} · 玉桌</value></data>
-  <data name="Xiangqi rules · Jade Tables" xml:space="preserve"><value>象棋规则 · 玉桌</value></data>
-  <data name="Xiangqi · Jade Tables" xml:space="preserve"><value>象棋 · 玉桌</value></data>
   <data name="Xiangqi: won – drawn – lost" xml:space="preserve"><value>象棋：胜 – 和 – 负</value></data>
   <data name="Yes, delete my account" xml:space="preserve"><value>是的，删除我的账号</value></data>
   <data name="Yes, resign" xml:space="preserve"><value>确定认输</value></data>
