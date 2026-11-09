@@ -1,0 +1,102 @@
+@page "/account/login"
+@inherits AccountPageBase
+
+<PageTitle>@L["Log in · Jade Tables"]</PageTitle>
+
+<div class="wrap page-pad auth-page">
+    <h1>@L["Log in"]</h1>
+    @if (!Features.Enabled)
+    {
+        <AccountsUnavailable />
+    }
+    else
+    {
+        <p class="lead">@L["Log in to keep your game history across devices. You can always play without an account."]</p>
+        <div class="card auth-card">
+            @if (Error == "external")
+            {
+                <p class="form-error">@L["Signing in with Google didn't work. Please try again."]</p>
+            }
+            else if (Error == "locked")
+            {
+                <p class="form-error">@L["Too many attempts. Please try again in 15 minutes."]</p>
+            }
+            <ExternalLogins ReturnUrl="@ReturnPath" />
+
+            <EditForm Model="Input" FormName="login" OnSubmit="Submit" class="auth-form" method="post">
+                <PlayerIdField />
+                <label>
+                    @L["Email"]
+                    <InputText @bind-Value="Input.Email" type="email" autocomplete="email" required />
+                </label>
+                <label>
+                    @L["Password"]
+                    <InputText @bind-Value="Input.Password" type="password" autocomplete="current-password" required />
+                </label>
+                <label class="auth-check">
+                    <InputCheckbox @bind-Value="Input.RememberMe" />
+                    @L["Keep me logged in on this device"]
+                </label>
+                @foreach (var e in Errors)
+                {
+                    <p class="form-error">@e</p>
+                }
+                @if (needsConfirmation)
+                {
+                    <p class="form-error">@L["Please confirm your email address first: use the link we sent you."]
+                        <a href="account/resend-confirmation">@L["Send it again"]</a></p>
+                }
+                <button type="submit" class="btn btn-primary">@L["Log in"]</button>
+            </EditForm>
+            <p class="auth-links">
+                <a href="account/forgot-password">@L["Forgot your password?"]</a>
+                <span>@L["New here?"] <a href="@($"account/register{ReturnQuery}")">@L["Create an account"]</a></span>
+            </p>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm(FormName = "login")] LoginInput Input { get; set; } = new();
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    [SupplyParameterFromQuery] public string? Error { get; set; }
+
+    bool needsConfirmation;
+
+    string ReturnPath => SafeRelative(ReturnUrl, "account");
+    string ReturnQuery => string.IsNullOrEmpty(ReturnUrl) ? "" : "?returnUrl=" + Uri.EscapeDataString(ReturnPath);
+
+    protected override void OnInitialized()
+    {
+        // Already logged in (and not posting the form): go straight on.
+        if (Features.Enabled && SignedIn && HttpMethods.IsGet(HttpContext!.Request.Method)) Go(ReturnPath);
+    }
+
+    async Task Submit()
+    {
+        var user = await Users.FindByEmailAsync((Input.Email ?? "").Trim());
+        if (user is null)
+        {
+            Errors.Add(L["Wrong email or password."]);
+            return;
+        }
+        var result = await SignIn.PasswordSignInAsync(user, Input.Password ?? "", Input.RememberMe, lockoutOnFailure: true);
+        if (result.Succeeded)
+        {
+            await Store.LinkAsync(user.Id, Input.PlayerId);
+            Go(ReturnPath);
+        }
+        else if (result.IsNotAllowed) needsConfirmation = true;
+        else if (result.IsLockedOut) Errors.Add(L["Too many attempts. Please try again in 15 minutes."]);
+        else if (!await Users.HasPasswordAsync(user)) Errors.Add(L["This account signs in with Google. Use the Google button above."]);
+        else Errors.Add(L["Wrong email or password."]);
+    }
+
+    sealed class LoginInput
+    {
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+        public bool RememberMe { get; set; } = true;
+        public string? PlayerId { get; set; }
+    }
+}

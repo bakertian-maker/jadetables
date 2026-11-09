@@ -12,75 +12,109 @@
   <data name="3 players" xml:space="preserve"><value>3 人</value></data>
   <data name="4 players" xml:space="preserve"><value>4 人</value></data>
   <data name="60 moves without a capture: the game is drawn." xml:space="preserve"><value>60 回合没有吃子，判为和棋。</value></data>
+  <data name="60-move rule" xml:space="preserve"><value>60 步不吃子</value></data>
   <data name="Accept" xml:space="preserve"><value>接受</value></data>
   <data name="Accept draw" xml:space="preserve"><value>同意和棋</value></data>
+  <data name="Account settings" xml:space="preserve"><value>账号设置</value></data>
+  <data name="Accounts aren't available right now. You can still play as a guest." xml:space="preserve"><value>账号功能暂时无法使用。你仍然可以以游客身份玩。</value></data>
   <data name="Add computer player" xml:space="preserve"><value>添加电脑玩家</value></data>
   <data name="Add kong" xml:space="preserve"><value>加杠</value></data>
   <data name="Advisor" xml:space="preserve"><value>士</value></data>
+  <data name="Against" xml:space="preserve"><value>对手</value></data>
   <data name="All four seats in room {0} are taken." xml:space="preserve"><value>房间 {0} 的四个座位都已有人。</value></data>
+  <data name="Already have an account?" xml:space="preserve"><value>已经有账号？</value></data>
+  <data name="At least 8 characters." xml:space="preserve"><value>至少 8 个字符。</value></data>
   <data name="Away" xml:space="preserve"><value>离开</value></data>
   <data name="Back to Mahjong" xml:space="preserve"><value>返回麻将大厅</value></data>
   <data name="Back to Xiangqi" xml:space="preserve"><value>返回象棋大厅</value></data>
   <data name="Back to home" xml:space="preserve"><value>返回首页</value></data>
   <data name="Back to lobby" xml:space="preserve"><value>返回大厅</value></data>
+  <data name="Back to log in" xml:space="preserve"><value>返回登录</value></data>
   <data name="Beginner" xml:space="preserve"><value>入门</value></data>
   <data name="Black" xml:space="preserve"><value>黑方</value></data>
   <data name="Bot" xml:space="preserve"><value>电脑</value></data>
   <data name="Both seats in room {0} are taken." xml:space="preserve"><value>房间 {0} 的两个座位都已有人。</value></data>
+  <data name="By creating an account you agree to how we handle your data, described on the" xml:space="preserve"><value>创建账号即表示你同意我们处理数据的方式，详见</value></data>
   <data name="Can't reach the server. Check your connection." xml:space="preserve"><value>无法连接服务器，请检查网络。</value></data>
   <data name="Cannon" xml:space="preserve"><value>炮</value></data>
   <data name="Capture" xml:space="preserve"><value>吃子</value></data>
   <data name="Captured pieces" xml:space="preserve"><value>吃掉的棋子</value></data>
+  <data name="Change password" xml:space="preserve"><value>修改密码</value></data>
   <data name="Characters" xml:space="preserve"><value>汉字</value></data>
   <data name="Chariot" xml:space="preserve"><value>车</value></data>
+  <data name="Check your email" xml:space="preserve"><value>请查收邮件</value></data>
   <data name="Check!" xml:space="preserve"><value>将军！</value></data>
   <data name="Check! Your turn." xml:space="preserve"><value>将军！轮到你了。</value></data>
   <data name="Checkmate." xml:space="preserve"><value>将死。</value></data>
   <data name="Chinese chess on the river board." xml:space="preserve"><value>楚河汉界，中国象棋。</value></data>
+  <data name="Choose a new password" xml:space="preserve"><value>设置新密码</value></data>
+  <data name="Choose a new password · Jade Tables" xml:space="preserve"><value>设置新密码 · 玉桌</value></data>
   <data name="Chow 上" xml:space="preserve"><value>吃</value></data>
   <data name="Claim" xml:space="preserve"><value>吃碰杠</value></data>
   <data name="Classic Cantonese rules with faan scoring. Play the computer straight away, or open a private room and send the link to three friends." xml:space="preserve"><value>经典广东规则，按番计分。可以直接和电脑对局，也可以开私人房间，把链接发给三位朋友。</value></data>
-  <data name="Classic Chinese games, one link away." xml:space="preserve"><value>经典中国游戏，一个链接就能开局。</value></data>
   <data name="Code, e.g. K7Q2M" xml:space="preserve"><value>房间号，如 K7Q2M</value></data>
+  <data name="Computer" xml:space="preserve"><value>电脑</value></data>
   <data name="Computer level (if a seat stays empty)" xml:space="preserve"><value>电脑难度（座位空着时）</value></data>
   <data name="Computer players" xml:space="preserve"><value>电脑玩家</value></data>
   <data name="Computer · {0}" xml:space="preserve"><value>电脑 · {0}</value></data>
   <data name="Computer: {0}" xml:space="preserve"><value>电脑：{0}</value></data>
+  <data name="Confirm my email" xml:space="preserve"><value>确认我的邮箱</value></data>
+  <data name="Confirm your Jade Tables account" xml:space="preserve"><value>确认你的玉桌账号</value></data>
+  <data name="Confirm your email" xml:space="preserve"><value>确认邮箱</value></data>
+  <data name="Confirm your email · Jade Tables" xml:space="preserve"><value>确认邮箱 · 玉桌</value></data>
   <data name="Connection lost. Reconnecting…" xml:space="preserve"><value>连接中断，正在重新连接…</value></data>
   <data name="Continue" xml:space="preserve"><value>继续</value></data>
+  <data name="Continue with Google" xml:space="preserve"><value>使用 Google 账号继续</value></data>
   <data name="Continue your game" xml:space="preserve"><value>继续你的牌局</value></data>
   <data name="Cookie choices" xml:space="preserve"><value>Cookie 选择</value></data>
   <data name="Cookie settings" xml:space="preserve"><value>Cookie 设置</value></data>
   <data name="Copied" xml:space="preserve"><value>已复制</value></data>
   <data name="Copy link" xml:space="preserve"><value>复制链接</value></data>
+  <data name="Create account" xml:space="preserve"><value>创建账号</value></data>
+  <data name="Create an account" xml:space="preserve"><value>创建账号</value></data>
+  <data name="Create an account · Jade Tables" xml:space="preserve"><value>创建账号 · 玉桌</value></data>
   <data name="Create room" xml:space="preserve"><value>创建房间</value></data>
+  <data name="Current password" xml:space="preserve"><value>当前密码</value></data>
+  <data name="Date" xml:space="preserve"><value>日期</value></data>
   <data name="Dealer" xml:space="preserve"><value>庄家</value></data>
   <data name="Decline" xml:space="preserve"><value>拒绝</value></data>
+  <data name="Delete account" xml:space="preserve"><value>删除账号</value></data>
+  <data name="Deletes your account, email address and password for good. Your finished games stay in the records without your name, as they would for a guest." xml:space="preserve"><value>永久删除你的账号、邮箱和密码。已完成的棋局会以不含名字的方式保留在记录里，和游客的棋局一样。</value></data>
   <data name="Difficult" xml:space="preserve"><value>困难</value></data>
   <data name="Discard" xml:space="preserve"><value>打牌</value></data>
+  <data name="Display name" xml:space="preserve"><value>显示名称</value></data>
   <data name="Dou Dizhu" xml:space="preserve"><value>斗地主</value></data>
   <data name="Draw" xml:space="preserve"><value>摸牌</value></data>
   <data name="Draw agreed." xml:space="preserve"><value>双方同意和棋。</value></data>
   <data name="Draw game" xml:space="preserve"><value>流局</value></data>
   <data name="Draw offered. Waiting for an answer…" xml:space="preserve"><value>已提和，等待对方回应…</value></data>
   <data name="Draw, discard and claim your way to a winning hand of four sets and a pair. Faan scoring, 136 tiles, no flowers." xml:space="preserve"><value>摸牌、打牌、吃碰杠，凑成四组牌加一对将即可和牌。按番计分，136 张牌，不用花牌。</value></data>
+  <data name="Drawn" xml:space="preserve"><value>和棋</value></data>
   <data name="Drawn game" xml:space="preserve"><value>和棋</value></data>
   <data name="East" xml:space="preserve"><value>东</value></data>
   <data name="East round" xml:space="preserve"><value>东风圈</value></data>
   <data name="East round (about 4–8 hands)" xml:space="preserve"><value>东风圈（约 4–8 局）</value></data>
   <data name="Elephant" xml:space="preserve"><value>象</value></data>
+  <data name="Email" xml:space="preserve"><value>邮箱</value></data>
   <data name="Enter a room code." xml:space="preserve"><value>请输入房间号。</value></data>
+  <data name="Enter your email address and we'll send you a link to choose a new password." xml:space="preserve"><value>输入你的邮箱，我们会发送一个设置新密码的链接。</value></data>
   <data name="Error reference: {0}" xml:space="preserve"><value>错误编号：{0}</value></data>
   <data name="Every room gets a short code and a link. Anyone with the link can sit down." xml:space="preserve"><value>每个房间都有一个短房间号和链接，拿到链接的人都可以入座。</value></data>
   <data name="Fight the landlord." xml:space="preserve"><value>一起斗地主。</value></data>
+  <data name="Forgot your password?" xml:space="preserve"><value>忘记密码？</value></data>
+  <data name="Forgot your password? · Jade Tables" xml:space="preserve"><value>忘记密码 · 玉桌</value></data>
   <data name="Four players, 136 tiles, one winning hand." xml:space="preserve"><value>四人对局，136 张牌，比谁先和牌。</value></data>
+  <data name="Free Classic Chinese Games Online: Mahjong &amp; Xiangqi | Jade Tables" xml:space="preserve"><value>免费在线麻将、象棋 · 经典中国游戏 | 玉桌</value></data>
+  <data name="Free classic Chinese games: no download, no account, multiplayer." xml:space="preserve"><value>免费经典中国游戏：免下载，无需注册，多人在线对战。</value></data>
   <data name="Free to play. No sign-up, no real-money betting." xml:space="preserve"><value>免费游玩，无需注册，不涉及任何真钱赌注。</value></data>
-  <data name="Free · no sign-up · play in your browser" xml:space="preserve"><value>免费 · 无需注册 · 浏览器即可玩</value></data>
+  <data name="Free. Your game history follows you to any device, and games you've already played in this browser are added to it." xml:space="preserve"><value>免费。你的对局记录在任何设备上都能看到，在这个浏览器里玩过的对局也会加进来。</value></data>
   <data name="Full game (four rounds)" xml:space="preserve"><value>完整一场（四圈）</value></data>
   <data name="Full game, four rounds" xml:space="preserve"><value>完整一场，四圈</value></data>
+  <data name="Game" xml:space="preserve"><value>游戏</value></data>
   <data name="Game in progress in room {0}" xml:space="preserve"><value>房间 {0} 的牌局进行中</value></data>
   <data name="Game log" xml:space="preserve"><value>牌局记录</value></data>
   <data name="Games" xml:space="preserve"><value>游戏</value></data>
+  <data name="Games played" xml:space="preserve"><value>已玩局数</value></data>
   <data name="General" xml:space="preserve"><value>将帅</value></data>
   <data name="Get a link for a friend. If nobody joins, the computer takes the other seat." xml:space="preserve"><value>生成链接邀请朋友。没人加入时，由电脑坐另一边。</value></data>
   <data name="Get a link for up to three friends. Empty seats get computer players." xml:space="preserve"><value>生成链接，最多邀请三位朋友。空位由电脑玩家补上。</value></data>
@@ -88,18 +122,25 @@
   <data name="Guest plays Red" xml:space="preserve"><value>朋友执红</value></data>
   <data name="Hand {0}: {1} round, {2} deals" xml:space="preserve"><value>第 {0} 局：{1}圈，{2} 坐庄</value></data>
   <data name="Have a room code from a friend? Enter it here, or just open their link." xml:space="preserve"><value>朋友给了你房间号？在这里输入，或者直接打开他们的链接。</value></data>
+  <data name="Hello {0}, someone (hopefully you) asked to reset the password for your Jade Tables account:" xml:space="preserve"><value>{0}你好，有人（希望是你）请求重置你的玉桌账号密码：</value></data>
+  <data name="Hello {0}, thanks for joining Jade Tables. Please confirm your email address:" xml:space="preserve"><value>{0}你好，感谢加入玉桌。请确认你的邮箱地址：</value></data>
   <data name="Hidden tile" xml:space="preserve"><value>未翻开的牌</value></data>
   <data name="Hint" xml:space="preserve"><value>提示</value></data>
   <data name="Home" xml:space="preserve"><value>首页</value></data>
   <data name="Hong Kong Mahjong" xml:space="preserve"><value>港式麻将</value></data>
   <data name="Hong Kong Mahjong rules · Jade Tables" xml:space="preserve"><value>港式麻将规则 · 玉桌</value></data>
   <data name="Hong Kong Mahjong · Jade Tables" xml:space="preserve"><value>港式麻将 · 玉桌</value></data>
+  <data name="Hong Kong Mahjong · Xiangqi (Chinese chess)" xml:space="preserve"><value>港式麻将 · 中国象棋</value></data>
   <data name="Hong Kong mahjong rules as played on Jade Tables: tiles, claiming, winning hands and the faan scoring table." xml:space="preserve"><value>玉桌使用的港式麻将规则：牌张、吃碰杠、和牌牌型和番种表。</value></data>
   <data name="Hong Kong rules · minimum {0} faan" xml:space="preserve"><value>港式规则 · {0} 番起和</value></data>
   <data name="Horse" xml:space="preserve"><value>马</value></data>
   <data name="Host plays Red" xml:space="preserve"><value>房主执红</value></data>
   <data name="How a hand works" xml:space="preserve"><value>一局怎么打</value></data>
   <data name="How to play" xml:space="preserve"><value>怎么下</value></data>
+  <data name="If there is an account with that address, we've sent it a link to choose a new password." xml:space="preserve"><value>如果这个邮箱有账号，我们已经发送了设置新密码的链接。</value></data>
+  <data name="If there is an unconfirmed account with that address, we've sent it a new link." xml:space="preserve"><value>如果这个邮箱有未确认的账号，我们已经发送了新的链接。</value></data>
+  <data name="If you didn't ask for this, you can ignore this email; your password stays the same. The link works for one day." xml:space="preserve"><value>如果不是你本人操作，可以忽略这封邮件，你的密码不会改变。链接一天内有效。</value></data>
+  <data name="If you didn't create an account, you can ignore this email." xml:space="preserve"><value>如果你没有创建账号，可以忽略这封邮件。</value></data>
   <data name="In development" xml:space="preserve"><value>开发中</value></data>
   <data name="Invite link" xml:space="preserve"><value>邀请链接</value></data>
   <data name="Jade Tables" xml:space="preserve"><value>玉桌</value></data>
@@ -107,6 +148,7 @@
   <data name="Join" xml:space="preserve"><value>加入</value></data>
   <data name="Join a room" xml:space="preserve"><value>加入房间</value></data>
   <data name="Joining room…" xml:space="preserve"><value>正在加入房间…</value></data>
+  <data name="Keep me logged in on this device" xml:space="preserve"><value>在这台设备上保持登录</value></data>
   <data name="Keep playing" xml:space="preserve"><value>继续下</value></data>
   <data name="Kong" xml:space="preserve"><value>杠</value></data>
   <data name="Kong 槓" xml:space="preserve"><value>杠</value></data>
@@ -116,11 +158,18 @@
   <data name="Letters" xml:space="preserve"><value>字母</value></data>
   <data name="Level" xml:space="preserve"><value>难度</value></data>
   <data name="Limit" xml:space="preserve"><value>满贯</value></data>
+  <data name="Log in" xml:space="preserve"><value>登录</value></data>
+  <data name="Log in to keep your game history across devices. You can always play without an account." xml:space="preserve"><value>登录后可以在不同设备上保留对局记录。不登录也可以随时开玩。</value></data>
+  <data name="Log in · Jade Tables" xml:space="preserve"><value>登录 · 玉桌</value></data>
+  <data name="Log out" xml:space="preserve"><value>退出登录</value></data>
+  <data name="Logging out also gives this browser a new guest identity, so the next person to use it plays separately." xml:space="preserve"><value>退出登录时，这个浏览器会换一个新的游客身份，下一个使用的人会分开记录。</value></data>
+  <data name="Lost" xml:space="preserve"><value>负</value></data>
   <data name="Made for beginners too" xml:space="preserve"><value>新手也能上手</value></data>
   <data name="Mahjong" xml:space="preserve"><value>麻将</value></data>
   <data name="Mahjong room {0} · Jade Tables" xml:space="preserve"><value>麻将房间 {0} · 玉桌</value></data>
   <data name="Mahjong! Self-drawn · {0} faan" xml:space="preserve"><value>自摸！· {0} 番</value></data>
   <data name="Mahjong! Win · {0} faan" xml:space="preserve"><value>和了！· {0} 番</value></data>
+  <data name="Mahjong: matches won / played" xml:space="preserve"><value>麻将：胜场 / 总场</value></data>
   <data name="Main" xml:space="preserve"><value>主导航</value></data>
   <data name="Match over" xml:space="preserve"><value>对局结束</value></data>
   <data name="May we use analytics cookies (Google Tag Manager) to see how the site is used? Nothing is sent to Google unless you accept." xml:space="preserve"><value>可以使用分析 cookie（Google Tag Manager）了解网站的使用情况吗？除非你接受，否则不会向 Google 发送任何数据。</value></data>
@@ -132,8 +181,14 @@
   <data name="Move to {0}" xml:space="preserve"><value>走到 {0}</value></data>
   <data name="Moves" xml:space="preserve"><value>棋谱</value></data>
   <data name="My friend" xml:space="preserve"><value>我的朋友</value></data>
+  <data name="My games" xml:space="preserve"><value>我的对局</value></data>
+  <data name="My games · Jade Tables" xml:space="preserve"><value>我的对局 · 玉桌</value></data>
   <data name="Neither side has pieces left that can attack: the game is drawn." xml:space="preserve"><value>双方都没有能进攻的棋子，判为和棋。</value></data>
+  <data name="New here?" xml:space="preserve"><value>第一次来？</value></data>
+  <data name="New password" xml:space="preserve"><value>新密码</value></data>
+  <data name="Newer games" xml:space="preserve"><value>较新的对局</value></data>
   <data name="Next hand" xml:space="preserve"><value>下一局</value></data>
+  <data name="No finished games yet. Games you finish while logged in, or in a browser you've logged in on, appear here." xml:space="preserve"><value>还没有已完成的对局。登录时完成的对局，或在登录过的浏览器里完成的对局，都会显示在这里。</value></data>
   <data name="No legal moves left. In Xiangqi that counts as a loss." xml:space="preserve"><value>无子可走（困毙），在象棋里算输棋。</value></data>
   <data name="No minimum (learning)" xml:space="preserve"><value>不限（练习）</value></data>
   <data name="No move timer" xml:space="preserve"><value>每步不限时</value></data>
@@ -141,24 +196,33 @@
   <data name="No timer" xml:space="preserve"><value>不限时</value></data>
   <data name="North" xml:space="preserve"><value>北</value></data>
   <data name="Not ready" xml:space="preserve"><value>未准备</value></data>
+  <data name="Nothing there? Look in your spam folder, or" xml:space="preserve"><value>没收到？看看垃圾邮件，或者</value></data>
   <data name="Offer draw" xml:space="preserve"><value>提和</value></data>
+  <data name="Older games" xml:space="preserve"><value>更早的对局</value></data>
   <data name="On {0}'s discard" xml:space="preserve"><value>{0} 点炮</value></data>
   <data name="Open a private room, send the link to friends and play on any phone or laptop. Short a player? A computer player takes the empty seat." xml:space="preserve"><value>开一个私人房间，把链接发给朋友，用手机或电脑都能玩。人不够？空位由电脑玩家补上。</value></data>
   <data name="Open seat" xml:space="preserve"><value>空位</value></data>
   <data name="Page not found" xml:space="preserve"><value>找不到页面</value></data>
   <data name="Page not found · Jade Tables" xml:space="preserve"><value>找不到页面 · 玉桌</value></data>
   <data name="Pass" xml:space="preserve"><value>过</value></data>
+  <data name="Password" xml:space="preserve"><value>密码</value></data>
+  <data name="Passwords need at least {0} characters." xml:space="preserve"><value>密码至少需要 {0} 个字符。</value></data>
+  <data name="Place {0} · {1} points" xml:space="preserve"><value>第 {0} 名 · {1} 分</value></data>
   <data name="Play" xml:space="preserve"><value>开始</value></data>
+  <data name="Play Hong Kong mahjong and Xiangqi (Chinese chess) free in your browser: no download, no account needed. Invite friends with a link or play the computer." xml:space="preserve"><value>在浏览器里免费玩港式麻将和中国象棋：免下载，无需注册。发个链接邀请朋友，或者和电脑对战。</value></data>
   <data name="Play Hong Kong mahjong online for free. Play the computer straight away or open a private room for friends." xml:space="preserve"><value>免费在线玩港式麻将。可以直接和电脑对局，也可以为朋友开私人房间。</value></data>
   <data name="Play Mahjong" xml:space="preserve"><value>开始打麻将</value></data>
+  <data name="Play Xiangqi" xml:space="preserve"><value>下象棋</value></data>
   <data name="Play Xiangqi (Chinese chess) online for free, against the computer or a friend with a private link." xml:space="preserve"><value>免费在线下中国象棋，可以和电脑对弈，也可以用私人链接邀请朋友。</value></data>
   <data name="Play a chime when it's your turn and this tab is in the background" xml:space="preserve"><value>轮到你而此页在后台时播放提示音</value></data>
   <data name="Play again" xml:space="preserve"><value>再来一场</value></data>
   <data name="Play again (swap sides)" xml:space="preserve"><value>再来一局（交换红黑）</value></data>
-  <data name="Play mahjong and other classic Chinese games online with friends or the computer. Free, no sign-up." xml:space="preserve"><value>在线和朋友或电脑玩麻将等经典中国游戏。免费，无需注册。</value></data>
   <data name="Play now" xml:space="preserve"><value>立即开始</value></data>
   <data name="Play the computer" xml:space="preserve"><value>和电脑对局</value></data>
+  <data name="Played" xml:space="preserve"><value>已完成</value></data>
   <data name="Player" xml:space="preserve"><value>玩家</value></data>
+  <data name="Please confirm your email address first: use the link we sent you." xml:space="preserve"><value>请先确认邮箱：点我们发给你的链接。</value></data>
+  <data name="Please enter your email address." xml:space="preserve"><value>请输入邮箱地址。</value></data>
   <data name="Practise alone, or fill empty seats. If someone drops out, a computer player keeps their seat warm for them." xml:space="preserve"><value>可以独自练习，也可以用电脑补空位。有人掉线时，电脑玩家会替他暂时坐着。</value></data>
   <data name="Privacy" xml:space="preserve"><value>隐私</value></data>
   <data name="Privacy · Jade Tables" xml:space="preserve"><value>隐私 · 玉桌</value></data>
@@ -175,21 +239,34 @@
   <data name="Reload" xml:space="preserve"><value>重新加载</value></data>
   <data name="Reloading…" xml:space="preserve"><value>正在重新加载…</value></data>
   <data name="Remove" xml:space="preserve"><value>移除</value></data>
+  <data name="Repeat password" xml:space="preserve"><value>再次输入密码</value></data>
+  <data name="Reset your Jade Tables password" xml:space="preserve"><value>重置你的玉桌密码</value></data>
   <data name="Resign" xml:space="preserve"><value>认输</value></data>
+  <data name="Result" xml:space="preserve"><value>结果</value></data>
   <data name="Room" xml:space="preserve"><value>房间</value></data>
   <data name="Room code" xml:space="preserve"><value>房间号</value></data>
   <data name="Room not found" xml:space="preserve"><value>找不到房间</value></data>
   <data name="Room {0} doesn't exist or has closed. Rooms close after 10 minutes with nobody in them." xml:space="preserve"><value>房间 {0} 不存在或已关闭。房间无人 10 分钟后会自动关闭。</value></data>
   <data name="Rules" xml:space="preserve"><value>规则</value></data>
+  <data name="Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Save password" xml:space="preserve"><value>保存密码</value></data>
+  <data name="Saved." xml:space="preserve"><value>已保存。</value></data>
   <data name="Self-drawn" xml:space="preserve"><value>自摸</value></data>
+  <data name="Send a new link" xml:space="preserve"><value>发送新链接</value></data>
+  <data name="Send it again" xml:space="preserve"><value>重新发送</value></data>
+  <data name="Send link" xml:space="preserve"><value>发送链接</value></data>
+  <data name="Send the confirmation link again" xml:space="preserve"><value>重新发送确认链接</value></data>
   <data name="Send the link to a friend. If nobody joins, the computer takes the other seat when the game starts." xml:space="preserve"><value>把链接发给朋友。开局时如果没人加入，由电脑坐另一边。</value></data>
   <data name="Send the link to up to three friends. Empty seats are filled by computer players when the game starts." xml:space="preserve"><value>把链接发给最多三位朋友。开局时空位由电脑玩家补上。</value></data>
   <data name="Show letters instead of Chinese characters on the pieces" xml:space="preserve"><value>棋子上显示字母而不是汉字</value></data>
+  <data name="Shown on the site. Up to 20 characters." xml:space="preserve"><value>在网站上显示，最多 20 个字符。</value></data>
   <data name="Sides chosen at random" xml:space="preserve"><value>随机分红黑</value></data>
+  <data name="Signing in with Google didn't work. Please try again." xml:space="preserve"><value>Google 登录没有成功，请再试一次。</value></data>
   <data name="Soldier" xml:space="preserve"><value>兵卒</value></data>
   <data name="Something went wrong" xml:space="preserve"><value>出错了</value></data>
   <data name="Something went wrong · Jade Tables" xml:space="preserve"><value>出错了 · 玉桌</value></data>
   <data name="Something went wrong." xml:space="preserve"><value>出了点问题。</value></data>
+  <data name="Something went wrong. Please try again." xml:space="preserve"><value>出了点问题，请再试一次。</value></data>
   <data name="Sorry, the server ran into a problem. Please try again in a moment." xml:space="preserve"><value>抱歉，服务器遇到问题。请稍后再试。</value></data>
   <data name="Sound off" xml:space="preserve"><value>声音：关</value></data>
   <data name="Sound on" xml:space="preserve"><value>声音：开</value></data>
@@ -201,18 +278,27 @@
   <data name="Tap a piece, then tap where it should go." xml:space="preserve"><value>点一个棋子，再点要走到的位置。</value></data>
   <data name="Tap a tile to pick it, tap it again to discard." xml:space="preserve"><value>点一张牌选中，再点一次打出。</value></data>
   <data name="Tap again, or press Discard." xml:space="preserve"><value>再点一次，或按“打出”。</value></data>
+  <data name="Thanks, your email address is confirmed." xml:space="preserve"><value>谢谢，你的邮箱已确认。</value></data>
+  <data name="That Google account is already linked to another Jade Tables account." xml:space="preserve"><value>这个 Google 账号已经关联了另一个玉桌账号。</value></data>
+  <data name="That password isn't right." xml:space="preserve"><value>密码不正确。</value></data>
   <data name="The host can start another match." xml:space="preserve"><value>房主可以再开一场。</value></data>
   <data name="The same position came up three times: the game is drawn." xml:space="preserve"><value>同一局面重复出现三次：判和。</value></data>
   <data name="The server is busy right now. Please try again in a few minutes." xml:space="preserve"><value>服务器现在比较忙，请几分钟后再试。</value></data>
+  <data name="The two passwords don't match." xml:space="preserve"><value>两次输入的密码不一致。</value></data>
   <data name="The wall is empty: the hand is a draw" xml:space="preserve"><value>牌墙已摸完：流局</value></data>
   <data name="The wall ran out before anyone completed a hand. The dealer deals again." xml:space="preserve"><value>牌墙摸完，无人和牌。庄家连庄。</value></data>
+  <data name="There is already an account with {0}." xml:space="preserve"><value>{0} 已经注册过账号。</value></data>
   <data name="Thinking" xml:space="preserve"><value>思考中</value></data>
+  <data name="This account signs in with Google. Use the Google button above." xml:space="preserve"><value>这个账号使用 Google 登录，请点上面的 Google 按钮。</value></data>
   <data name="This hand" xml:space="preserve"><value>本局</value></data>
+  <data name="This link has expired or was already used. Please ask for a new one." xml:space="preserve"><value>这个链接已过期或已被使用，请重新申请。</value></data>
   <data name="This page doesn't exist. The link may be mistyped, or a room may have closed." xml:space="preserve"><value>这个页面不存在。链接可能输错了，或者房间已经关闭。</value></data>
   <data name="This table is full" xml:space="preserve"><value>这桌已满</value></data>
   <data name="Three players, one landlord. Bid, team up and empty your hand first." xml:space="preserve"><value>三人一局，一个地主。叫分、组队，谁先出完手牌谁赢。</value></data>
+  <data name="Tick the box to confirm." xml:space="preserve"><value>请勾选确认。</value></data>
   <data name="Tile numbers in the corner, a hint button and plain-English rules with the Chinese names alongside." xml:space="preserve"><value>牌角标有数字，有提示按钮，规则说明简单易懂。</value></data>
   <data name="Time limit" xml:space="preserve"><value>限时</value></data>
+  <data name="Too many attempts. Please try again in 15 minutes." xml:space="preserve"><value>尝试次数太多，请 15 分钟后再试。</value></data>
   <data name="Total" xml:space="preserve"><value>合计</value></data>
   <data name="Try again" xml:space="preserve"><value>重试</value></data>
   <data name="Turn timer" xml:space="preserve"><value>出牌限时</value></data>
@@ -224,37 +310,56 @@
   <data name="Waiting for the other players…" xml:space="preserve"><value>等待其他玩家…</value></data>
   <data name="Waiting room {0}" xml:space="preserve"><value>房间 {0} 等待开始</value></data>
   <data name="Wall" xml:space="preserve"><value>牌墙</value></data>
+  <data name="We've sent a link to {0}. Open it to confirm your address, then log in." xml:space="preserve"><value>我们已经发送链接到 {0}。打开链接确认邮箱，然后登录。</value></data>
   <data name="West" xml:space="preserve"><value>西</value></data>
-  <data name="What Jade Tables stores about you: no accounts, a random player id in your browser, and finished games without names." xml:space="preserve"><value>玉桌保存哪些数据：没有账号，浏览器里一个随机玩家编号，以及不含名字的棋局记录。</value></data>
+  <data name="What Jade Tables stores about you: a random player id in your browser, finished games without names, and an optional account." xml:space="preserve"><value>玉桌保存哪些数据：浏览器里一个随机玩家编号、不含名字的对局记录，以及可选的账号。</value></data>
   <data name="Who plays Red (moves first)" xml:space="preserve"><value>谁执红（先走）</value></data>
   <data name="Win" xml:space="preserve"><value>和牌</value></data>
   <data name="Win the game" xml:space="preserve"><value>获胜</value></data>
+  <data name="Won" xml:space="preserve"><value>胜</value></data>
+  <data name="Wrong email or password." xml:space="preserve"><value>邮箱或密码不正确。</value></data>
   <data name="Xiangqi" xml:space="preserve"><value>象棋</value></data>
   <data name="Xiangqi (Chinese chess) rules: the board, how each piece moves, check, checkmate and draws." xml:space="preserve"><value>中国象棋规则：棋盘、各棋子走法、将军、将死与和棋。</value></data>
   <data name="Xiangqi board" xml:space="preserve"><value>象棋棋盘</value></data>
   <data name="Xiangqi room {0} · Jade Tables" xml:space="preserve"><value>象棋房间 {0} · 玉桌</value></data>
   <data name="Xiangqi rules · Jade Tables" xml:space="preserve"><value>象棋规则 · 玉桌</value></data>
   <data name="Xiangqi · Jade Tables" xml:space="preserve"><value>象棋 · 玉桌</value></data>
+  <data name="Xiangqi: won – drawn – lost" xml:space="preserve"><value>象棋：胜 – 和 – 负</value></data>
+  <data name="Yes, delete my account" xml:space="preserve"><value>是的，删除我的账号</value></data>
   <data name="Yes, resign" xml:space="preserve"><value>确定认输</value></data>
   <data name="You" xml:space="preserve"><value>你</value></data>
   <data name="You and three computer players, East round. Starts straight away." xml:space="preserve"><value>你和三位电脑玩家，打东风圈，立即开始。</value></data>
   <data name="You finished first. 恭喜!" xml:space="preserve"><value>你得了第一名，恭喜！</value></data>
   <data name="You lose" xml:space="preserve"><value>你输了</value></data>
   <data name="You play Red and move first. No timer." xml:space="preserve"><value>你执红先走，不限时。</value></data>
+  <data name="You sign in with Google. To add a password as well, use" xml:space="preserve"><value>你使用 Google 登录。如果也想设置密码，请用</value></data>
   <data name="You win!" xml:space="preserve"><value>你和牌了！</value></data>
   <data name="You won!" xml:space="preserve"><value>你赢了！</value></data>
   <data name="You're watching this game." xml:space="preserve"><value>你正在观战。</value></data>
   <data name="Your draw offer was declined." xml:space="preserve"><value>对方拒绝了你的提和。</value></data>
   <data name="Your name at the table" xml:space="preserve"><value>你的昵称</value></data>
+  <data name="Your password has been changed." xml:space="preserve"><value>你的密码已修改。</value></data>
   <data name="Your turn" xml:space="preserve"><value>轮到你了</value></data>
   <data name="Your turn." xml:space="preserve"><value>轮到你了。</value></data>
   <data name="a tile from the wall on your turn." xml:space="preserve"><value>：轮到你时从牌墙摸一张牌。</value></data>
+  <data name="agreed" xml:space="preserve"><value>协议和棋</value></data>
   <data name="another player's discard to make a pung (three alike), kong (four alike) or, from the player before you, a chow (a run of three)." xml:space="preserve"><value>：要别人打出的牌组成碰（三张相同）、杠（四张相同），或者吃上家的牌组成顺子（三张连续）。</value></data>
   <data name="by checkmate, or when your opponent has no legal move." xml:space="preserve"><value>：将死对方，或者对方无子可走。</value></data>
   <data name="by moving onto an enemy piece. Cannons must jump exactly one piece to capture." xml:space="preserve"><value>：走到对方棋子的位置把它吃掉。炮必须隔一个棋子才能吃子。</value></data>
+  <data name="checkmate" xml:space="preserve"><value>将死</value></data>
+  <data name="no attackers left" xml:space="preserve"><value>双方无进攻子力</value></data>
+  <data name="no legal moves" xml:space="preserve"><value>无子可走</value></data>
   <data name="no turn timer" xml:space="preserve"><value>出牌不限时</value></data>
   <data name="one piece per turn. Red moves first." xml:space="preserve"><value>：每次走一个棋子，红方先走。</value></data>
   <data name="one tile, so you keep 13." xml:space="preserve"><value>：打出一张，手里保持 13 张。</value></data>
+  <data name="or" xml:space="preserve"><value>或</value></data>
+  <data name="perpetual chase" xml:space="preserve"><value>长捉</value></data>
+  <data name="perpetual check" xml:space="preserve"><value>长将</value></data>
+  <data name="privacy page" xml:space="preserve"><value>隐私页面</value></data>
+  <data name="repetition" xml:space="preserve"><value>重复局面</value></data>
+  <data name="resignation" xml:space="preserve"><value>认输</value></data>
+  <data name="send it again" xml:space="preserve"><value>重新发送</value></data>
+  <data name="time" xml:space="preserve"><value>超时</value></data>
   <data name="with four sets and a pair worth at least the minimum faan." xml:space="preserve"><value>：凑成四组牌加一对将，且番数达到起和番。</value></data>
   <data name="your general: it stays in its palace, and the two generals may never face each other on an open line." xml:space="preserve"><value>你的将帅：它只能在九宫里活动，而且将帅不能在中间无子的直线上照面。</value></data>
   <data name="{0} adds to a kong of {1}" xml:space="preserve"><value>{0} 加杠 {1}</value></data>
@@ -265,12 +370,15 @@
   <data name="{0} faan" xml:space="preserve"><value>{0} 番</value></data>
   <data name="{0} finished first." xml:space="preserve"><value>{0} 得了第一名。</value></data>
   <data name="{0} gave perpetual check, which loses." xml:space="preserve"><value>{0}长将，判负。</value></data>
+  <data name="{0} hands" xml:space="preserve"><value>{0} 局</value></data>
   <data name="{0} is adding to a kong with" xml:space="preserve"><value>{0} 正在加杠：</value></data>
   <data name="{0} is playing" xml:space="preserve"><value>{0} 正在出牌</value></data>
+  <data name="{0} isn't a valid email address." xml:space="preserve"><value>{0} 不是有效的邮箱地址。</value></data>
   <data name="{0} kept chasing a piece (perpetual chase), which loses." xml:space="preserve"><value>{0}长捉，判负。</value></data>
   <data name="{0} kongs {1}" xml:space="preserve"><value>{0} 杠 {1}</value></data>
   <data name="{0} left" xml:space="preserve"><value>剩 {0} 张</value></data>
   <data name="{0} min each, +{1}s per move" xml:space="preserve"><value>每方 {0} 分钟，每步加 {1} 秒</value></data>
+  <data name="{0} moves" xml:space="preserve"><value>{0} 回合</value></data>
   <data name="{0} moves played." xml:space="preserve"><value>共走了 {0} 回合。</value></data>
   <data name="{0} offers a draw." xml:space="preserve"><value>{0}提议和棋。</value></data>
   <data name="{0} on the clock" xml:space="preserve"><value>棋钟剩余 {0}</value></data>

@@ -1,3 +1,4 @@
+using GameWeb.Accounts;
 using GameWeb.Seo;
 using GameWeb.Components;
 using GameWeb.Data;
@@ -42,6 +43,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSingleton<GameCatalog>();
 builder.Services.AddSingleton<RoomService>();
+builder.Services.AddScoped<PlayerAccountLinker>();
 
 // Game archive and opening book in SQL Server. The connection string comes from user secrets in
 // development and from the environment in production; without one, games simply aren't saved.
@@ -54,12 +56,16 @@ if (!string.IsNullOrWhiteSpace(gamesDb))
     builder.Services.AddSingleton<IGameArchive>(sp => sp.GetRequiredService<SqlGameStore>());
     builder.Services.AddSingleton<IOpeningBook>(sp => sp.GetRequiredService<SqlGameStore>());
     builder.Services.AddHostedService(sp => sp.GetRequiredService<SqlGameStore>());
+    // Player accounts (register, log in, game history) live in the same database.
+    builder.AddAccounts();
 }
 else
 {
     builder.Services.AddSingleton<IGameArchive>(NullGameStore.Instance);
     builder.Services.AddSingleton<IOpeningBook>(NullGameStore.Instance);
+    builder.Services.AddSingleton(AccountFeatures.Off);
 }
+bool accounts = !string.IsNullOrWhiteSpace(gamesDb);
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.AddScoped<GameText>();
 builder.Services.AddScoped<XqText>();
@@ -91,6 +97,11 @@ app.UseRewriter(new RewriteOptions()
 // so pages and files are matched on the address without the prefix.
 app.UseLanguagePaths();
 app.UseRouting();
+if (accounts)
+{
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
 
 app.UseCookiePolicy();
 // Render errors at the requested URL, retaining the HTTP status and original language.
@@ -119,6 +130,8 @@ app.MapGet("/culture/set", (string culture, string? redirectUri, HttpContext htt
     var page = Languages.IsSafeLocalPath(redirectUri) ? redirectUri! : "/";
     return Results.LocalRedirect(LanguagePaths.PrefixFor(culture) + page);
 });
+
+if (accounts) app.MapAccountEndpoints();
 
 // robots.txt and sitemap.xml for search engines.
 app.MapSearchFiles();

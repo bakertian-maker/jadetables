@@ -2,6 +2,7 @@
 @inject NavigationManager Nav
 @inject GameCatalog Catalog
 @inject Microsoft.Extensions.Configuration.IConfiguration Config
+@inject GameWeb.Accounts.AccountFeatures Accounts
 
 <div class="site">
     <header class="site-header">
@@ -11,10 +12,21 @@
                 <span class="brand-name">@L["Jade Tables"]</span>
             </a>
             <nav class="site-nav" aria-label="@L["Main"]">
-                <NavLink href="./" Match="NavLinkMatch.All">@L["Home"]</NavLink>
+                <NavLink href="./" Match="NavLinkMatch.All" class="nav-home">@L["Home"]</NavLink>
                 @foreach (var g in Catalog.Playable)
                 {
                     <NavLink href="@g.Url" Match="NavLinkMatch.Prefix">@L[g.NavName]</NavLink>
+                }
+                @if (Accounts.Enabled)
+                {
+                    if (HttpContext?.User.Identity?.IsAuthenticated == true)
+                    {
+                        <NavLink href="account" Match="NavLinkMatch.All" class="nav-account" title="@L["My games"]">@AccountName</NavLink>
+                    }
+                    else
+                    {
+                        <NavLink href="account/login" Match="NavLinkMatch.Prefix" class="nav-account">@L["Log in"]</NavLink>
+                    }
                 }
                 <span class="lang-switch" role="group" aria-label="Language / 語言">
                     @foreach (var (culture, label, name) in Languages.Menu)
@@ -57,6 +69,11 @@
 </div>
 
 @code {
+    [CascadingParameter] HttpContext? HttpContext { get; set; }
+
+    string AccountName => HttpContext?.User.FindFirst(GameWeb.Accounts.AccountSetup.DisplayNameClaim)?.Value is { Length: > 0 } name
+        ? name : L["My games"];
+
     string SwitchHref(string culture) =>
         $"/culture/set?culture={culture}&redirectUri={Uri.EscapeDataString("/" + Nav.ToBaseRelativePath(Nav.Uri))}";
 }

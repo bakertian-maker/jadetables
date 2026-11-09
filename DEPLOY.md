@@ -54,3 +54,40 @@ To replace files that are in use, put a file named `app_offline.htm` into the si
 - A game against the computer starts and moves.
 - A finished game appears in the `Games` table.
 - If the site doesn't start, set `stdoutLogEnabled="true"` in the published `web.config`, create a `logs` folder next to it, and read the log. Switch it off again afterwards.
+
+## Accounts: email and Google sign-in
+
+Accounts work as soon as the database is connected. Two optional settings turn on email and Google sign-in. Like the connection string, put them on the application pool as environment variables, never in a file in the site folder. Recycle the pool after changing them.
+
+Until email is set up, new players can play straight away without confirming their address, and the confirmation and password-reset links are only written to the log.
+
+### Email (SMTP)
+
+Use the SMTP details from your mail provider:
+
+| Variable | Example |
+|---|---|
+| `Email__Host` | `smtp.yourprovider.com` |
+| `Email__Port` | `587` (or `465`) |
+| `Email__UserName` | `noreply@jadetables.com` |
+| `Email__Password` | the mailbox or app password |
+| `Email__From` | `noreply@jadetables.com` |
+| `Email__FromName` | `Jade Tables` (optional) |
+
+Add each one like the connection string, for example:
+
+```
+%windir%\system32\inetsrv\appcmd set config -section:system.applicationHost/applicationPools /+"[name='JadeTables'].environmentVariables.[name='Email__Host',value='smtp.yourprovider.com']" /commit:apphost
+```
+
+Once `Email__Host` and `Email__From` are set, new players must confirm their address before they can log in. To help emails reach the inbox, set up SPF and DKIM for jadetables.com with your mail provider.
+
+### Sign in with Google
+
+1. Go to https://console.cloud.google.com, create a project, and open **APIs & Services → OAuth consent screen**. Choose **External**, enter "Jade Tables", your support email, and `jadetables.com` as an authorised domain. Add the privacy page, https://www.jadetables.com/privacy. Then publish the app.
+2. Under **Credentials → Create credentials → OAuth client ID**, choose **Web application**.
+   - **Authorised redirect URI:** `https://www.jadetables.com/signin-google` (exactly this, for every language).
+3. Copy the client ID and secret into two app-pool variables:
+   - `Authentication__Google__ClientId`
+   - `Authentication__Google__ClientSecret`
+4. Recycle the pool. The **Continue with Google** button then appears on the log-in and register pages.

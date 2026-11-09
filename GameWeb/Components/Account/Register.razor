@@ -1,0 +1,108 @@
+@page "/account/register"
+@inherits AccountPageBase
+
+<PageTitle>@L["Create an account · Jade Tables"]</PageTitle>
+
+<div class="wrap page-pad auth-page">
+    <h1>@L["Create an account"]</h1>
+    @if (!Features.Enabled)
+    {
+        <AccountsUnavailable />
+    }
+    else if (checkEmail)
+    {
+        <div class="card auth-card">
+            <h2>@L["Check your email"]</h2>
+            <p>@L["We've sent a link to {0}. Open it to confirm your address, then log in.", Input.Email ?? ""]</p>
+            <p class="mj-muted">@L["Nothing there? Look in your spam folder, or"] <a href="account/resend-confirmation">@L["send it again"]</a>.</p>
+        </div>
+    }
+    else
+    {
+        <p class="lead">@L["Free. Your game history follows you to any device, and games you've already played in this browser are added to it."]</p>
+        <div class="card auth-card">
+            <ExternalLogins ReturnUrl="@ReturnPath" />
+
+            <EditForm Model="Input" FormName="register" OnSubmit="Submit" class="auth-form" method="post">
+                <PlayerIdField />
+                <label>
+                    @L["Display name"]
+                    <InputText @bind-Value="Input.DisplayName" maxlength="20" autocomplete="nickname" />
+                    <span class="auth-hint">@L["Shown on the site. Up to 20 characters."]</span>
+                </label>
+                <label>
+                    @L["Email"]
+                    <InputText @bind-Value="Input.Email" type="email" autocomplete="email" required />
+                </label>
+                <label>
+                    @L["Password"]
+                    <InputText @bind-Value="Input.Password" type="password" autocomplete="new-password" minlength="8" required />
+                    <span class="auth-hint">@L["At least 8 characters."]</span>
+                </label>
+                <label>
+                    @L["Repeat password"]
+                    <InputText @bind-Value="Input.ConfirmPassword" type="password" autocomplete="new-password" required />
+                </label>
+                @foreach (var e in Errors)
+                {
+                    <p class="form-error">@e</p>
+                }
+                <p class="auth-hint">@L["By creating an account you agree to how we handle your data, described on the"] <a href="privacy">@L["privacy page"]</a>.</p>
+                <button type="submit" class="btn btn-primary">@L["Create account"]</button>
+            </EditForm>
+            <p class="auth-links"><span>@L["Already have an account?"] <a href="account/login">@L["Log in"]</a></span></p>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm(FormName = "register")] RegisterInput Input { get; set; } = new();
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
+    bool checkEmail;
+
+    string ReturnPath => SafeRelative(ReturnUrl, "account");
+
+    async Task Submit()
+    {
+        var email = (Input.Email ?? "").Trim();
+        if (email.Length == 0) Errors.Add(L["Please enter your email address."]);
+        if ((Input.Password ?? "") != (Input.ConfirmPassword ?? "")) Errors.Add(L["The two passwords don't match."]);
+        if (Errors.Count > 0) return;
+
+        var user = new ApplicationUser
+        {
+            UserName = email,
+            Email = email,
+            DisplayName = GameWeb.Accounts.AccountSetup.CleanDisplayName(Input.DisplayName, email),
+            CreatedAt = DateTime.UtcNow,
+            Culture = Languages.CurrentCulture,
+        };
+        var result = await Users.CreateAsync(user, Input.Password ?? "");
+        if (!result.Succeeded)
+        {
+            Errors.AddRange(result.Errors.Select(e => e.Description).Distinct());
+            return;
+        }
+        // The games already played in this browser now belong to the account.
+        await Store.LinkAsync(user.Id, Input.PlayerId);
+
+        if (Users.Options.SignIn.RequireConfirmedAccount)
+        {
+            await SendConfirmationAsync(user);
+            checkEmail = true;
+            return;
+        }
+        await SignIn.SignInAsync(user, isPersistent: true);
+        Go(ReturnPath);
+    }
+
+    sealed class RegisterInput
+    {
+        public string? DisplayName { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+        public string? ConfirmPassword { get; set; }
+        public string? PlayerId { get; set; }
+    }
+}

@@ -1,0 +1,246 @@
+@page "/account"
+@inherits AccountPageBase
+@using GameWeb.Games.Archive
+@inject XqText X
+
+<PageTitle>@L["My games · Jade Tables"]</PageTitle>
+
+<div class="wrap page-pad account-page">
+    @if (!Features.Enabled)
+    {
+        <h1>@L["My games"]</h1>
+        <AccountsUnavailable />
+    }
+    else if (user is not null)
+    {
+        <p class="eyebrow">@user.Email</p>
+        <h1>@L["My games"]</h1>
+
+        <div class="account-stats">
+            <div><strong>@summary.Games</strong><span>@L["Games played"]</span></div>
+            <div><strong>@summary.XiangqiWins – @summary.XiangqiDraws – @summary.XiangqiLosses</strong><span>@L["Xiangqi: won – drawn – lost"]</span></div>
+            <div><strong>@summary.MahjongFirsts / @summary.MahjongMatches</strong><span>@L["Mahjong: matches won / played"]</span></div>
+        </div>
+
+        @if (history.Count == 0)
+        {
+            <div class="card">
+                <p>@L["No finished games yet. Games you finish while logged in, or in a browser you've logged in on, appear here."]</p>
+                <a class="btn btn-primary" href="xiangqi">@L["Play Xiangqi"]</a>
+                <a class="btn btn-ghost" href="mahjong">@L["Play Mahjong"]</a>
+            </div>
+        }
+        else
+        {
+            <div class="history-wrap">
+                <table class="rules-table history">
+                    <thead>
+                        <tr><th>@L["Date"]</th><th>@L["Game"]</th><th>@L["Result"]</th><th>@L["Against"]</th><th>@L["Length"]</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var g in history)
+                        {
+                            <tr>
+                                <td><time datetime="@g.EndedAt.ToString("o")">@g.EndedAt.ToString(Languages.IsChinese ? "yyyy-MM-dd" : "d MMM yyyy")</time></td>
+                                <td>@(g.Type == GameType.Xiangqi ? L["Xiangqi"] : L["Mahjong"])
+                                    @if (g.Side is byte side)
+                                    {
+                                        <span class="history-side">@X.SideName(side == 0 ? XqSide.Red : XqSide.Black)</span>
+                                    }
+                                </td>
+                                <td><span class="history-result is-@g.Outcome.ToString().ToLowerInvariant()">@ResultText(g)</span>
+                                    @if (g.Type == GameType.Xiangqi && g.Reason != 0)
+                                    {
+                                        <span class="history-reason">@X.ShortReason((XqEndReason)g.Reason)</span>
+                                    }
+                                </td>
+                                <td>@Opponents(g)</td>
+                                <td>@(g.Type == GameType.Xiangqi ? L["{0} moves", (g.Length + 1) / 2] : L["{0} hands", g.Length])</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <p class="history-pages">
+                @if (Page > 1)
+                {
+                    <a href="@($"account?page={Page - 1}")">@L["Newer games"]</a>
+                }
+                @if (history.Count == PageSize)
+                {
+                    <a href="@($"account?page={Page + 1}")">@L["Older games"]</a>
+                }
+            </p>
+        }
+
+        <h2 class="account-h2">@L["Account settings"]</h2>
+        <div class="account-settings">
+            <section class="card">
+                <h3>@L["Display name"]</h3>
+                <EditForm Model="NameForm" FormName="name" OnSubmit="SaveName" class="auth-form" method="post">
+                    <InputText @bind-Value="NameForm.DisplayName" maxlength="20" aria-label="@L["Display name"]" />
+                    @if (nameSaved)
+                    {
+                        <p class="auth-ok">@L["Saved."]</p>
+                    }
+                    <button type="submit" class="btn btn-ghost btn-sm">@L["Save"]</button>
+                </EditForm>
+            </section>
+
+            <section class="card">
+                <h3>@L["Password"]</h3>
+                @if (hasPassword)
+                {
+                    <EditForm Model="PasswordForm" FormName="password" OnSubmit="ChangePassword" class="auth-form" method="post">
+                        <label>@L["Current password"]
+                            <InputText @bind-Value="PasswordForm.Current" type="password" autocomplete="current-password" required /></label>
+                        <label>@L["New password"]
+                            <InputText @bind-Value="PasswordForm.New" type="password" autocomplete="new-password" minlength="8" required /></label>
+                        @foreach (var e in passwordErrors)
+                        {
+                            <p class="form-error">@e</p>
+                        }
+                        @if (passwordSaved)
+                        {
+                            <p class="auth-ok">@L["Your password has been changed."]</p>
+                        }
+                        <button type="submit" class="btn btn-ghost btn-sm">@L["Change password"]</button>
+                    </EditForm>
+                }
+                else
+                {
+                    <p>@L["You sign in with Google. To add a password as well, use"] <a href="account/forgot-password">@L["Forgot your password?"]</a></p>
+                }
+            </section>
+
+            <section class="card">
+                <h3>@L["Log out"]</h3>
+                <form method="post" action="account/logout" data-logout>
+                    <AntiforgeryToken />
+                    <input type="hidden" name="returnUrl" value="@($"{HttpContext?.Request.PathBase}/")" />
+                    <p>@L["Logging out also gives this browser a new guest identity, so the next person to use it plays separately."]</p>
+                    <button type="submit" class="btn btn-ghost btn-sm">@L["Log out"]</button>
+                </form>
+            </section>
+
+            <section class="card account-danger">
+                <h3>@L["Delete account"]</h3>
+                <p>@L["Deletes your account, email address and password for good. Your finished games stay in the records without your name, as they would for a guest."]</p>
+                <EditForm Model="DeleteForm" FormName="delete" OnSubmit="DeleteAccount" class="auth-form" method="post" data-logout>
+                    @if (hasPassword)
+                    {
+                        <label>@L["Password"]
+                            <InputText @bind-Value="DeleteForm.Password" type="password" autocomplete="current-password" required /></label>
+                    }
+                    <label class="auth-check">
+                        <InputCheckbox @bind-Value="DeleteForm.Confirm" />
+                        @L["Yes, delete my account"]
+                    </label>
+                    @foreach (var e in deleteErrors)
+                    {
+                        <p class="form-error">@e</p>
+                    }
+                    <button type="submit" class="btn btn-danger btn-sm">@L["Delete account"]</button>
+                </EditForm>
+            </section>
+        </div>
+    }
+</div>
+
+@code {
+    const int PageSize = 30;
+
+    [SupplyParameterFromQuery(Name = "page")] public int Page { get; set; }
+    [SupplyParameterFromForm(FormName = "name")] NameInput NameForm { get; set; } = new();
+    [SupplyParameterFromForm(FormName = "password")] PasswordInput PasswordForm { get; set; } = new();
+    [SupplyParameterFromForm(FormName = "delete")] DeleteInput DeleteForm { get; set; } = new();
+
+    ApplicationUser? user;
+    bool hasPassword;
+    IReadOnlyList<HistoryEntry> history = [];
+    HistorySummary summary = new(0, 0, 0, 0, 0, 0);
+    bool nameSaved, passwordSaved;
+    readonly List<string> passwordErrors = [], deleteErrors = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Features.Enabled) return;
+        user = SignedIn ? await Users.GetUserAsync(HttpContext!.User) : null;
+        if (user is null)
+        {
+            Go("account/login?returnUrl=account");
+            return;
+        }
+        if (Page < 1) Page = 1;
+        hasPassword = await Users.HasPasswordAsync(user);
+        NameForm.DisplayName ??= user.DisplayName;
+        history = await Store.HistoryAsync(user.Id, (Page - 1) * PageSize, PageSize);
+        summary = await Store.SummaryAsync(user.Id);
+    }
+
+    async Task SaveName()
+    {
+        if (user is null) return;
+        user.DisplayName = GameWeb.Accounts.AccountSetup.CleanDisplayName(NameForm.DisplayName, user.Email);
+        await Users.UpdateAsync(user);
+        await SignIn.RefreshSignInAsync(user);   // the header shows the name from the sign-in cookie
+        NameForm.DisplayName = user.DisplayName;
+        nameSaved = true;
+    }
+
+    async Task ChangePassword()
+    {
+        if (user is null) return;
+        var result = await Users.ChangePasswordAsync(user, PasswordForm.Current ?? "", PasswordForm.New ?? "");
+        if (!result.Succeeded)
+        {
+            passwordErrors.AddRange(result.Errors.Select(e => e.Description).Distinct());
+            return;
+        }
+        await SignIn.RefreshSignInAsync(user);
+        passwordSaved = true;
+    }
+
+    async Task DeleteAccount()
+    {
+        if (user is null) return;
+        if (!DeleteForm.Confirm) deleteErrors.Add(L["Tick the box to confirm."]);
+        else if (hasPassword && !await Users.CheckPasswordAsync(user, DeleteForm.Password ?? "")) deleteErrors.Add(L["That password isn't right."]);
+        if (deleteErrors.Count > 0) return;
+
+        var id = user.Id;
+        var result = await Users.DeleteAsync(user);   // removes its browser links too
+        if (!result.Succeeded)
+        {
+            deleteErrors.AddRange(result.Errors.Select(e => e.Description));
+            return;
+        }
+        Store.Forget(id);
+        await SignIn.SignOutAsync();
+        Go("./?deleted=1");
+    }
+
+    string ResultText(HistoryEntry g) => g.Type == GameType.Mahjong
+        ? (g.Place is int place ? L["Place {0} · {1} points", place, g.Score ?? 0] : L["Played"])
+        : g.Outcome switch
+        {
+            GameOutcome.Win => L["Won"],
+            GameOutcome.Loss => L["Lost"],
+            GameOutcome.Draw => L["Drawn"],
+            _ => L["Played"],
+        };
+
+    string Opponents(HistoryEntry g) => string.Join(", ", g.Opponents
+        .GroupBy(o => (o.IsBot, o.BotLevel))
+        .Select(grp =>
+        {
+            string name = !grp.Key.IsBot ? L["Player"]
+                : g.Type == GameType.Xiangqi && grp.Key.BotLevel is byte level ? L["Computer · {0}", X.LevelName((XqLevel)level)]
+                : L["Computer"];
+            return grp.Count() > 1 ? $"{name} ×{grp.Count()}" : name;
+        }));
+
+    sealed class NameInput { public string? DisplayName { get; set; } }
+    sealed class PasswordInput { public string? Current { get; set; } public string? New { get; set; } }
+    sealed class DeleteInput { public string? Password { get; set; } public bool Confirm { get; set; } }
+}

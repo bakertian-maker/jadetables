@@ -324,3 +324,56 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
 .consent-btn:hover { background: #fff; }
 .footer-link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
 .footer-link:hover { color: #fff; }
+
+/* Accounts: log in, register and the My games page (Components/Account) */
+.site-nav a.nav-account { border: 1px solid rgba(243,234,212,.3); max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auth-page { max-width: 480px; }
+.auth-card { display: grid; gap: 14px; }
+.auth-form { display: grid; gap: 14px; }
+.auth-form label { display: grid; gap: 6px; font-weight: 500; font-size: .92rem; }
+.auth-form input:not([type="checkbox"]) { width: 100%; }
+.auth-form .btn { justify-self: start; }
+.auth-form label.auth-check { display: flex; align-items: center; gap: 8px; font-weight: 400; }
+.auth-check input { width: 18px; height: 18px; accent-color: var(--jade-500); }
+.auth-hint { font-weight: 400; font-size: .84rem; color: var(--muted); margin: 0; }
+.auth-ok { color: var(--jade-500); margin: 0; font-weight: 600; }
+.auth-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin: 4px 0 0; font-size: .92rem; }
+.auth-external { margin: 0; }
+.btn-google { width: 100%; background: #fff; color: #1f1f1f; border-color: #dadce0; }
+.btn-google:hover { background: #f8f9fa; color: #1f1f1f; }
+.auth-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .85rem; margin: 0; }
+.auth-or::before, .auth-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.btn-danger { background: transparent; color: var(--red); border-color: var(--red); }
+.btn-danger:hover { background: var(--red); color: #fff; }
+
+.account-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0 22px; }
+.account-stats div { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 2px; }
+.account-stats strong { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.account-stats span { color: var(--muted); font-size: .85rem; }
+.history-wrap { overflow-x: auto; }
+.history { min-width: 560px; }
+.history td { font-size: .93rem; }
+.history-side, .history-reason { display: block; color: var(--muted); font-size: .82rem; }
+.history-result { font-weight: 600; }
+.history-result.is-win { color: var(--jade-500); }
+.history-result.is-loss { color: var(--red); }
+.history-pages { display: flex; justify-content: space-between; gap: 12px; }
+.account-h2 { margin-top: 36px; }
+.account-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.account-settings h3 { margin: 0 0 10px; }
+.account-settings p { margin: 0 0 12px; font-size: .92rem; }
+.account-danger { border-color: rgba(194, 59, 34, .35); }
+@media (max-width: 640px) {
+    .account-stats { grid-template-columns: 1fr; }
+}
+/* Phones: the logo already goes home, so the Home link makes room for Log in / My games. */
+@media (max-width: 560px) {
+    .site-nav a.nav-home { display: none; }
+}
+@media (max-width: 420px) {
+    .brand-name { display: none; }
+    .site-nav { gap: 2px; }
+    .site-nav a { padding: 8px 6px; }
+    .site-nav .lang-switch { margin-left: 2px; }
+    .site-nav .lang-opt { padding: 5px 6px; }
+}

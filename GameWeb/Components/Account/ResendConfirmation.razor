@@ -1,0 +1,52 @@
+@page "/account/resend-confirmation"
+@inherits AccountPageBase
+
+<PageTitle>@L["Confirm your email · Jade Tables"]</PageTitle>
+
+<div class="wrap page-pad auth-page">
+    <h1>@L["Send the confirmation link again"]</h1>
+    @if (!Features.Enabled)
+    {
+        <AccountsUnavailable />
+    }
+    else
+    {
+        <div class="card auth-card">
+            @if (sent)
+            {
+                <p>@L["If there is an unconfirmed account with that address, we've sent it a new link."]</p>
+                <a class="btn btn-ghost" href="account/login">@L["Back to log in"]</a>
+            }
+            else
+            {
+                <EditForm Model="Input" FormName="resend" OnSubmit="Submit" class="auth-form" method="post">
+                    <label>
+                        @L["Email"]
+                        <InputText @bind-Value="Input.Email" type="email" autocomplete="email" required />
+                    </label>
+                    <button type="submit" class="btn btn-primary">@L["Send link"]</button>
+                </EditForm>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm(FormName = "resend")] EmailInput Input { get; set; } = new();
+
+    bool sent;
+
+    async Task Submit()
+    {
+        var email = (Input.Email ?? "").Trim();
+        var user = email.Length > 0 ? await Users.FindByEmailAsync(email) : null;
+        // Same answer whether or not the account exists, so the form can't be used to find out who has one.
+        if (user is { EmailConfirmed: false } && Emails.TryReserve(user.Id)) await SendConfirmationAsync(user);
+        sent = true;
+    }
+
+    sealed class EmailInput
+    {
+        public string? Email { get; set; }
+    }
+}

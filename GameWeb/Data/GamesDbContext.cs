@@ -1,4 +1,5 @@
 using GameWeb.Games.Archive;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameWeb.Data;
@@ -85,15 +86,37 @@ public sealed class ImportedGameRecord
     public DateTime ImportedAt { get; set; }
 }
 
-public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : DbContext(options)
+/// <summary>Games, the opening book and player accounts (ASP.NET Core Identity tables, AspNet*).</summary>
+public sealed class GamesDbContext(DbContextOptions<GamesDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<GameRecord> Games => Set<GameRecord>();
     public DbSet<GamePlayerRecord> GamePlayers => Set<GamePlayerRecord>();
     public DbSet<BookEntry> OpeningBook => Set<BookEntry>();
     public DbSet<ImportedGameRecord> ImportedGames => Set<ImportedGameRecord>();
+    public DbSet<PlayerLink> PlayerLinks => Set<PlayerLink>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
+        base.OnModelCreating(model);   // the Identity tables
+
+        model.Entity<ApplicationUser>(e =>
+        {
+            e.Property(u => u.DisplayName).HasMaxLength(20).IsRequired();
+            e.Property(u => u.CreatedAt).HasColumnType("datetime2(0)");
+            e.Property(u => u.Culture).HasMaxLength(10).IsRequired();
+        });
+
+        model.Entity<PlayerLink>(e =>
+        {
+            e.ToTable("PlayerLinks");
+            e.HasKey(l => l.PlayerKey);
+            e.Property(l => l.PlayerKey).HasColumnType("binary(16)");
+            e.Property(l => l.LinkedAt).HasColumnType("datetime2(0)");
+            e.HasIndex(l => l.UserId);
+            // Deleting an account removes its links; its games stay, with nobody attached.
+            e.HasOne<ApplicationUser>().WithMany().HasForeignKey(l => l.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
         model.Entity<GameRecord>(e =>
         {
             e.ToTable("Games");

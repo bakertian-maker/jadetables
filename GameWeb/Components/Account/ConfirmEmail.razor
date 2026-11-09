@@ -1,0 +1,42 @@
+@page "/account/confirm-email"
+@inherits AccountPageBase
+
+<PageTitle>@L["Confirm your email · Jade Tables"]</PageTitle>
+
+<div class="wrap page-pad auth-page">
+    <h1>@L["Confirm your email"]</h1>
+    @if (!Features.Enabled)
+    {
+        <AccountsUnavailable />
+    }
+    else
+    {
+        <div class="card auth-card">
+            @if (confirmed)
+            {
+                <p>@L["Thanks, your email address is confirmed."]</p>
+                <a class="btn btn-primary" href="account/login">@L["Log in"]</a>
+            }
+            else
+            {
+                <p class="form-error">@L["This link has expired or was already used. Please ask for a new one."]</p>
+                <a class="btn btn-ghost" href="account/resend-confirmation">@L["Send a new link"]</a>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public string? UserId { get; set; }
+    [SupplyParameterFromQuery] public string? Code { get; set; }
+
+    bool confirmed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Features.Enabled || string.IsNullOrEmpty(UserId) || DecodeToken(Code) is not { } token) return;
+        var user = await Users.FindByIdAsync(UserId);
+        if (user is null) return;
+        confirmed = user.EmailConfirmed || (await Users.ConfirmEmailAsync(user, token)).Succeeded;
+    }
+}

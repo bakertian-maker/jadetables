@@ -196,4 +196,33 @@ window.gameweb = {
     },
 };
 
+// ---- Accounts ----------------------------------------------------------------------
+// Sign-in and register forms carry this browser's player id (input[data-player-id]), so the games
+// already played here are added to the account. Logging out (or deleting the account) gives the
+// browser a new id, so whoever uses it next plays separately.
+
+function fillPlayerIdFields(): void {
+    const fields = document.querySelectorAll<HTMLInputElement>("input[data-player-id]");
+    if (fields.length === 0) return;
+    const id = window.gameweb.identity().id;
+    fields.forEach((f) => { f.value = id; });
+}
+
+document.addEventListener("submit", (e) => {
+    const form = e.target as HTMLElement | null;
+    if (form?.hasAttribute("data-logout")) {
+        try {
+            localStorage.removeItem(ID_KEY);
+        } catch {
+            // Storage blocked: nothing kept to clear.
+        }
+        memoryId = null;
+    }
+}, true);
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fillPlayerIdFields);
+else fillPlayerIdFields();
+const blazor = (window as unknown as { Blazor?: { addEventListener(name: string, cb: () => void): void } }).Blazor;
+blazor?.addEventListener("enhancedload", fillPlayerIdFields);
+
 export {};

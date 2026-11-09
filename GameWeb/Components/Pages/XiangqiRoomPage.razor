@@ -4,6 +4,7 @@
 @inject RoomService Rooms
 @inject IJSRuntime JS
 @inject NavigationManager Nav
+@inject GameWeb.Accounts.PlayerAccountLinker Links
 @inject XqText X
 
 <PageTitle>@L["Xiangqi room {0} · Jade Tables", Code.ToUpperInvariant()]</PageTitle>
@@ -82,6 +83,8 @@ else if (view is not null)
             return;
         }
         identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
+        // Signed in: games played in this browser belong to the account (see AccountStore.LinkAsync).
+        _ = Links.LinkCurrentAsync(identity.Id);
         inviteUrl = Nav.BaseUri + room.Url;   // keeps the language: https://…/zh-hk/xiangqi/room/ABCDE
         soundOn = await JS.InvokeAsync<bool>("gameweb.soundEnabled");
         letters = await JS.InvokeAsync<string?>("gameweb.getPref", "xq.letters") == "1";

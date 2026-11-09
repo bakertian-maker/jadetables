@@ -30,6 +30,12 @@ DYNAMIC_KEYS = [
     "East", "South", "West", "North",
     # Xiangqi piece names (XqText.PieceName)
     "General", "Advisor", "Elephant", "Horse", "Chariot", "Cannon", "Soldier",
+    # Account emails (Accounts/AccountEmails.cs passes these keys as arguments)
+    "Confirm your Jade Tables account", "Hello {0}, thanks for joining Jade Tables. Please confirm your email address:",
+    "Confirm my email", "If you didn't create an account, you can ignore this email.",
+    "Reset your Jade Tables password",
+    "Hello {0}, someone (hopefully you) asked to reset the password for your Jade Tables account:",
+    "If you didn't ask for this, you can ignore this email; your password stays the same. The link works for one day.",
 ]
 
 out = sys.stdout.buffer
@@ -44,6 +50,7 @@ def used_keys():
     keys = []
     files = glob.glob(os.path.join(PROJECT, "Components", "**", "*.razor"), recursive=True)
     files += glob.glob(os.path.join(PROJECT, "Localization", "*.cs"))
+    files += glob.glob(os.path.join(PROJECT, "Accounts", "*.cs"))
     for f in files:
         text = open(f, encoding="utf-8-sig").read()
         for m in pattern.finditer(text):

@@ -1,0 +1,8 @@
+@* The browser's player id, filled in by Scripts/gameweb.ts, so signing in or registering can add the games
+   already played in this browser to the account. *@
+<input type="hidden" name="@Name" data-player-id />
+
+@code {
+    /// <summary>The form field name: "Input.PlayerId" for an EditForm whose model property is Input.</summary>
+    [Parameter] public string Name { get; set; } = "Input.PlayerId";
+}

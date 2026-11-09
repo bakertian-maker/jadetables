@@ -85,6 +85,22 @@ public sealed class XqText(IStringLocalizer<SharedResource> l)
         : s.MoveSeconds > 0 ? l["{0}s per move", s.MoveSeconds]
         : l["No move timer"];
 
+    /// <summary>How a game ended, in a word or two, for the game history.</summary>
+    public string ShortReason(XqEndReason reason) => reason switch
+    {
+        XqEndReason.Checkmate => l["checkmate"],
+        XqEndReason.Stalemate => l["no legal moves"],
+        XqEndReason.Resignation => l["resignation"],
+        XqEndReason.Timeout => l["time"],
+        XqEndReason.NoCaptureLimit => l["60-move rule"],
+        XqEndReason.NoAttackers => l["no attackers left"],
+        XqEndReason.Agreement => l["agreed"],
+        XqEndReason.Repetition => l["repetition"],
+        XqEndReason.PerpetualCheck => l["perpetual check"],
+        XqEndReason.PerpetualChase => l["perpetual chase"],
+        _ => "",
+    };
+
     public string ReasonText(XqEndReason reason, string loserName) => reason switch
     {
         XqEndReason.Checkmate => l["Checkmate."],
