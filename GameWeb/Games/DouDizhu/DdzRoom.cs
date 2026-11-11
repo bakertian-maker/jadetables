@@ -12,6 +12,8 @@ public sealed class DdzRoomSettings
     public int TurnSeconds { get; set; } = 30;
     /// <summary>Fill empty seats with computer players and start as soon as the creator arrives.</summary>
     public bool QuickPlay { get; set; }
+    /// <summary>How well the computer players play.</summary>
+    public DdzLevel BotLevel { get; set; } = DdzLevel.Medium;
 }
 
 /// <summary>One seat as a viewer sees it. <paramref name="Hand"/> is only filled in for the viewer (and for
@@ -118,8 +120,9 @@ public sealed class DdzRoom : Room
         if (_game is not { Phase: DdzPhase.MatchOver } g || _matchArchived) return;
         _matchArchived = true;
         var players = Enumerable.Range(0, DdzGame.Players).Select(seat => new FinishedPlayer(
-            seat, null, Seats[seat].PlayerId, Seats[seat].IsBot, null, g.Scores[seat])).ToList();
-        string details = JsonSerializer.Serialize(new { hands = Settings.Hands });
+            seat, null, Seats[seat].PlayerId, Seats[seat].IsBot,
+            Seats[seat].IsBot ? (byte)Settings.BotLevel : null, g.Scores[seat])).ToList();
+        string details = JsonSerializer.Serialize(new { hands = Settings.Hands, level = Settings.BotLevel.ToString() });
         Archive.Save(new FinishedGame(
             GameType.DouDizhu, Code, _matchStartedAt, DateTime.UtcNow,
             Result: 1, Reason: 0, g.HandNumber, Moves: null, details, players, BookMoves: []));
@@ -166,7 +169,7 @@ public sealed class DdzRoom : Room
                 int s = g.CurrentSeat;
                 if (IsBotControlled(s, now))
                 {
-                    if (elapsed >= BotTurnDelay) changed = g.Apply(s, DdzBot.Decide(g, s));
+                    if (elapsed >= BotTurnDelay) changed = g.Apply(s, DdzBot.Decide(g, s, Settings.BotLevel));
                 }
                 else if (Settings.TurnSeconds > 0 && elapsed.TotalSeconds >= Settings.TurnSeconds)
                     changed = g.Apply(s, g.AutoAction(s));

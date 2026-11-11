@@ -80,6 +80,7 @@ public class DouDizhuTests
         Assert.True(P("4 4 4 4").Beats(P("3 3 3 3")));
         Assert.True(P("SJ BJ").Beats(P("2 2 2 2")));            // rocket beats bombs
         Assert.False(P("2 2 2 2").Beats(P("SJ BJ")));
+        Assert.Empty(Combos.Beating(H("2 2 2 2 3"), P("SJ BJ")));   // no hint, no bomb, after the rocket
     }
 
     [Fact]

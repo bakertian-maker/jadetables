@@ -274,6 +274,41 @@ public sealed class DdzGame
         return true;
     }
 
+    /// <summary>
+    /// A copy of the hand in play as <paramref name="viewer"/> might imagine it, for the computer's look-ahead:
+    /// the viewer's own cards as they are, and the cards it can't see dealt at random between the other two
+    /// (each keeps their number of cards; the landlord keeps any of the face-up bottom cards not yet played).
+    /// </summary>
+    internal DdzGame Imagine(int viewer, Random rng)
+    {
+        var copy = new DdzGame(Settings, rng)
+        {
+            Phase = Phase, HandNumber = HandNumber, Bottom = Bottom, Landlord = Landlord, Bid = Bid,
+            CurrentSeat = CurrentSeat, LastCombo = LastCombo, LastSeat = LastSeat, Bombs = Bombs,
+            _firstBidder = _firstBidder, _landlordPlays = _landlordPlays, _farmerPlays = _farmerPlays, _passesInRow = _passesInRow,
+        };
+        copy.Played.AddRange(Played);
+        var seen = new HashSet<int>(Hands[viewer]);
+        seen.UnionWith(Played);
+        var landlordKnown = Landlord >= 0 && Landlord != viewer ? Bottom.Where(c => !seen.Contains(c)).ToList() : [];
+        seen.UnionWith(landlordKnown);
+        var hidden = Enumerable.Range(0, Cards.Count).Where(c => !seen.Contains(c)).ToList();
+        for (int i = hidden.Count - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            (hidden[i], hidden[j]) = (hidden[j], hidden[i]);
+        }
+        int next = 0;
+        for (int s = 0; s < Players; s++)
+        {
+            if (s == viewer) { copy.Hands[s] = [.. Hands[s]]; continue; }
+            var hand = s == Landlord ? new List<int>(landlordKnown) : [];
+            while (hand.Count < Hands[s].Count) hand.Add(hidden[next++]);
+            copy.Hands[s] = hand;
+        }
+        return copy;
+    }
+
     /// <summary>True if the two seats are on the same side this hand (both farmers).</summary>
     public bool SameSide(int a, int b) => a == b || (Landlord >= 0 && a != Landlord && b != Landlord);
 }

@@ -21,6 +21,13 @@ public sealed class DdzText(IStringLocalizer<SharedResource> l)
         ? (card == Cards.BigJoker ? "大王" : "小王")
         : "JOKER";
 
+    public string LevelName(DdzLevel level) => level switch
+    {
+        DdzLevel.Beginner => l["Beginner"],
+        DdzLevel.Medium => l["Medium"],
+        _ => l["Difficult"],
+    };
+
     public string KindName(DdzKind kind) => kind switch
     {
         DdzKind.Single => l["Single"],

@@ -1,23 +1,33 @@
 namespace GameWeb.Games.DouDizhu;
 
+public enum DdzLevel { Beginner, Medium, Difficult }
+
 /// <summary>
-/// A rule-based computer player, solid enough for casual games:
+/// Rule-based computer players at three levels.
 /// <list type="bullet">
-/// <item>Bids by hand strength (jokers, 2s, bombs, aces).</item>
-/// <item>Leads its cheapest useful play, preferring to get rid of low cards in long sequences.</item>
-/// <item>Follows with the lowest play that wins; keeps bombs for when an opponent is close to going out.</item>
-/// <item>A farmer doesn't fight its partner's winning play, and plays its best when the landlord has few
-/// cards left.</item>
+/// <item><b>Beginner</b> bids too boldly, leads its lowest single or pair, beats whatever it can (bombs
+/// included) and sometimes passes for no reason. It doesn't help its partner much.</item>
+/// <item><b>Medium</b> bids by hand strength, leads its cheapest useful play, follows with the lowest play
+/// that wins, keeps bombs for when an opponent is close to going out, and doesn't fight its partner.</item>
+/// <item><b>Difficult</b> plans its whole hand: it counts how many plays it needs to go out, and picks the
+/// lead or answer that keeps that number lowest. It tracks the cards still out, so it knows which of its
+/// plays can't be beaten and uses them to keep the lead on the way out. It feeds a partner who is about
+/// to go out, and stops an opponent with one or two cards left.</item>
 /// </list>
 /// </summary>
 public static class DdzBot
 {
-    public static DdzAction Decide(DdzGame g, int seat)
+    public static DdzAction Decide(DdzGame g, int seat, DdzLevel level = DdzLevel.Medium, Random? rng = null)
     {
-        return g.Phase switch
+        rng ??= Random.Shared;
+        return (g.Phase, level) switch
         {
-            DdzPhase.Bidding => DecideBid(g, seat),
-            DdzPhase.Playing => DecidePlay(g, seat),
+            (DdzPhase.Bidding, DdzLevel.Beginner) => BeginnerBid(g, seat, rng),
+            (DdzPhase.Bidding, DdzLevel.Difficult) => DdzExpert.Bid(g, seat),
+            (DdzPhase.Bidding, _) => DecideBid(g, seat),
+            (DdzPhase.Playing, DdzLevel.Beginner) => BeginnerPlay(g, seat, rng),
+            (DdzPhase.Playing, DdzLevel.Difficult) => DdzExpert.Play(g, seat, rng),
+            (DdzPhase.Playing, _) => DecidePlay(g, seat),
             _ => new DdzAction(DdzActionType.Ready),
         };
     }
@@ -39,12 +49,54 @@ public static class DdzBot
         return s;
     }
 
+    internal static DdzAction BidUpTo(DdzGame g, int want) =>
+        want > g.Bid ? new DdzAction(DdzActionType.Bid, want) : new DdzAction(DdzActionType.Pass);
+
     static DdzAction DecideBid(DdzGame g, int seat)
     {
         int s = Strength(g.Hands[seat]);
-        int want = s >= 11 ? 3 : s >= 8 ? 2 : s >= 6 ? 1 : 0;
-        return want > g.Bid ? new DdzAction(DdzActionType.Bid, want) : new DdzAction(DdzActionType.Pass);
+        return BidUpTo(g, s >= 11 ? 3 : s >= 8 ? 2 : s >= 6 ? 1 : 0);
     }
+
+    // ---------- Beginner ----------
+
+    static DdzAction BeginnerBid(DdzGame g, int seat, Random rng)
+    {
+        int s = Strength(g.Hands[seat]) + rng.Next(-1, 3);   // optimistic, and a bit random
+        return BidUpTo(g, s >= 9 ? 3 : s >= 6 ? 2 : s >= 4 ? 1 : 0);
+    }
+
+    static DdzAction BeginnerPlay(DdzGame g, int seat, Random rng)
+    {
+        var hand = g.Hands[seat];
+        DdzCombo? choice;
+        if (g.LastCombo is null)
+        {
+            choice = Combos.Analyze(hand).FirstOrDefault();
+            if (choice is null)
+            {
+                // Its lowest single or pair; now and then a longer play it happens to notice.
+                var options = Combos.LeadOptions(hand);
+                bool simple = rng.NextDouble() < 0.6;
+                choice = options
+                    .Where(o => !simple || o.Kind is DdzKind.Single or DdzKind.Pair)
+                    .OrderBy(o => o.Rank - (o.Length - 1)).ThenBy(o => o.Cards.Count)
+                    .FirstOrDefault() ?? options[0];
+            }
+        }
+        else
+        {
+            var candidates = Combos.Beating(hand, g.LastCombo);
+            choice = candidates.FirstOrDefault(c => c.Cards.Count == hand.Count) ?? candidates.FirstOrDefault();
+            bool partnerWinning = g.SameSide(g.LastSeat, seat) && g.LastSeat != seat;
+            if (choice is not null && choice.Cards.Count != hand.Count
+                && (rng.NextDouble() < 0.2 || (partnerWinning && rng.NextDouble() < 0.5)))
+                choice = null;
+        }
+        return choice is null ? new DdzAction(DdzActionType.Pass) : new DdzAction(DdzActionType.Play, Cards: choice.Cards);
+    }
+
+    // ---------- Medium ----------
 
     static DdzAction DecidePlay(DdzGame g, int seat)
     {
@@ -54,7 +106,7 @@ public static class DdzBot
     }
 
     /// <summary>Opponents' smallest hand: how close the other side is to going out.</summary>
-    static int DangerCards(DdzGame g, int seat) =>
+    internal static int DangerCards(DdzGame g, int seat) =>
         Enumerable.Range(0, DdzGame.Players).Where(s => !g.SameSide(s, seat)).Min(s => g.Hands[s].Count);
 
     static DdzCombo ChooseLead(DdzGame g, int seat, List<int> hand)
@@ -124,7 +176,7 @@ public static class DdzBot
         return null;
     }
 
-    static HashSet<int> BombRanks(IReadOnlyList<int> hand)
+    internal static HashSet<int> BombRanks(IReadOnlyList<int> hand)
     {
         var c = Cards.RankCounts(hand);
         var set = Enumerable.Range(0, Cards.RankCount).Where(r => c[r] == 4).ToHashSet();

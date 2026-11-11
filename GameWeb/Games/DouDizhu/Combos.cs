@@ -53,7 +53,7 @@ public sealed record DdzCombo(DdzKind Kind, int Rank, int Length, IReadOnlyList<
 public static class Combos
 {
     /// <summary>Highest rank a sequence may reach: A (2 and the jokers never join a sequence).</summary>
-    const int SequenceTop = Cards.RankAce;
+    public const int SequenceTop = Cards.RankAce;
 
     /// <summary>
     /// Every way the cards can be read as a play, best reading first (e.g. 333444555666 is a four-triple
@@ -150,6 +150,7 @@ public static class Combos
     public static List<DdzCombo> Beating(IReadOnlyList<int> hand, DdzCombo lead)
     {
         var list = new List<DdzCombo>();
+        if (lead.Kind == DdzKind.Rocket) return list;   // nothing beats the rocket
         if (!lead.IsBomb) list.AddRange(OfKind(hand, lead.Kind, lead.Length, lead.Rank));
         list.AddRange(OfKind(hand, DdzKind.Bomb, 1, lead.Kind == DdzKind.Bomb ? lead.Rank : -1));
         list.AddRange(OfKind(hand, DdzKind.Rocket, 1, -1));

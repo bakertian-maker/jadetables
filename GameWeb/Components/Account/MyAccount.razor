@@ -2,6 +2,7 @@
 @inherits AccountPageBase
 @using GameWeb.Games.Archive
 @inject XqText X
+@inject DdzText D
 
 <PageTitle>@L["My games · Jade Tables"]</PageTitle>
 
@@ -296,6 +297,7 @@
         {
             string name = !grp.Key.IsBot ? L["Player"]
                 : g.Type == GameType.Xiangqi && grp.Key.BotLevel is byte level ? L["Computer · {0}", X.LevelName((XqLevel)level)]
+                : g.Type == GameType.DouDizhu && grp.Key.BotLevel is byte ddzLevel ? L["Computer · {0}", D.LevelName((GameWeb.Games.DouDizhu.DdzLevel)ddzLevel)]
                 : L["Computer"];
             return grp.Count() > 1 ? $"{name} ×{grp.Count()}" : name;
         }));

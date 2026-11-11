@@ -5,6 +5,7 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @inject GameWeb.Accounts.PlayerAccountLinker Links
+@inject DdzText D
 
 <PageMeta Title="@L["Play Dou Dizhu Online Free – Fight the Landlord vs the Computer or Friends | Jade Tables"]" Description="@L["Play Dou Dizhu (Fight the Landlord) online for free: bid to be the landlord, or team up as farmers. Play the computer straight away or invite two friends."]" />
 
@@ -49,6 +50,16 @@
         <article class="card card-feature">
             <h2>@L["Play the computer"]</h2>
             <p>@L["You and two computer players, six hands. Starts straight away. No timer."]</p>
+            <div class="form-grid">
+                <label>
+                    @L["Level"]
+                    <select @bind="quickLevel">
+                        <option value="@DdzLevel.Beginner">@D.LevelName(DdzLevel.Beginner)</option>
+                        <option value="@DdzLevel.Medium">@D.LevelName(DdzLevel.Medium)</option>
+                        <option value="@DdzLevel.Difficult">@D.LevelName(DdzLevel.Difficult)</option>
+                    </select>
+                </label>
+            </div>
             <button class="btn btn-primary btn-lg" @onclick="QuickPlay" disabled="@busy">@L["Play now"]</button>
         </article>
 
@@ -62,6 +73,14 @@
                         <option value="3">@L["{0} hands", 3]</option>
                         <option value="6">@L["{0} hands", 6]</option>
                         <option value="9">@L["{0} hands", 9]</option>
+                    </select>
+                </label>
+                <label>
+                    @L["Computer level (if a seat stays empty)"]
+                    <select @bind="roomLevel">
+                        <option value="@DdzLevel.Beginner">@D.LevelName(DdzLevel.Beginner)</option>
+                        <option value="@DdzLevel.Medium">@D.LevelName(DdzLevel.Medium)</option>
+                        <option value="@DdzLevel.Difficult">@D.LevelName(DdzLevel.Difficult)</option>
                     </select>
                 </label>
                 <label>
@@ -106,6 +125,8 @@
     GameWeb.Accounts.SignedInPlayer? account;
     int hands = 6;
     int turnSeconds = 30;
+    DdzLevel quickLevel = DdzLevel.Medium;
+    DdzLevel roomLevel = DdzLevel.Medium;
     string joinCode = "";
     string? joinError;
     string? createError;
@@ -128,9 +149,9 @@
         await JS.InvokeVoidAsync("gameweb.setName", nickname);
     }
 
-    void QuickPlay() => Open(new DdzRoomSettings { QuickPlay = true, Hands = 6, TurnSeconds = 0 });
+    void QuickPlay() => Open(new DdzRoomSettings { QuickPlay = true, Hands = 6, TurnSeconds = 0, BotLevel = quickLevel });
 
-    void CreateRoom() => Open(new DdzRoomSettings { Hands = hands, TurnSeconds = turnSeconds });
+    void CreateRoom() => Open(new DdzRoomSettings { Hands = hands, TurnSeconds = turnSeconds, BotLevel = roomLevel });
 
     void Open(DdzRoomSettings settings)
     {

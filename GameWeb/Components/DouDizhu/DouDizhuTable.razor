@@ -11,6 +11,10 @@
             {
                 <span class="mj-chip">@L["Bid {0}", View.Bid] · <strong>×@View.Multiplier</strong></span>
             }
+            @if (View.Seats.Any(s => s.IsBot))
+            {
+                <span class="mj-chip mj-hide-sm">@L["Computer · {0}", D.LevelName(View.Settings.BotLevel)]</span>
+            }
             <span class="mj-chip mj-hide-sm">@L["Room"] @View.Code</span>
         </div>
         <div class="mj-topbar-links">
