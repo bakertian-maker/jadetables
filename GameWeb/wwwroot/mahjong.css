@@ -264,3 +264,42 @@ button.mj-tile:focus-visible { outline: 3px solid var(--focus, #e3b341); outline
     .mj-log { position: static; margin: 0 8px 12px; max-width: none; }
     .btn { padding: 10px 14px; }
 }
+
+/* Phones held sideways: opponents at the edges, a compact centre, my hand always on screen. */
+@media (orientation: landscape) and (max-height: 520px) {
+    .mj-table { min-height: 100svh; }
+    .mj-board {
+        grid-template-columns: minmax(90px, 1fr) minmax(0, 3fr) minmax(90px, 1fr);
+        grid-template-areas: "left top right" "left center right" "me me me";
+        grid-template-rows: auto 1fr auto; gap: 4px; padding: 4px 8px 6px;
+    }
+    .mj-opp.pos-top { align-self: start; }
+    .mj-opp .mj-backs .mj-tile { display: none; }
+    .mj-opp .mj-backs .mj-tile:not(.is-back) { display: inline-block; --tw: 13px; }
+    .mj-count { display: inline; }
+    .mj-topbar { padding: 4px 12px; }
+    .mj-opp { gap: 2px; }
+    .mj-opp.pos-top { flex-direction: row; justify-content: center; gap: 8px; }
+    .mj-opp.pos-left, .mj-opp.pos-right { align-self: center; }
+    .mj-plate { flex-direction: row; width: auto; max-width: 100%; border-radius: 999px; padding: 2px 8px 2px 2px; gap: 4px; font-size: .75rem; }
+    .mj-plate .mj-tag:not(.mj-tag-dealer) { display: none; }
+    .mj-melds .mj-tile { --tw: 14px; }
+    .mj-center { padding: 4px; gap: 3px; border-radius: 12px; }
+    .mj-pond .mj-tile { --tw: 16px; }
+    .mj-pond.pond-top, .mj-pond.pond-bottom { grid-template-columns: repeat(12, auto); }
+    .mj-pond.pond-left, .mj-pond.pond-right { grid-template-columns: repeat(4, auto); }
+    .mj-compass { width: 64px; height: 64px; border-radius: 10px; }
+    .mj-compass-core { inset: 15px; }
+    .mj-compass-round { font-size: 18px; }
+    .mj-compass-wall { font-size: .55rem; }
+    .mj-compass-wind { width: 15px; height: 15px; font-size: 10px; }
+    .mj-me { gap: 4px; }
+    .mj-actions { min-height: 0; gap: 4px 10px; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+    .mj-status { font-size: .85rem; }
+    .mj-myrow { gap: 8px; }
+    .mj-hand { padding-top: 10px; }
+    .mj-hand .mj-tile { --tw: clamp(24px, calc((100vw - 40px) / 15.5), 44px); }
+    .mj-me .mj-plate { display: none; }   /* my name and score are in the top bar's seat list on wide screens; here, space wins */
+    .mj-log { display: none; }
+    .btn { padding: 7px 12px; }
+}

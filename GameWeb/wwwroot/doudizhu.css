@@ -147,3 +147,29 @@ button.ddz-card:focus-visible { outline: 3px solid var(--focus, #e3b341); outlin
     .ddz-counter-rank { font-size: .8rem; }
     .ddz-counter-left { font-size: .95rem; }
 }
+
+/* Phones held sideways: both opponents beside the centre, my hand always on screen. */
+@media (orientation: landscape) and (max-height: 520px) {
+    .ddz-board {
+        grid-template-columns: minmax(120px, 1fr) minmax(0, 1.6fr) minmax(120px, 1fr);
+        grid-template-areas: "left center right" "me me me"; grid-template-rows: 1fr auto; gap: 4px; padding: 4px 8px 6px;
+    }
+    .ddz-opp { gap: 4px; }
+    .ddz-opp .mj-plate { flex-direction: row; flex-wrap: wrap; border-radius: 12px; padding: 2px 8px; font-size: .75rem; gap: 4px; width: auto; }
+    .ddz-md { --cw: 26px; }
+    .ddz-played { min-height: calc(26px * 1.4 + 16px); }
+    .ddz-played.mine { min-height: 0; }
+    .ddz-center { gap: 4px; padding-top: 0; }
+    .ddz-counter-cell { min-width: 16px; padding: 1px; }
+    .ddz-counter-rank { font-size: .6rem; }
+    .ddz-counter-left { font-size: .7rem; }
+    .ddz-me { gap: 4px; }
+    .ddz-me .mj-plate { display: none; }
+    .mj-actions { min-height: 0; gap: 4px; }
+    .mj-status { font-size: .85rem; }
+    .ddz-hand { --cw: clamp(34px, 6.2vw, 48px); padding-top: 12px; }
+    .ddz-lg { --cw: clamp(34px, 6.2vw, 48px); }
+    .ddz-card.is-selected { transform: translateY(-10px) !important; }
+    .mj-log { display: none; }
+    .btn { padding: 7px 12px; }
+}

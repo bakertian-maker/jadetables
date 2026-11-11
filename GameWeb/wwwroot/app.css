@@ -472,3 +472,14 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
 @media (max-width: 420px) {
     .site-nav .nav-menu summary, .site-nav a.nav-account, .site-nav .lang-menu summary { padding: 0 10px; }
 }
+
+/* ---------- Phones held sideways (short landscape screens) ----------
+   While a game table is open, the site header gives its height to the game; the table's own top bar
+   still has Rules and Leave. Each game's stylesheet then fits its table to the screen height. */
+@media (orientation: landscape) and (max-height: 520px) {
+    body:has(.mj-table, .xq-table) .site-header,
+    body:has(.mj-table, .xq-table) .site-footer { display: none; }
+    .mj-table, .xq-table { min-height: 100svh; }
+    .mj-topbar, .xq-topbar { padding: 4px 12px; font-size: .8rem; }
+    .mj-topbar .mj-chip { padding: 2px 8px; }
+}

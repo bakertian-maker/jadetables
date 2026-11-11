@@ -176,3 +176,14 @@ button.xq-piece:focus-visible { outline: 3px solid #f2c94c; outline-offset: 2px;
     .xq-piece.is-moved { animation: xq-land 1.6s ease-out both; }
     .xq-piece.is-captured-ghost { display: none; }
 }
+
+/* Phones held sideways: board as tall as the screen allows, moves beside it. */
+@media (orientation: landscape) and (max-height: 520px) {
+    .xq-table { min-height: 100svh; }
+    .xq-layout { grid-template-columns: min(calc((100svh - 40px - 2 * 36px - 30px) * 92 / 102), 58vw) minmax(200px, 300px); gap: 12px; padding: 6px 12px; align-items: start; }
+    .xq-board-col { gap: 4px; max-width: none; }
+    .xq-player { min-height: 32px; padding: 2px 10px 2px 4px; gap: 6px; font-size: .85rem; }
+    .xq-player-side { width: 24px; height: 24px; }
+    .xq-side { padding: 10px; gap: 8px; max-height: calc(100svh - 46px); overflow: auto; }
+    .xq-moves-scroll { max-height: none; }
+}
