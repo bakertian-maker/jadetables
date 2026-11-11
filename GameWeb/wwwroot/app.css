@@ -346,7 +346,7 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
 .btn-danger { background: transparent; color: var(--red); border-color: var(--red); }
 .btn-danger:hover { background: var(--red); color: #fff; }
 
-.account-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0 22px; }
+.account-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 18px 0 22px; }
 .account-stats div { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 2px; }
 .account-stats strong { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
 .account-stats span { color: var(--muted); font-size: .85rem; }

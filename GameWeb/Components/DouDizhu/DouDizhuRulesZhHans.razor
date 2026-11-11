@@ -1,0 +1,71 @@
+@* 简体中文斗地主规则，显示在 /zh-cn/doudizhu/rules。 *@
+
+<div class="wrap page-pad rules">
+    <p class="eyebrow">Dou Dizhu</p>
+    <h1>斗地主规则</h1>
+    <p class="lead">斗地主是中国最流行的扑克游戏。三个人、一副牌：地主一人对抗两个农民，谁先出完手里的牌，谁那一方就赢。</p>
+
+    <nav class="rules-toc" aria-label="本页目录">
+        <a href="#cards">牌</a><a href="#bidding">叫地主</a><a href="#play">出牌</a><a href="#hands">牌型</a><a href="#scoring">计分</a><a href="#here">在玉桌玩</a>
+    </nav>
+
+    <h2 id="cards">牌</h2>
+    <p>一副完整的 54 张牌，含大小王。只比点数，不比花色。从小到大：</p>
+    <p><DdzCardRow Ranks="3 4 5 6 7 8 9 10 J Q K A 2 SJ BJ" /></p>
+    <p>所以 2 比 A 大，大王是最大的牌。</p>
+
+    <h2 id="bidding">发牌和叫分</h2>
+    <ul>
+        <li>每人 17 张牌，留 3 张底牌给地主。</li>
+        <li>按顺序每人叫一次：<strong>1 分、2 分或 3 分</strong>，必须比前面的高，也可以不叫。叫 3 分立即结束叫分。</li>
+        <li>叫分最高的人当<strong>地主</strong>，拿走 3 张底牌（大家都能看到），用 20 张牌单独作战。另外两人是<strong>农民</strong>，一起对抗地主。</li>
+        <li>如果没人叫分，就重新发牌。</li>
+    </ul>
+
+    <h2 id="play">出牌</h2>
+    <ul>
+        <li>地主先出，可以出任何合法的牌型。</li>
+        <li>按顺序轮流出牌。每人要么<strong>压过上一手牌</strong>（同样牌型、同样张数、更大的点数），要么<strong>不出</strong>。</li>
+        <li><strong>炸弹</strong>（四张同点数）可以压任何普通牌型，大炸弹压小炸弹。<strong>王炸</strong>（大小王）压一切。</li>
+        <li>另外两人都不出时，最后出牌的人重新开始，可以出任何牌型。</li>
+        <li>有人出完最后一张牌，这一局就结束：地主出完，地主赢；任何一个农民出完，两个农民都赢。</li>
+    </ul>
+
+    <h2 id="hands">牌型</h2>
+    <table class="rules-table ddz-rules-table">
+        <thead><tr><th>牌型</th><th>例子</th><th>说明</th></tr></thead>
+        <tbody>
+            <tr><td>单张</td><td><DdzCardRow Ranks="K" /></td><td>任意一张牌。</td></tr>
+            <tr><td>对子</td><td><DdzCardRow Ranks="9 9" /></td><td>两张同点数。大小王不算对子，合在一起是王炸。</td></tr>
+            <tr><td>三张</td><td><DdzCardRow Ranks="7 7 7" /></td><td>可以单出，也可以带一张或带一对。</td></tr>
+            <tr><td>三带一</td><td><DdzCardRow Ranks="7 7 7 4" /></td><td>比三张的点数。</td></tr>
+            <tr><td>三带二</td><td><DdzCardRow Ranks="7 7 7 4 4" /></td><td></td></tr>
+            <tr><td>顺子</td><td><DdzCardRow Ranks="5 6 7 8 9" /></td><td>五张或以上连续单牌，从 3 到 A。2 和大小王不能连。</td></tr>
+            <tr><td>连对</td><td><DdzCardRow Ranks="8 8 9 9 10 10" /></td><td>三对或以上连续的对子。</td></tr>
+            <tr><td>飞机</td><td><DdzCardRow Ranks="J J J Q Q Q" /></td><td>两个或以上连续的三张，可以不带，也可以每个三张带一张或一对。</td></tr>
+            <tr><td>飞机带翅膀</td><td><DdzCardRow Ranks="J J J Q Q Q 3 5" /></td><td></td></tr>
+            <tr><td>四带二</td><td><DdzCardRow Ranks="6 6 6 6 3 9" /></td><td>四张带两张或两对，不算炸弹。</td></tr>
+            <tr><td>炸弹</td><td><DdzCardRow Ranks="10 10 10 10" /></td><td>压任何普通牌型。</td></tr>
+            <tr><td>王炸</td><td><DdzCardRow Ranks="SJ BJ" /></td><td>最大，连炸弹也能压。</td></tr>
+        </tbody>
+    </table>
+    <p>要压过一手牌，必须牌型相同、张数相同、点数更大：五张的顺子只能用更大的五张顺子压，三带一只能用更大的三带一压，依此类推。</p>
+
+    <h2 id="scoring">计分</h2>
+    <ul>
+        <li>一局的分数是<strong>叫的分</strong>（1、2 或 3 分）。</li>
+        <li>每出一个炸弹或王炸（不论哪一方），分数<strong>翻倍</strong>。</li>
+        <li><strong>春天</strong>（地主赢，两个农民一张牌都没出）或<strong>反春</strong>（农民赢，地主只出过一手牌）再翻倍。</li>
+        <li>每个农民赢或输这么多分，地主赢或输两倍。</li>
+    </ul>
+    <p>例子：叫 2 分、出了一个炸弹，这一局值 4 分。地主赢就 +8，每个农民 −4。</p>
+
+    <h2 id="here">在玉桌玩</h2>
+    <ul>
+        <li>一场比赛 3、6 或 9 局，分数累计。</li>
+        <li>点牌选中，再按<strong>出牌</strong>。<strong>提示</strong>会选出能出的牌，从最小的开始；再按一次换下一种。</li>
+        <li>私人房间可以设出牌限时。超时就自动不出；如果是你先出，就出最小的一张。</li>
+        <li>空位由电脑补上。断线超过一分钟，电脑会替你出牌。</li>
+    </ul>
+    <p><a class="btn btn-primary" href="doudizhu">开始斗地主</a></p>
+</div>

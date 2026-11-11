@@ -1,0 +1,71 @@
+@* English Dou Dizhu rules, shown on /doudizhu/rules. *@
+
+<div class="wrap page-pad rules">
+    <p class="eyebrow">斗地主</p>
+    <h1>Dou Dizhu rules</h1>
+    <p class="lead">Dou Dizhu ("Fight the Landlord") is China's most popular card game. Three players, one deck: the landlord plays alone against two farmers, and the first player to get rid of all their cards wins for their side.</p>
+
+    <nav class="rules-toc" aria-label="On this page">
+        <a href="#cards">Cards</a><a href="#bidding">Bidding</a><a href="#play">Play</a><a href="#hands">Hand types</a><a href="#scoring">Scoring</a><a href="#here">On Jade Tables</a>
+    </nav>
+
+    <h2 id="cards">The cards</h2>
+    <p>A full deck of 54 cards, jokers included. Suits don't matter; only ranks do. From lowest to highest:</p>
+    <p><DdzCardRow Ranks="3 4 5 6 7 8 9 10 J Q K A 2 SJ BJ" /></p>
+    <p>So 2 is higher than an ace, and the big (coloured) joker is the highest card of all.</p>
+
+    <h2 id="bidding">Dealing and bidding</h2>
+    <ul>
+        <li>Each player gets 17 cards. Three cards are left face down for the landlord.</li>
+        <li>Players bid once each, in turn: <strong>1, 2 or 3 points</strong>, each bid higher than the last, or pass. Bidding 3 ends the bidding at once.</li>
+        <li>The highest bidder becomes the <strong>landlord</strong> (地主), takes the three extra cards (everyone sees them) and plays alone with 20 cards. The other two are <strong>farmers</strong> (农民) and play as a team.</li>
+        <li>If nobody bids, the cards are dealt again.</li>
+    </ul>
+
+    <h2 id="play">Playing a hand</h2>
+    <ul>
+        <li>The landlord leads first, with any legal play.</li>
+        <li>Play goes round the table. Each player must either <strong>beat the last play</strong> with a higher play of the same type and the same number of cards, or <strong>pass</strong>.</li>
+        <li>A <strong>bomb</strong> (four of a kind) beats any ordinary play, and a higher bomb beats a lower one. The <strong>rocket</strong> (both jokers) beats everything.</li>
+        <li>When the other two both pass, the last player to play starts a new round with anything they like.</li>
+        <li>As soon as someone plays their last card, the hand is over. If it's the landlord, the landlord wins; if it's either farmer, both farmers win.</li>
+    </ul>
+
+    <h2 id="hands">Hand types</h2>
+    <table class="rules-table ddz-rules-table">
+        <thead><tr><th>Play</th><th>Example</th><th>Notes</th></tr></thead>
+        <tbody>
+            <tr><td>Single</td><td><DdzCardRow Ranks="K" /></td><td>Any one card.</td></tr>
+            <tr><td>Pair</td><td><DdzCardRow Ranks="9 9" /></td><td>Two of the same rank. The jokers are not a pair: together they're the rocket.</td></tr>
+            <tr><td>Three of a kind</td><td><DdzCardRow Ranks="7 7 7" /></td><td>On its own, with one card, or with a pair.</td></tr>
+            <tr><td>Three with one</td><td><DdzCardRow Ranks="7 7 7 4" /></td><td>Compared by the three of a kind.</td></tr>
+            <tr><td>Three with a pair</td><td><DdzCardRow Ranks="7 7 7 4 4" /></td><td></td></tr>
+            <tr><td>Straight</td><td><DdzCardRow Ranks="5 6 7 8 9" /></td><td>Five or more in a row, from 3 up to A. 2 and the jokers can't be in a straight.</td></tr>
+            <tr><td>Pairs in a row</td><td><DdzCardRow Ranks="8 8 9 9 10 10" /></td><td>Three or more pairs in a row.</td></tr>
+            <tr><td>Airplane</td><td><DdzCardRow Ranks="J J J Q Q Q" /></td><td>Two or more threes in a row, alone or carrying one card or one pair for each three.</td></tr>
+            <tr><td>Airplane with wings</td><td><DdzCardRow Ranks="J J J Q Q Q 3 5" /></td><td></td></tr>
+            <tr><td>Four with two</td><td><DdzCardRow Ranks="6 6 6 6 3 9" /></td><td>Four of a kind with two cards or two pairs. Not a bomb.</td></tr>
+            <tr><td>Bomb</td><td><DdzCardRow Ranks="10 10 10 10" /></td><td>Beats any ordinary play.</td></tr>
+            <tr><td>Rocket</td><td><DdzCardRow Ranks="SJ BJ" /></td><td>Beats everything, bombs included.</td></tr>
+        </tbody>
+    </table>
+    <p>To beat a play you need the same type and length with a higher main rank: a straight of five can only be beaten by a higher straight of five, three with one by a higher three with one, and so on.</p>
+
+    <h2 id="scoring">Scoring</h2>
+    <ul>
+        <li>The hand is worth the <strong>bid</strong> (1, 2 or 3 points).</li>
+        <li>It <strong>doubles</strong> for every bomb or rocket played, by either side.</li>
+        <li>It doubles again for a <strong>spring</strong> (春天): the landlord wins and neither farmer played a single card. Or for an <strong>anti-spring</strong>: the farmers win and the landlord only played once.</li>
+        <li>Each farmer wins or loses that many points. The landlord wins or loses twice as many, against both farmers.</li>
+    </ul>
+    <p>Example: a bid of 2 with one bomb is worth 4 points. If the landlord wins, they get +8 and each farmer −4.</p>
+
+    <h2 id="here">On Jade Tables</h2>
+    <ul>
+        <li>A match is 3, 6 or 9 hands. Scores add up across the match.</li>
+        <li>Tap cards to pick them, then press <strong>Play</strong>. <strong>Hint</strong> picks a play that works, the lowest first; press it again for the next one.</li>
+        <li>Private rooms can have a turn timer. If it runs out, you pass, or play your lowest card if you're starting a round.</li>
+        <li>Empty seats are taken by computer players. If you lose your connection, a computer player takes your seat after a minute.</li>
+    </ul>
+    <p><a class="btn btn-primary" href="doudizhu">Play Dou Dizhu</a></p>
+</div>

@@ -2,7 +2,7 @@ using GameWeb.Games.Xiangqi;
 
 namespace GameWeb.Games.Archive;
 
-public enum GameType : byte { Mahjong = 1, Xiangqi = 2 }
+public enum GameType : byte { Mahjong = 1, Xiangqi = 2, DouDizhu = 3 }
 
 /// <param name="Side">Xiangqi: 0 Red, 1 Black. Mahjong: null.</param>
 /// <param name="PlayerId">The browser's player id; the store keeps only a hash of it.</param>

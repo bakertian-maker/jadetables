@@ -1,0 +1,46 @@
+@* One playing card. A button when it can be picked (in the player's hand), otherwise a picture. *@
+@using GameWeb.Games.DouDizhu
+@inject DdzText D
+
+@if (Back)
+{
+    <span class="ddz-card is-back @SizeClass" aria-hidden="true"></span>
+}
+else if (OnClick.HasDelegate)
+{
+    <button type="button" class="ddz-card @SizeClass @ColorClass @(Selected ? "is-selected" : "") @(Hinted ? "is-hinted" : "")"
+            aria-pressed="@(Selected ? "true" : "false")" aria-label="@D.CardName(Card)" @onclick="OnClick">
+        @Face()
+    </button>
+}
+else
+{
+    <span class="ddz-card @SizeClass @ColorClass" role="img" aria-label="@D.CardName(Card)">@Face()</span>
+}
+
+@code {
+    [Parameter] public int Card { get; set; }
+    [Parameter] public bool Back { get; set; }
+    [Parameter] public bool Selected { get; set; }
+    [Parameter] public bool Hinted { get; set; }
+    /// <summary>"lg" (hand), "md" (played cards), "sm" (the landlord's cards, results).</summary>
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    string SizeClass => "ddz-" + Size;
+    string ColorClass => Cards.IsRed(Card) ? "is-red" : "is-black";
+
+    RenderFragment Face() => __builder =>
+    {
+        if (Cards.IsJoker(Card))
+        {
+            <span class="ddz-corner ddz-joker-word">@D.JokerWord(Card)</span>
+            <span class="ddz-pip ddz-joker-star" aria-hidden="true">★</span>
+        }
+        else
+        {
+            <span class="ddz-corner"><span class="ddz-rank">@Cards.RankLabel(Card)</span><span class="ddz-suit">@Cards.SuitSymbol(Card)</span></span>
+            <span class="ddz-pip" aria-hidden="true">@Cards.SuitSymbol(Card)</span>
+        }
+    };
+}

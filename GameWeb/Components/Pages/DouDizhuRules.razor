@@ -1,0 +1,16 @@
+@page "/doudizhu/rules"
+
+<PageMeta Title="@L["Dou Dizhu Rules: How to Play Fight the Landlord | Jade Tables"]" Description="@L["Dou Dizhu (Fight the Landlord) rules: bidding, every hand type with examples, bombs, the rocket and scoring."]" />
+
+@if (Languages.Current == Script.Traditional)
+{
+    <DouDizhuRulesZhHant />
+}
+else if (Languages.Current == Script.Simplified)
+{
+    <DouDizhuRulesZhHans />
+}
+else
+{
+    <DouDizhuRulesEn />
+}

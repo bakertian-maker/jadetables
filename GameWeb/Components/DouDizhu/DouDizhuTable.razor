@@ -1,0 +1,422 @@
+@* The three-seat Dou Dizhu table, from the viewer's seat: the next player on the right, the one after on the left. *@
+@using GameWeb.Games.DouDizhu
+@inject GameText T
+@inject DdzText D
+
+<div class="mj-table ddz-table">
+    <div class="mj-topbar">
+        <div class="mj-topbar-info">
+            <span class="mj-chip">@L["Hand {0} of {1}", View.HandNumber, View.Settings.Hands]</span>
+            @if (View.Bid > 0)
+            {
+                <span class="mj-chip">@L["Bid {0}", View.Bid] · <strong>×@View.Multiplier</strong></span>
+            }
+            <span class="mj-chip mj-hide-sm">@L["Room"] @View.Code</span>
+        </div>
+        <div class="mj-topbar-links">
+            <button type="button" class="mj-link-button" aria-pressed="@(SoundOn ? "true" : "false")" @onclick="OnToggleSound"
+                    title="@L["Play a chime when it's your turn and this tab is in the background"]">@(SoundOn ? L["Sound on"] : L["Sound off"])</button>
+            <a href="doudizhu/rules" target="_blank">@L["Rules"]</a>
+            <a href="doudizhu">@L["Leave"]</a>
+        </div>
+    </div>
+
+    <div class="ddz-board">
+        @Opponent(SeatAt(2), "left")
+        @Opponent(SeatAt(1), "right")
+
+        <div class="ddz-center">
+            <div class="ddz-bottom" aria-label="@L["The landlord's cards"]">
+                @if (View.Bottom is { } bottom)
+                {
+                    @foreach (var c in bottom)
+                    {
+                        <DdzCard Card="c" Size="sm" />
+                    }
+                }
+                else
+                {
+                    @for (int i = 0; i < 3; i++)
+                    {
+                        <DdzCard Back="true" Size="sm" />
+                    }
+                }
+            </div>
+            @if (View.Phase == DdzPhase.Bidding)
+            {
+                <p class="ddz-center-note">@(View.Bid > 0 ? L["Highest bid: {0}", View.Bid] : L["Bidding for landlord"])</p>
+            }
+        </div>
+
+        <div class="ddz-me">
+            @if (Me is not null)
+            {
+                <div class="ddz-played mine">@TrickView(Me)</div>
+            }
+            <div class="mj-actions" aria-live="polite">
+                @ActionBar()
+                @if (View.SecondsLeft is not null && View.SecondsTotal > 0 && View.Phase is DdzPhase.Bidding or DdzPhase.Playing)
+                {
+                    <div class="mj-timer" @key="View.PhaseVersion">
+                        <div class="mj-timer-fill" style="@timerStyle"></div>
+                    </div>
+                }
+            </div>
+            @if (Me?.Hand is { } hand)
+            {
+                <div class="ddz-hand" style="--n:@hand.Count">
+                    @foreach (var c in hand)
+                    {
+                        var card = c;
+                        if (MyPlayTurn)
+                        {
+                            <DdzCard Card="card" Size="lg" Selected="selected.Contains(card)" OnClick="() => Toggle(card)" />
+                        }
+                        else
+                        {
+                            <DdzCard Card="card" Size="lg" />
+                        }
+                    }
+                </div>
+                @Plate(Me, "bottom")
+            }
+        </div>
+    </div>
+
+    @if (View.Log.Count > 0)
+    {
+        <details class="mj-log">
+            <summary>@L["Game log"]</summary>
+            <ol>
+                @foreach (var line in View.Log.Reverse())
+                {
+                    <li>@LogLine(line)</li>
+                }
+            </ol>
+        </details>
+    }
+
+    @if (View.Phase == DdzPhase.HandOver && View.Result is { } result)
+    {
+        @ResultDialog(result)
+    }
+    @if (View.Phase == DdzPhase.MatchOver)
+    {
+        @MatchOverDialog()
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public DdzView View { get; set; } = default!;
+    [Parameter] public EventCallback<DdzAction> OnAction { get; set; }
+    [Parameter] public EventCallback OnPlayAgain { get; set; }
+    [Parameter] public bool SoundOn { get; set; } = true;
+    [Parameter] public EventCallback OnToggleSound { get; set; }
+
+    readonly HashSet<int> selected = [];
+    int lastPhaseVersion = -1;
+    int hintIndex = -1;
+    List<DdzCombo> hints = [];
+    string timerStyle = "";
+
+    int Viewer => View.MySeat >= 0 ? View.MySeat : 0;
+    int SeatAt(int pos) => (Viewer + pos) % 3;
+    DdzSeatView? Me => View.Me;
+    bool MyPlayTurn => View.MyTurn && View.Phase == DdzPhase.Playing;
+    string NameOf(int seat) => seat >= 0 && seat < View.Seats.Count ? SeatName(View.Seats[seat]) : "";
+    string SeatName(DdzSeatView s) => s.IsBot ? T.BotName(s.BotIndex) : s.Name;
+
+    /// <summary>The selected cards as a play, if they make a legal one now.</summary>
+    DdzCombo? SelectedPlay => selected.Count == 0 ? null : Combos.Read(selected.ToList(), View.LastCombo);
+
+    protected override void OnParametersSet()
+    {
+        if (View.PhaseVersion != lastPhaseVersion)
+        {
+            lastPhaseVersion = View.PhaseVersion;
+            selected.Clear();
+            hintIndex = -1;
+            hints = [];
+            timerStyle = View.SecondsLeft is double left && View.SecondsTotal > 0
+                ? FormattableString.Invariant($"--from:{Math.Clamp(left / View.SecondsTotal * 100, 0, 100):0.#}%;animation-duration:{left:0.##}s")
+                : "";
+        }
+        // Drop selections of cards no longer in the hand.
+        if (Me?.Hand is { } hand) selected.IntersectWith(hand);
+    }
+
+    void Toggle(int card)
+    {
+        if (!selected.Remove(card)) selected.Add(card);
+    }
+
+    /// <summary>Hint: select the next play that would work (the lowest first), cycling round.</summary>
+    void Hint()
+    {
+        if (Me?.Hand is not { } hand) return;
+        if (hints.Count == 0)
+            hints = View.LastCombo is { } lead ? Combos.Beating(hand, lead) : Combos.LeadOptions(hand).OrderBy(o => o.Rank - o.Length).ToList();
+        if (hints.Count == 0) return;
+        hintIndex = (hintIndex + 1) % hints.Count;
+        selected.Clear();
+        selected.UnionWith(hints[hintIndex].Cards);
+    }
+
+    bool NoPlayPossible => MyPlayTurn && View.LastCombo is { } lead && Me?.Hand is { } h && Combos.Beating(h, lead).Count == 0;
+
+    async Task Play()
+    {
+        if (SelectedPlay is null) return;
+        var cards = selected.ToList();
+        selected.Clear();
+        await OnAction.InvokeAsync(new DdzAction(DdzActionType.Play, Cards: cards));
+    }
+
+    Task Pass()
+    {
+        selected.Clear();
+        return OnAction.InvokeAsync(new DdzAction(DdzActionType.Pass));
+    }
+
+    Task Bid(int points) => OnAction.InvokeAsync(points == 0 ? new DdzAction(DdzActionType.Pass) : new DdzAction(DdzActionType.Bid, points));
+
+    RenderFragment ActionBar() => __builder =>
+    {
+        if (Me is null)
+        {
+            <p class="mj-status">@L["You're watching this game."]</p>
+            return;
+        }
+        if (View.Phase == DdzPhase.Bidding)
+        {
+            if (View.MyTurn)
+            {
+                <p class="mj-status"><strong>@L["Your bid."]</strong> @L["The highest bidder becomes the landlord and plays alone against the other two."]</p>
+                <div class="mj-buttons">
+                    <button class="btn btn-ghost" @onclick="() => Bid(0)">@L["No bid"]</button>
+                    @foreach (var b in View.AllowedBids)
+                    {
+                        var points = b;
+                        <button class="btn btn-primary" @onclick="() => Bid(points)">@L["{0} pt", points]</button>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="mj-status"><span class="mj-thinking">@L["{0} is bidding", NameOf(View.CurrentSeat)]</span></p>
+            }
+            return;
+        }
+        if (View.Phase != DdzPhase.Playing) return;
+        if (!View.MyTurn)
+        {
+            <p class="mj-status"><span class="mj-thinking">@L["{0} to play", NameOf(View.CurrentSeat)]</span></p>
+            return;
+        }
+        var play = SelectedPlay;
+        <p class="mj-status">
+            <strong>@(View.Leading ? L["Your lead: play anything."] : L["Your turn: beat it or pass."])</strong>
+            @if (play is not null)
+            {
+                <span class="ddz-kind">@D.KindName(play.Kind)</span>
+            }
+            else if (selected.Count > 0)
+            {
+                <span class="ddz-kind is-bad">@(View.Leading ? L["Not a valid play"] : L["Doesn't beat it"])</span>
+            }
+            else if (NoPlayPossible)
+            {
+                <span class="mj-muted">@L["Nothing beats it: pass."]</span>
+            }
+        </p>
+        <div class="mj-buttons">
+            @if (!View.Leading)
+            {
+                <button class="btn btn-ghost" @onclick="Pass">@L["Pass"]</button>
+            }
+            <button class="btn btn-ghost" @onclick="Hint" disabled="@NoPlayPossible">@L["Hint"]</button>
+            @if (selected.Count > 0)
+            {
+                <button class="btn btn-ghost" @onclick="() => selected.Clear()">@L["Clear"]</button>
+            }
+            <button class="btn btn-primary" @onclick="Play" disabled="@(play is null)">@L["Play cards"]</button>
+        </div>
+    };
+
+    RenderFragment Opponent(int seat, string pos) => __builder =>
+    {
+        var s = View.Seats[seat];
+        bool active = View.CurrentSeat == seat && View.Phase is DdzPhase.Bidding or DdzPhase.Playing;
+        <div class="ddz-opp pos-@pos @(active ? "is-active" : "")">
+            @Plate(s, pos)
+            <div class="ddz-backs" aria-label="@L["{0} cards", s.CardCount]">
+                @if (s.Hand is { } shown)
+                {
+                    <div class="ddz-reveal">
+                        @foreach (var c in shown)
+                        {
+                            <DdzCard Card="c" Size="sm" />
+                        }
+                    </div>
+                }
+                else
+                {
+                    <DdzCard Back="true" Size="md" />
+                    <span class="ddz-count @(s.CardCount <= 2 && View.Phase == DdzPhase.Playing ? "is-low" : "")">@s.CardCount</span>
+                }
+            </div>
+            <div class="ddz-played">@TrickView(s)</div>
+        </div>
+    };
+
+    RenderFragment Plate(DdzSeatView s, string pos) => __builder =>
+    {
+        <div class="mj-plate ddz-plate @(View.CurrentSeat == s.Seat && View.Phase is DdzPhase.Bidding or DdzPhase.Playing ? "is-turn" : "")">
+            @if (View.Landlord >= 0)
+            {
+                <span class="ddz-role @(s.IsLandlord ? "is-landlord" : "")" title="@D.Role(s.IsLandlord)">@(s.IsLandlord ? L["Landlord"] : L["Farmer"])</span>
+            }
+            <span class="mj-plate-name">@SeatName(s)</span>
+            @if (s.Seat == View.MySeat)
+            {
+                <span class="mj-tag">@L["You"]</span>
+            }
+            else if (s.Away)
+            {
+                <span class="mj-tag mj-tag-away">@L["Away"]</span>
+            }
+            <span class="mj-plate-score">@s.Score</span>
+        </div>
+    };
+
+    /// <summary>What a seat did in this trick (or its bid while bidding).</summary>
+    RenderFragment TrickView(DdzSeatView s) => __builder =>
+    {
+        if (View.Phase == DdzPhase.Bidding)
+        {
+            if (s.Bid is not null)
+            {
+                <span class="ddz-say">@D.BidText(s.Bid)</span>
+            }
+            return;
+        }
+        if (View.Phase != DdzPhase.Playing || s.Trick is null) return;
+        if (s.Trick.Passed)
+        {
+            <span class="ddz-say">@L["Pass"]</span>
+            return;
+        }
+        var combo = s.Trick.Combo!;
+        <div class="ddz-play @(combo.IsBomb ? "is-bomb" : "") @(s.Seat == View.LastSeat ? "is-latest" : "")" @key="@($"{s.Seat}-{View.PhaseVersion}-{combo.Cards.Count}")">
+            <div class="ddz-play-cards">
+                @foreach (var c in Cards.SortForDisplay(combo.Cards))
+                {
+                    <DdzCard Card="c" Size="md" />
+                }
+            </div>
+            @if (combo.Kind is not (DdzKind.Single or DdzKind.Pair))
+            {
+                <span class="ddz-kind">@D.KindName(combo.Kind)</span>
+            }
+        </div>
+    };
+
+    string LogLine(DdzLogEntry e) => e.Kind switch
+    {
+        DdzLogKind.Bid => L["{0} bid {1}.", NameOf(e.Seat), e.Value],
+        DdzLogKind.Pass => L["{0} passed.", NameOf(e.Seat)],
+        DdzLogKind.Landlord => L["{0} is the landlord ({1} pt).", NameOf(e.Seat), e.Value],
+        DdzLogKind.Redeal => L["Nobody bid: the cards are dealt again."],
+        DdzLogKind.Play => L["{0}: {1}", NameOf(e.Seat), PlayText(e.Combo!)],
+        DdzLogKind.Win => e.Value == 1 ? L["{0} went out: the landlord wins.", NameOf(e.Seat)] : L["{0} went out: the farmers win.", NameOf(e.Seat)],
+        _ => "",
+    };
+
+    string PlayText(DdzCombo c) =>
+        D.KindName(c.Kind) + " " + string.Join(" ", Cards.SortForDisplay(c.Cards).Select(x => Cards.IsJoker(x) ? D.JokerWord(x) : Cards.RankLabel(x)));
+
+    RenderFragment ResultDialog(DdzResult r) => __builder =>
+    {
+        bool iWon = View.MySeat >= 0 && r.Changes[View.MySeat] > 0;
+        <div class="mj-overlay" role="dialog" aria-modal="true" aria-labelledby="ddz-result-title">
+            <div class="mj-dialog">
+                <h2 id="ddz-result-title">@(r.LandlordWon ? L["The landlord wins!"] : L["The farmers win!"])</h2>
+                <p class="mj-dialog-sub">
+                    @if (View.MySeat >= 0)
+                    {
+                        <strong>@(iWon ? L["You won this hand."] : L["You lost this hand."])</strong>
+                    }
+                    @L["Landlord: {0}.", NameOf(r.Landlord)]
+                </p>
+                <table class="mj-faan">
+                    <tbody>
+                        <tr><td>@L["Bid"]</td><td>@r.Bid</td></tr>
+                        @if (r.Bombs > 0)
+                        {
+                            <tr><td>@L["Bombs and rockets"]</td><td>×@(1 << r.Bombs)</td></tr>
+                        }
+                        @if (r.Spring)
+                        {
+                            <tr><td>@L["Spring: the farmers never played"]</td><td>×2</td></tr>
+                        }
+                        @if (r.AntiSpring)
+                        {
+                            <tr><td>@L["Anti-spring: the landlord played only once"]</td><td>×2</td></tr>
+                        }
+                    </tbody>
+                    <tfoot><tr><td>@L["Points (the landlord's are doubled)"]</td><td>@r.Points</td></tr></tfoot>
+                </table>
+                <table class="mj-scores">
+                    <thead><tr><th>@L["Player"]</th><th>@L["This hand"]</th><th>@L["Total"]</th></tr></thead>
+                    <tbody>
+                        @for (int s = 0; s < 3; s++)
+                        {
+                            var seat = View.Seats[s];
+                            <tr class="@(s == View.MySeat ? "is-me" : "")">
+                                <td><span class="mj-ready-dot @(seat.Ready ? "on" : "")"></span>@SeatName(seat)@(s == r.Landlord ? " · " + L["Landlord"] : "")</td>
+                                <td class="@(r.Changes[s] > 0 ? "pos" : "neg")">@(r.Changes[s] > 0 ? "+" : "")@r.Changes[s]</td>
+                                <td>@seat.Score</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="mj-dialog-actions">
+                    @if (View.MySeat >= 0 && !View.Seats[View.MySeat].Ready)
+                    {
+                        <button class="btn btn-primary" @onclick="() => OnAction.InvokeAsync(new DdzAction(DdzActionType.Ready))">
+                            @(View.HandNumber >= View.Settings.Hands ? L["See the final scores"] : L["Next hand"])
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="mj-muted">@L["Waiting for the others…"]</span>
+                    }
+                </div>
+            </div>
+        </div>
+    };
+
+    RenderFragment MatchOverDialog() => __builder =>
+    {
+        var order = View.Seats.OrderByDescending(s => s.Score).ToList();
+        <div class="mj-overlay" role="dialog" aria-modal="true" aria-labelledby="ddz-final-title">
+            <div class="mj-dialog">
+                <h2 id="ddz-final-title">@L["Final scores"]</h2>
+                <p class="mj-dialog-sub">@L["{0} hands played.", View.HandNumber]</p>
+                <ol class="mj-standings">
+                    @foreach (var s in order)
+                    {
+                        <li class="@(s.Seat == View.MySeat ? "is-me" : "")"><span>@SeatName(s)</span><strong>@s.Score</strong></li>
+                    }
+                </ol>
+                <div class="mj-dialog-actions">
+                    <a class="btn btn-ghost" href="doudizhu">@L["Back to lobby"]</a>
+                    @if (View.MySeat >= 0)
+                    {
+                        <button class="btn btn-primary" @onclick="OnPlayAgain">@L["Play again"]</button>
+                    }
+                </div>
+            </div>
+        </div>
+    };
+}

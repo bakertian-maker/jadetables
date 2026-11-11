@@ -19,7 +19,7 @@ public sealed class GameCatalog
             "xiangqi", "2 players", GameStatus.Playable, "Xiangqi"),
         new("doudizhu", "Dou Dizhu", "鬥地主", "斗地主", "Fight the landlord.",
             "Three players, one landlord. Bid, team up and empty your hand first.",
-            "", "3 players", GameStatus.InDevelopment, "Dou Dizhu"),
+            "doudizhu", "3 players", GameStatus.Playable, "Dou Dizhu"),
     ];
 
     public GameInfo? Find(string key) => Games.FirstOrDefault(g => g.Key == key);

@@ -33,6 +33,7 @@
             </div>
             <div><strong>@summary.XiangqiWins – @summary.XiangqiDraws – @summary.XiangqiLosses</strong><span>@L["Xiangqi: won – drawn – lost"]</span></div>
             <div><strong>@summary.MahjongFirsts / @summary.MahjongMatches</strong><span>@L["Mahjong: matches won / played"]</span></div>
+            <div><strong>@summary.DouDizhuFirsts / @summary.DouDizhuMatches</strong><span>@L["Dou Dizhu: matches won / played"]</span></div>
         </div>
 
         @if (history.Count == 0)
@@ -55,7 +56,7 @@
                         {
                             <tr>
                                 <td><time datetime="@g.EndedAt.ToString("o")">@g.EndedAt.ToString(Languages.IsChinese ? "yyyy-MM-dd" : "d MMM yyyy")</time></td>
-                                <td>@(g.Type == GameType.Xiangqi ? L["Xiangqi"] : L["Mahjong"])
+                                <td>@GameName(g.Type)
                                     @if (g.Side is byte side)
                                     {
                                         <span class="history-side">@X.SideName(side == 0 ? XqSide.Red : XqSide.Black)</span>
@@ -272,7 +273,14 @@
         Go("./?deleted=1");
     }
 
-    string ResultText(HistoryEntry g) => g.Type == GameType.Mahjong
+    string GameName(GameType type) => type switch
+    {
+        GameType.Xiangqi => L["Xiangqi"],
+        GameType.DouDizhu => L["Dou Dizhu"],
+        _ => L["Mahjong"],
+    };
+
+    string ResultText(HistoryEntry g) => g.Type != GameType.Xiangqi
         ? (g.Place is int place ? L["Place {0} · {1} points", place, g.Score ?? 0] : L["Played"])
         : g.Outcome switch
         {

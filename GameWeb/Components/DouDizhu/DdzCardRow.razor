@@ -1,0 +1,29 @@
+@* A row of example cards for the rules pages: Ranks="3 3 3 4" (BJ / SJ for the jokers). Suits are varied so repeats look real. *@
+@using GameWeb.Games.DouDizhu
+
+<span class="ddz-example">
+    @foreach (var c in cards)
+    {
+        <DdzCard Card="c" Size="sm" />
+    }
+</span>
+
+@code {
+    [Parameter, EditorRequired] public string Ranks { get; set; } = "";
+
+    static readonly string[] Labels = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"];
+    List<int> cards = [];
+
+    protected override void OnParametersSet()
+    {
+        var used = new Dictionary<string, int>();
+        cards = [];
+        foreach (var r in Ranks.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (r == "BJ") { cards.Add(Cards.BigJoker); continue; }
+            if (r == "SJ") { cards.Add(Cards.SmallJoker); continue; }
+            int n = used[r] = used.GetValueOrDefault(r) + 1;
+            cards.Add(Array.IndexOf(Labels, r) * 4 + (n - 1 + Array.IndexOf(Labels, r)) % 4);
+        }
+    }
+}

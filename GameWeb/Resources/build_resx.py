@@ -30,6 +30,8 @@ DYNAMIC_KEYS = [
     "East", "South", "West", "North",
     # Xiangqi piece names (XqText.PieceName)
     "General", "Advisor", "Elephant", "Horse", "Chariot", "Cannon", "Soldier",
+    # Card suits (DdzText.CardName)
+    "Spades", "Hearts", "Clubs", "Diamonds",
     # Account emails (Accounts/AccountEmails.cs passes these keys as arguments)
     "Confirm your Jade Tables account", "Hello {0}, thanks for joining Jade Tables. Please confirm your email address:",
     "Confirm my email", "If you didn't create an account, you can ignore this email.",

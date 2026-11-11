@@ -26,7 +26,8 @@ public sealed record HistoryEntry(
 /// <summary>One line of the leaderboard.</summary>
 public sealed record LeaderboardRow(int Rank, string DisplayName, int Rating, int Games, int Wins, int Draws, int Losses, bool IsMe);
 
-public sealed record HistorySummary(int Games, int XiangqiWins, int XiangqiDraws, int XiangqiLosses, int MahjongMatches, int MahjongFirsts);
+public sealed record HistorySummary(int Games, int XiangqiWins, int XiangqiDraws, int XiangqiLosses, int MahjongMatches, int MahjongFirsts,
+    int DouDizhuMatches = 0, int DouDizhuFirsts = 0);
 
 /// <summary>Links browsers to accounts and reads a player's game history.</summary>
 public sealed class AccountStore(IDbContextFactory<GamesDbContext> factory, ILogger<AccountStore> logger)
@@ -213,7 +214,9 @@ public sealed class AccountStore(IDbContextFactory<GamesDbContext> factory, ILog
             all.Count(e => e.Type == GameType.Xiangqi && e.Outcome == GameOutcome.Draw),
             all.Count(e => e.Type == GameType.Xiangqi && e.Outcome == GameOutcome.Loss),
             all.Count(e => e.Type == GameType.Mahjong),
-            all.Count(e => e.Type == GameType.Mahjong && e.Place == 1));
+            all.Count(e => e.Type == GameType.Mahjong && e.Place == 1),
+            all.Count(e => e.Type == GameType.DouDizhu),
+            all.Count(e => e.Type == GameType.DouDizhu && e.Place == 1));
     }
 
     /// <summary>Works out a game from the point of view of the seat whose player key is one of <paramref name="myKeys"/>.</summary>

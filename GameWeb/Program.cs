@@ -76,6 +76,7 @@ bool accounts = !string.IsNullOrWhiteSpace(gamesDb);
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.AddScoped<GameText>();
 builder.Services.AddScoped<XqText>();
+builder.Services.AddScoped<DdzText>();
 
 var app = builder.Build();
 

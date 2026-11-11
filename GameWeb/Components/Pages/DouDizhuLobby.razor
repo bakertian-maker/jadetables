@@ -1,0 +1,154 @@
+@page "/doudizhu"
+@rendermode InteractiveServer
+@using GameWeb.Games.DouDizhu
+@inject RoomService Rooms
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject GameWeb.Accounts.PlayerAccountLinker Links
+
+<PageMeta Title="@L["Play Dou Dizhu Online Free – Fight the Landlord vs the Computer or Friends | Jade Tables"]" Description="@L["Play Dou Dizhu (Fight the Landlord) online for free: bid to be the landlord, or team up as farmers. Play the computer straight away or invite two friends."]" />
+
+<section class="lobby-hero">
+    <div class="wrap lobby-hero-inner">
+        <div>
+            <p class="eyebrow">@L["斗地主 · Fight the Landlord"]</p>
+            <h1>@L["Dou Dizhu"]</h1>
+            <p class="lead">@L["Three players, one deck. Bid to be the landlord and play alone, or team up as farmers. First to empty their hand wins for their side."]</p>
+        </div>
+        <div class="lobby-hero-cards" aria-hidden="true">
+            <DdzCard Card="Cards.BigJoker" Size="lg" />
+            <DdzCard Card="Cards.SmallJoker" Size="lg" />
+            <DdzCard Card="@(Cards.RankTwo * 4 + 1)" Size="lg" />
+            <DdzCard Card="@(Cards.RankAce * 4)" Size="lg" />
+        </div>
+    </div>
+</section>
+
+<div class="wrap page-pad">
+    <ContinueGames GameKey="doudizhu" />
+
+    <div class="name-row">
+        <label for="nickname">@L["Your name at the table"]</label>
+        @if (account is not null)
+        {
+            <input id="nickname" value="@account.DisplayName" readonly aria-describedby="nickname-hint" />
+            <a id="nickname-hint" class="name-hint" href="account">@L["Change it in My games"]</a>
+        }
+        else
+        {
+            <input id="nickname" maxlength="20" value="@nickname" @onchange="SaveName" placeholder="@L["Guest"]" />
+        }
+    </div>
+
+    @if (createError is not null)
+    {
+        <p class="form-error" role="alert">@createError</p>
+    }
+
+    <div class="lobby-grid">
+        <article class="card card-feature">
+            <h2>@L["Play the computer"]</h2>
+            <p>@L["You and two computer players, six hands. Starts straight away. No timer."]</p>
+            <button class="btn btn-primary btn-lg" @onclick="QuickPlay" disabled="@busy">@L["Play now"]</button>
+        </article>
+
+        <article class="card">
+            <h2>@L["Private room"]</h2>
+            <p>@L["Get a link for up to two friends. Empty seats get computer players."]</p>
+            <div class="form-grid">
+                <label>
+                    @L["Length"]
+                    <select @bind="hands">
+                        <option value="3">@L["{0} hands", 3]</option>
+                        <option value="6">@L["{0} hands", 6]</option>
+                        <option value="9">@L["{0} hands", 9]</option>
+                    </select>
+                </label>
+                <label>
+                    @L["Turn timer"]
+                    <select @bind="turnSeconds">
+                        <option value="30">@L["{0} seconds", 30]</option>
+                        <option value="20">@L["{0} seconds", 20]</option>
+                        <option value="0">@L["No timer"]</option>
+                    </select>
+                </label>
+            </div>
+            <button class="btn btn-primary" @onclick="CreateRoom" disabled="@busy">@L["Create room"]</button>
+        </article>
+
+        <article class="card">
+            <h2>@L["Join a room"]</h2>
+            <p>@L["Have a room code from a friend? Enter it here, or just open their link."]</p>
+            <form class="join-form" @onsubmit="Join" @onsubmit:preventDefault>
+                <input aria-label="@L["Room code"]" placeholder="@L["Code, e.g. K7Q2M"]" maxlength="5" @bind="joinCode" class="code-input" />
+                <button class="btn btn-ghost" type="submit">@L["Join"]</button>
+            </form>
+            @if (joinError is not null)
+            {
+                <p class="form-error">@joinError</p>
+            }
+        </article>
+    </div>
+
+    <section class="how">
+        <h2>@L["How a hand works"]</h2>
+        <ol class="how-steps">
+            <li><strong>@L["Bid"]</strong> @L["1, 2 or 3 points to be the landlord. The landlord takes the three extra cards and plays alone."]</li>
+            <li><strong>@L["Lead"]</strong> @L["any play: a single, a pair, a straight, three with one, an airplane…"]</li>
+            <li><strong>@L["Beat it"]</strong> @L["with a higher play of the same kind, or pass. A bomb beats anything; the rocket (both jokers) beats bombs."]</li>
+            <li><strong>@L["Go out"]</strong> @L["first to win for your side. Bombs and springs double the points."] <a href="doudizhu/rules">@L["Read the full rules"]</a></li>
+        </ol>
+    </section>
+</div>
+
+@code {
+    string nickname = "";
+    GameWeb.Accounts.SignedInPlayer? account;
+    int hands = 6;
+    int turnSeconds = 30;
+    string joinCode = "";
+    string? joinError;
+    string? createError;
+    bool busy;
+
+    sealed record Identity(string Id, string Name);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var identity = await JS.InvokeAsync<Identity>("gameweb.identity", L["Guest"].Value);
+        nickname = identity.Name;
+        account = await Links.CurrentAsync();
+        StateHasChanged();
+    }
+
+    async Task SaveName(ChangeEventArgs e)
+    {
+        nickname = Room.CleanName(e.Value?.ToString());
+        await JS.InvokeVoidAsync("gameweb.setName", nickname);
+    }
+
+    void QuickPlay() => Open(new DdzRoomSettings { QuickPlay = true, Hands = 6, TurnSeconds = 0 });
+
+    void CreateRoom() => Open(new DdzRoomSettings { Hands = hands, TurnSeconds = turnSeconds });
+
+    void Open(DdzRoomSettings settings)
+    {
+        var room = Rooms.TryCreate(code => new DdzRoom(code, settings));
+        if (room is null)
+        {
+            createError = L["The server is busy right now. Please try again in a few minutes."];
+            return;
+        }
+        busy = true;
+        Nav.NavigateTo(room.Url);
+    }
+
+    void Join()
+    {
+        var code = joinCode.Trim().ToUpperInvariant();
+        if (code.Length == 0) { joinError = L["Enter a room code."]; return; }
+        if (Rooms.Get(code) is null) { joinError = L["No open room with code {0}.", code]; return; }
+        Nav.NavigateTo($"doudizhu/room/{code}");
+    }
+}
