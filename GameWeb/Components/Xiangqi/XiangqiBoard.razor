@@ -61,6 +61,13 @@
                 {
                     <span class="xq-mark xq-mark-from" style="@Pos(last.From)"></span>
                     <span class="xq-mark xq-mark-to" style="@Pos(last.To)"></span>
+                    @* A captured piece fades out where it stood, under the piece sliding in. *@
+                    @if (View.History.Count > 0 && View.History[^1].Captured is int captured and not 0)
+                    {
+                        <span class="xq-piece is-captured-ghost" style="@Pos(last.To)" aria-hidden="true" @key="@($"ghost-{View.Version}")">
+                            <XqPiece Piece="captured" Letters="Letters" />
+                        </span>
+                    }
                 }
                 @if (HintMove is XqMove hint)
                 {
@@ -74,18 +81,22 @@
                     int piece = View.Board[sq];
                     if (piece == 0) continue;
                     bool movable = View.MyTurn && View.MyMoves.ContainsKey(square);
-                    string css = $"xq-piece{(selected == square ? " is-selected" : "")}{(View.CheckSquare == square ? " is-check" : "")}{(movable ? " is-movable" : "")}";
+                    // The piece that just moved slides in from where it was; a new key per move restarts the animation.
+                    bool justMoved = View.LastMove is XqMove lm && lm.To == square;
+                    string css = $"xq-piece{(selected == square ? " is-selected" : "")}{(View.CheckSquare == square ? " is-check" : "")}{(movable ? " is-movable" : "")}{(justMoved ? " is-moved" : "")}";
+                    string style = justMoved ? Pos(square) + ";" + FromVars(View.LastMove!.Value.From) : Pos(square);
+                    object key = justMoved ? $"{square}-{View.Version}" : square;
                     string label = $"{X.SideName(Pieces.SideOf(piece))} {X.PieceName(piece)}, {XqText.SquareName(square)}";
                     if (movable)
                     {
-                        <button type="button" class="@css" style="@Pos(square)" aria-label="@label" aria-pressed="@(selected == square ? "true" : "false")"
-                                @onclick="() => Select(square)">
+                        <button type="button" class="@css" style="@style" aria-label="@label" aria-pressed="@(selected == square ? "true" : "false")"
+                                @onclick="() => Select(square)" @key="key">
                             <XqPiece Piece="piece" Letters="Letters" />
                         </button>
                     }
                     else
                     {
-                        <span class="@css" style="@Pos(square)" role="img" aria-label="@label"><XqPiece Piece="piece" Letters="Letters" /></span>
+                        <span class="@css" style="@style" role="img" aria-label="@label" @key="key"><XqPiece Piece="piece" Letters="Letters" /></span>
                     }
                 }
 
@@ -259,6 +270,13 @@
     {
         int r = Sq.Rank(sq), f = Sq.File(sq);
         return Flipped ? (8 - f, r) : (f, 9 - r);
+    }
+
+    /// <summary>Where the last move started, as CSS variables for the slide animation.</summary>
+    string FromVars(int sq)
+    {
+        var (x, y) = Display(sq);
+        return FormattableString.Invariant($"--from-left:{(6 + 10 * x) / 92.0 * 100:0.###}%;--from-top:{(6 + 10 * y) / 102.0 * 100:0.###}%");
     }
 
     string Pos(int sq)

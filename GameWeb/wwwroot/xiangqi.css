@@ -148,3 +148,31 @@ button.xq-piece:focus-visible { outline: 3px solid #f2c94c; outline-offset: 2px;
 .xq-draw-offer { background: rgba(242, 201, 76, .14); border: 1px solid rgba(242, 201, 76, .5); border-radius: 10px; padding: 10px 12px; }
 .xq-draw-offer p { margin: 0 0 8px; font-weight: 600; }
 .xq-draw-note { margin: 0; }
+
+/* ---------- The last move: slide in, glow on landing, then a lasting ring ---------- */
+.xq-mark-from { box-shadow: inset 0 0 0 2px rgba(242, 201, 76, .85); background: rgba(242, 201, 76, .22); }
+.xq-mark-to { width: 12%; box-shadow: 0 0 0 3px rgba(242, 201, 76, 1), 0 0 14px rgba(242, 201, 76, .8); }
+.xq-piece.is-moved {
+    z-index: 4;
+    animation: xq-slide .55s cubic-bezier(.25, .8, .25, 1) both, xq-land 1.4s ease-out .55s both;
+}
+@keyframes xq-slide {
+    from { left: var(--from-left); top: var(--from-top); transform: translate(-50%, -58%) scale(1.15);
+           filter: drop-shadow(0 10px 8px rgba(0, 0, 0, .35)); }
+    to { transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes xq-land {
+    0% { filter: drop-shadow(0 0 0 #f2c94c) drop-shadow(0 0 14px rgba(242, 201, 76, 1)) drop-shadow(0 2px 2px rgba(0, 0, 0, .3)); }
+    100% { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .3)); }
+}
+.xq-piece.is-moved.is-check { animation: xq-slide .55s cubic-bezier(.25, .8, .25, 1) both, xq-check 1s ease-in-out .55s infinite; }
+.xq-piece.is-captured-ghost { z-index: 3; pointer-events: none; animation: xq-captured .6s ease-in forwards; }
+@keyframes xq-captured {
+    0%, 55% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+    /* No sliding: the piece just glows where it landed. */
+    .xq-piece.is-moved { animation: xq-land 1.6s ease-out both; }
+    .xq-piece.is-captured-ghost { display: none; }
+}

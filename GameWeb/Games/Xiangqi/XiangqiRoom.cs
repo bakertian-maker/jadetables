@@ -67,7 +67,11 @@ public sealed class XqView
 /// <summary>A two-seat Xiangqi room: a player against a friend or the computer.</summary>
 public sealed class XiangqiRoom : Room
 {
-    static readonly TimeSpan BotMinimumDelay = TimeSpan.FromMilliseconds(500);
+    /// <summary>
+    /// The computer waits at least this long before moving, so the player sees their own move land (the
+    /// board slides each piece in over about half a second) before the reply arrives.
+    /// </summary>
+    static readonly TimeSpan BotMinimumDelay = TimeSpan.FromMilliseconds(1200);
     /// <summary>Half-moves a side must wait after offering a draw before offering again.</summary>
     public const int DrawOfferGap = 10;
 
