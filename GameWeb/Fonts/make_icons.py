@@ -4,7 +4,8 @@
 
 Writes to GameWeb/wwwroot:
   favicon.ico           16, 32 and 48 px (browsers and search engines ask for /favicon.ico)
-  apple-touch-icon.png  180 px, for "Add to Home Screen" on phones
+  apple-touch-icon.png  180 px, for "Add to Home Screen" on iPhone
+  icon-192.png          192 px, for Home Screen shortcuts on Android
   og-image.png          1200 x 630, the picture shown when a link is shared (WhatsApp, WeChat, Facebook…)
 Needs Pillow and fontTools (pip install pillow fonttools).
 """
@@ -60,6 +61,13 @@ def apple_touch_icon() -> None:
     img.save(os.path.join(WWW, 'apple-touch-icon.png'), optimize=True)
 
 
+def android_icon() -> None:
+    img = Image.new('RGB', (192, 192), JADE_700)
+    t = tile(160)
+    img.paste(t, (16, 16), t)
+    img.save(os.path.join(WWW, 'icon-192.png'), optimize=True)
+
+
 def og_image() -> None:
     W, H = 1200, 630
     img = Image.new('RGB', (W, H), JADE_900)
@@ -94,6 +102,7 @@ def _outfit(size: int, weight: int) -> ImageFont.FreeTypeFont:
 if __name__ == '__main__':
     favicon()
     apple_touch_icon()
+    android_icon()
     og_image()
-    for name in ('favicon.ico', 'apple-touch-icon.png', 'og-image.png'):
+    for name in ('favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'og-image.png'):
         print(name, os.path.getsize(os.path.join(WWW, name)) // 1024, 'KB')

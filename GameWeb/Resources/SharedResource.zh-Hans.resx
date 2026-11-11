@@ -29,7 +29,9 @@
   <data name="All four seats in room {0} are taken." xml:space="preserve"><value>房间 {0} 的四个座位都已有人。</value></data>
   <data name="All three seats in room {0} are taken." xml:space="preserve"><value>房间 {0} 的三个座位都已坐满。</value></data>
   <data name="Already have an account?" xml:space="preserve"><value>已经有账号？</value></data>
+  <data name="Android (Chrome):" xml:space="preserve"><value>Android（Chrome）：</value></data>
   <data name="Anti-spring: the landlord played only once" xml:space="preserve"><value>反春：地主只出过一手牌</value></data>
+  <data name="Apple's instructions" xml:space="preserve"><value>Apple 说明</value></data>
   <data name="At least 8 characters." xml:space="preserve"><value>至少 8 个字符。</value></data>
   <data name="Away" xml:space="preserve"><value>离开</value></data>
   <data name="Back to Dou Dizhu" xml:space="preserve"><value>返回斗地主</value></data>
@@ -152,6 +154,7 @@
   <data name="Get a link for up to two friends. Empty seats get computer players." xml:space="preserve"><value>生成链接邀请最多两位朋友，空位由电脑补上。</value></data>
   <data name="Get a rating" xml:space="preserve"><value>获得等级分</value></data>
   <data name="Go out" xml:space="preserve"><value>出完</value></data>
+  <data name="Google's instructions" xml:space="preserve"><value>Google 说明</value></data>
   <data name="Guest" xml:space="preserve"><value>游客</value></data>
   <data name="Guest plays Red" xml:space="preserve"><value>朋友执红</value></data>
   <data name="Hand {0} of {1}" xml:space="preserve"><value>第 {0} 局，共 {1} 局</value></data>
@@ -253,6 +256,7 @@
   <data name="On {0}'s discard" xml:space="preserve"><value>{0} 点炮</value></data>
   <data name="Open a private room, send the link to friends and play on any phone or laptop. Short a player? A computer player takes the empty seat." xml:space="preserve"><value>开一个私人房间，把链接发给朋友，用手机或电脑都能玩。人不够？空位由电脑玩家补上。</value></data>
   <data name="Open seat" xml:space="preserve"><value>空位</value></data>
+  <data name="Open the exact page you want to save, such as this one or your favourite game, then add it to your phone's Home Screen." xml:space="preserve"><value>先打开你想保存的页面，例如本页或你最喜欢的游戏，再把它添加到手机主屏幕。</value></data>
   <data name="Page not found" xml:space="preserve"><value>找不到页面</value></data>
   <data name="Page not found · Jade Tables" xml:space="preserve"><value>找不到页面 · 玉桌</value></data>
   <data name="Pair" xml:space="preserve"><value>对子</value></data>
@@ -276,6 +280,7 @@
   <data name="Play again" xml:space="preserve"><value>再来一场</value></data>
   <data name="Play again (swap sides)" xml:space="preserve"><value>再来一局（交换红黑）</value></data>
   <data name="Play cards" xml:space="preserve"><value>出牌</value></data>
+  <data name="Play in one tap: add Jade Tables to your Home Screen" xml:space="preserve"><value>一键开玩：把玉桌添加到手机主屏幕</value></data>
   <data name="Play now" xml:space="preserve"><value>立即开始</value></data>
   <data name="Play the computer" xml:space="preserve"><value>和电脑对局</value></data>
   <data name="Played" xml:space="preserve"><value>已完成</value></data>
@@ -355,10 +360,12 @@
   <data name="Still out" xml:space="preserve"><value>记牌</value></data>
   <data name="Straight" xml:space="preserve"><value>顺子</value></data>
   <data name="Table centre" xml:space="preserve"><value>牌桌中央</value></data>
+  <data name="Tap Share (it may be under ⋯) → Add to Home Screen → Add. If you see Open as Web App, leave it off for a regular browser shortcut." xml:space="preserve"><value>点“分享”（可能在“⋯”里）→“添加到主屏幕”→“添加”。如果看到“作为网页 App 打开”，请保持关闭，这样就是普通的浏览器快捷方式。</value></data>
   <data name="Tap a dot to move there." xml:space="preserve"><value>点小圆点走到那里。</value></data>
   <data name="Tap a piece, then tap where it should go." xml:space="preserve"><value>点一个棋子，再点要走到的位置。</value></data>
   <data name="Tap a tile to pick it, tap it again to discard." xml:space="preserve"><value>点一张牌选中，再点一次打出。</value></data>
   <data name="Tap again, or press Discard." xml:space="preserve"><value>再点一次，或按“打出”。</value></data>
+  <data name="Tap ⋮ → Install and create shortcut → Create shortcut → Add. Some versions call the menu option Add to Home screen." xml:space="preserve"><value>点“⋮”→“安装并创建快捷方式”→“创建快捷方式”→“添加”。有些版本的选项叫“添加到主屏幕”。</value></data>
   <data name="Thanks, your email address is confirmed." xml:space="preserve"><value>谢谢，你的邮箱已确认。</value></data>
   <data name="That Google account is already linked to another Jade Tables account." xml:space="preserve"><value>这个 Google 账号已经关联了另一个玉桌账号。</value></data>
   <data name="That password isn't right." xml:space="preserve"><value>密码不正确。</value></data>
@@ -424,6 +431,7 @@
   <data name="You" xml:space="preserve"><value>你</value></data>
   <data name="You and three computer players, East round. Starts straight away." xml:space="preserve"><value>你和三位电脑玩家，打东风圈，立即开始。</value></data>
   <data name="You and two computer players, six hands. Starts straight away. No timer." xml:space="preserve"><value>你和两个电脑玩家，共六局。马上开始，不限时。</value></data>
+  <data name="You can rename the shortcut before tapping Add." xml:space="preserve"><value>添加之前，可以先修改快捷方式的名称。</value></data>
   <data name="You finished first. 恭喜!" xml:space="preserve"><value>你得了第一名，恭喜！</value></data>
   <data name="You lose" xml:space="preserve"><value>你输了</value></data>
   <data name="You lost this hand." xml:space="preserve"><value>这一局你输了。</value></data>
@@ -451,6 +459,7 @@
   <data name="by playing with an account, and see the best players on" xml:space="preserve"><value>：登录账号下棋即可获得，最强玩家都在</value></data>
   <data name="checkmate" xml:space="preserve"><value>将死</value></data>
   <data name="first to win for your side. Bombs and springs double the points." xml:space="preserve"><value>先出完的一方获胜。炸弹和春天会让分数翻倍。</value></data>
+  <data name="iPhone (Safari):" xml:space="preserve"><value>iPhone（Safari）：</value></data>
   <data name="no attackers left" xml:space="preserve"><value>双方无进攻子力</value></data>
   <data name="no legal moves" xml:space="preserve"><value>无子可走</value></data>
   <data name="no turn timer" xml:space="preserve"><value>出牌不限时</value></data>

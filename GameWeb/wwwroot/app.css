@@ -187,6 +187,25 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
 .feature h3 { color: var(--jade-500); }
 .feature p { color: var(--ink-2); }
 
+/* "Add to Home Screen" tip on the home page */
+.home-screen-wrap { padding-top: 0; padding-bottom: 16px; }
+.home-screen-tip {
+    display: flex; gap: 18px; align-items: flex-start;
+    padding: 20px 22px; border-radius: 16px;
+    background: color-mix(in srgb, var(--jade-500) 7%, transparent);
+    border: 1px solid color-mix(in srgb, var(--jade-500) 22%, transparent);
+}
+.home-screen-tip img { flex: none; border-radius: 12px; }
+.home-screen-tip h2 { font-size: 1.15rem; margin: 0 0 6px; }
+.home-screen-tip p { margin: 0 0 8px; color: var(--ink-2); }
+.home-screen-tip ul { margin: 0 0 8px; padding-left: 18px; display: grid; gap: 6px; color: var(--ink-2); }
+.home-screen-tip strong { color: var(--ink); }
+.home-screen-tip .mj-muted { margin: 0; font-size: .9rem; }
+@media (max-width: 560px) {
+    .home-screen-tip { flex-direction: column; gap: 10px; padding: 16px; }
+    .home-screen-tip img { width: 44px; height: 44px; }
+}
+
 /* Lobby */
 .lobby-hero { background: var(--jade-800); color: #f3ead4; }
 .lobby-hero-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 44px; padding-bottom: 44px; }

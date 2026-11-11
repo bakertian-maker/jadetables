@@ -57,6 +57,29 @@
     </div>
 </section>
 
+<section class="wrap page-pad home-screen-wrap">
+    <div class="home-screen-tip" id="home-screen">
+        <img src="icon-192.png" alt="" width="56" height="56" />
+        <div>
+            <h2>@L["Play in one tap: add Jade Tables to your Home Screen"]</h2>
+            <p>@L["Open the exact page you want to save, such as this one or your favourite game, then add it to your phone's Home Screen."]</p>
+            <ul>
+                <li>
+                    <strong>@L["iPhone (Safari):"]</strong>
+                    @L["Tap Share (it may be under ⋯) → Add to Home Screen → Add. If you see Open as Web App, leave it off for a regular browser shortcut."]
+                    <a href="@AppleHelp" target="_blank" rel="noopener">@L["Apple's instructions"]</a>
+                </li>
+                <li>
+                    <strong>@L["Android (Chrome):"]</strong>
+                    @L["Tap ⋮ → Install and create shortcut → Create shortcut → Add. Some versions call the menu option Add to Home screen."]
+                    <a href="@GoogleHelp" target="_blank" rel="noopener">@L["Google's instructions"]</a>
+                </li>
+            </ul>
+            <p class="mj-muted">@L["You can rename the shortcut before tapping Add."]</p>
+        </div>
+    </div>
+</section>
+
 <section class="wrap page-pad features">
     <div class="feature">
         <h3>@L["Private rooms"]</h3>
@@ -71,3 +94,20 @@
         <p>@L["Tile numbers in the corner, a hint button and plain-English rules with the Chinese names alongside."]</p>
     </div>
 </section>
+
+@code {
+    // Each help page in the visitor's language.
+    static string AppleHelp => Languages.Current switch
+    {
+        Script.Simplified => "https://support.apple.com/zh-cn/guide/iphone/iph42ab2f3a7/ios",
+        Script.Traditional => "https://support.apple.com/zh-hk/guide/iphone/iph42ab2f3a7/ios",
+        _ => "https://support.apple.com/en-asia/guide/iphone/iph42ab2f3a7/ios",
+    };
+
+    static string GoogleHelp => "https://support.google.com/chrome/answer/15085120?co=GENIE.Platform%3DAndroid&hl=" + Languages.Current switch
+    {
+        Script.Simplified => "zh-Hans",
+        Script.Traditional => "zh-Hant",
+        _ => "en-GB",
+    };
+}

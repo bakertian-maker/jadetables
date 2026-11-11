@@ -557,4 +557,24 @@ ZH_HANT = {
     "Cards still out": "還沒出的牌",
     "Still out": "記牌",
     "{0}: {1} still out": "{0}：還有 {1} 張沒出",
+
+    # Home: Add to Home Screen
+    "Play in one tap: add Jade Tables to your Home Screen":
+        "一按即玩：把玉桌加到手機主畫面",
+    "Open the exact page you want to save, such as this one or your favourite game, then add it to your phone's Home Screen.":
+        "先打開你想儲存的頁面，例如本頁或你最喜歡的遊戲，再把它加到手機的主畫面。",
+    "iPhone (Safari):":
+        "iPhone（Safari）：",
+    "Tap Share (it may be under ⋯) → Add to Home Screen → Add. If you see Open as Web App, leave it off for a regular browser shortcut.":
+        "點「分享」（可能在「⋯」裏面）→「加至主畫面」→「加入」。如果見到「以網頁 App 形式打開」，請保持關閉，這樣就是普通的瀏覽器捷徑。",
+    "Android (Chrome):":
+        "Android（Chrome）：",
+    "Tap ⋮ → Install and create shortcut → Create shortcut → Add. Some versions call the menu option Add to Home screen.":
+        "點「⋮」→「安裝並建立捷徑」→「建立捷徑」→「新增」。部分版本的選項叫「加到主畫面」。",
+    "Apple's instructions":
+        "Apple 說明",
+    "Google's instructions":
+        "Google 說明",
+    "You can rename the shortcut before tapping Add.":
+        "加入之前，可以先改捷徑的名稱。",
 }
