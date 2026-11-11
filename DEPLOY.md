@@ -36,16 +36,58 @@ The steps below are for a Windows server running IIS, with SQL Server Express on
 
 ## Each release
 
-On your development PC:
+The scripts in `Deploy/` do the work. Copy `install-release.ps1` and `backup-database.ps1` to `C:\Deploy` on the server once (and again if they change).
+
+**1. On your PC:** build the release.
 
 ```
-dotnet test
-dotnet publish GameWeb -p:PublishProfile=IIS
+powershell -ExecutionPolicy Bypass -File Deployuild-release.ps1
 ```
 
-This writes the site to `GameWeb\bin\publish\iis\`. Copy that folder's contents to the server's site folder (for example `C:\inetpub\jadetables`).
+It runs the tests (and stops if any fail), publishes for IIS and writes `Deploy\out\jadetables-<date>-<commit>.zip`. It warns if you have uncommitted changes. Add `-CopyTo \your-server\deploy` to copy the zip to a shared folder.
 
-To replace files that are in use, put a file named `app_offline.htm` into the site folder first. IIS then stops the app and shows that page. Copy the new files, then delete `app_offline.htm`.
+**2. Copy the zip to the server**, for example into `C:\Deploy` through Remote Desktop.
+
+**3. On the server**, in an administrator PowerShell:
+
+```
+powershell -ExecutionPolicy Bypass -File C:\Deploy\install-release.ps1
+```
+
+It installs the newest zip in `C:\Deploy` (or the one given with `-Zip`):
+- Keeps a copy of the current version in `C:\Websites\_releases` (the last 5 are kept).
+- Shows a short "back in a moment" page while it copies the files.
+- Checks that https://www.jadetables.com/ answers afterwards.
+
+If the defaults don't match your server, pass `-Site <site folder>` or `-Url <address>`.
+
+Games in progress end when the site restarts, because rooms are kept in memory. Install when it's quiet.
+
+**If something is wrong**, put the previous version back:
+
+```
+powershell -ExecutionPolicy Bypass -File C:\Deploy\install-release.ps1 -Rollback
+```
+
+Files that a new release no longer uses are left in place, which is harmless. Releases with database changes also need the SQL script from `Database/` (or `Database:MigrateOnStartup`) before or along with the install.
+
+## Nightly database backups
+
+Set up once, on the server in an administrator PowerShell:
+
+```
+powershell -ExecutionPolicy Bypass -File C:\Deployackup-database.ps1 -Install
+```
+
+This does three things:
+- Gives the Windows SYSTEM account permission to back up the `Games` database.
+- Creates the scheduled task **Jade Tables database backup**, which runs every night at 03:30.
+- Makes a first backup straight away, so you can see that it works.
+
+Backups go to `C:\Backups\JadeTables` as `Games-<date>.bak`. SQL Server checks every page as it writes them, and anything older than 14 days is deleted. Change these with `-Destination`, `-KeepDays` and `-At`. To back up by hand at any time, run the script without `-Install`.
+
+- **Copy backups off the server too**, for example to your PC or cloud storage, every week or so. A backup on the same disk doesn't help if the server itself is lost.
+- **To restore**, use SQL Server Management Studio: right-click **Databases** → **Restore Database…** → **Device**, and pick the `.bak` file.
 
 ## Checks after deploying
 

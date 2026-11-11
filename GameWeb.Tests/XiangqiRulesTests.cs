@@ -234,6 +234,7 @@ public class XiangqiBotTests
     [Theory]
     [InlineData(XqLevel.Medium, XqLevel.Beginner)]
     [InlineData(XqLevel.Difficult, XqLevel.Medium)]
+    [Trait("Category", "Strength")]   // timed and statistical: skipped by Deploy/build-release.ps1
     public void StrongerLevel_WinsMoreGames(XqLevel stronger, XqLevel weaker)
     {
         int strongWins = 0, weakWins = 0, draws = 0;

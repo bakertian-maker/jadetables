@@ -36,3 +36,6 @@ GameWeb/wwwroot/js/
 
 # Side-by-side preview builds
 .preview-build/
+
+# Release zips made by Deploy/build-release.ps1
+Deploy/out/
