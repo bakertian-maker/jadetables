@@ -457,3 +457,18 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
     .brand-name { display: none; }
     .nav-menu-label { display: none; }
 }
+
+/* Phones: the header controls (Menu, Log in / name, language) line up as pills of one height. */
+.site-nav { align-items: center; }
+@media (max-width: 560px) {
+    .site-nav .nav-menu summary,
+    .site-nav a.nav-account,
+    .site-nav .lang-menu summary {
+        box-sizing: border-box; height: 36px; display: inline-flex; align-items: center;
+        padding: 0 12px; line-height: 1; font-size: .9rem; border: 1px solid rgba(243,234,212,.3); border-radius: 999px;
+    }
+    .nav-menu, .lang-menu { display: flex; }
+}
+@media (max-width: 420px) {
+    .site-nav .nav-menu summary, .site-nav a.nav-account, .site-nav .lang-menu summary { padding: 0 10px; }
+}
