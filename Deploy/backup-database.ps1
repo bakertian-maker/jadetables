@@ -62,14 +62,26 @@ function Find-Sqlcmd {
 }
 
 # Runs a query and returns its output lines; stops on any SQL error.
+# The query goes to sqlcmd as a file (-i): older versions of sqlcmd misread a multi-line query passed on
+# the command line ("Unknown Option").
 function Invoke-Sql([string]$query, [string]$db = 'master') {
-    $auth = if ($SqlUser) { @('-U', $SqlUser) } else { @('-E') }
-    $output = & $script:sqlcmd -S $Server -d $db @auth -C -b -h -1 -W -Q "SET NOCOUNT ON; $query" 2>&1
-    if ($LASTEXITCODE -ne 0) { throw "sqlcmd failed: $($output -join ' ')" }
-    return $output
+    # @(...) keeps this a list: a one-item list from an if would turn into plain text, which sqlcmd misreads.
+    $auth = @(if ($SqlUser) { '-U'; $SqlUser } else { '-E' })
+    $file = Join-Path $env:TEMP ("jadetables-" + [guid]::NewGuid().ToString('N') + '.sql')
+    [IO.File]::WriteAllText($file, "SET NOCOUNT ON;`r`n$query`r`n", (New-Object Text.UTF8Encoding $false))
+    try {
+        $output = & $script:sqlcmd -S $Server -d $db @auth @script:trust -b -h -1 -W -f 65001 -i $file 2>&1
+        if ($LASTEXITCODE -ne 0) { throw "sqlcmd failed: $($output -join ' ')" }
+        return $output
+    }
+    finally { Remove-Item $file -Force -ErrorAction SilentlyContinue }
 }
 
 $script:sqlcmd = Find-Sqlcmd
+# Newer sqlcmd encrypts connections and needs -C to accept the server's own certificate; older versions
+# don't encrypt by default and may not know -C at all.
+$help = (& $script:sqlcmd '-?' 2>&1) -join "`n"
+$script:trust = @(if ($help -match '-C\b') { '-C' })
 
 if ($Install) {
     Write-Host "Giving the SYSTEM account permission to back up [$Database]..."
