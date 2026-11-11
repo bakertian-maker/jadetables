@@ -44,6 +44,29 @@ public static class LanguagePaths
         return false;
     }
 
+    /// <summary>
+    /// The language to show a visitor arriving at an English (unprefixed) address: the one they chose before
+    /// (the language cookie), otherwise their browser's language. Search engines and link-preview bots
+    /// always get the address they asked for, so every language version is indexed and previewed as itself.
+    /// Visitors arriving at a /zh-cn or /zh-hk address are never redirected: that link was chosen on purpose.
+    /// </summary>
+    public static string PreferredLanguage(string? savedChoice, string? acceptLanguage, string? userAgent)
+    {
+        if (savedChoice is not null && Languages.Supported.Contains(savedChoice)) return savedChoice;
+        if (IsBot(userAgent)) return Languages.English;
+        return FromAcceptLanguage(acceptLanguage);
+    }
+
+    /// <summary>Crawlers and link-preview fetchers (Google, Bing, WhatsApp, WeChat, Facebook, X, Telegram…).</summary>
+    public static bool IsBot(string? userAgent)
+    {
+        if (string.IsNullOrWhiteSpace(userAgent)) return true;   // real browsers always send one
+        var ua = userAgent.ToLowerInvariant();
+        string[] marks = ["bot", "crawl", "spider", "slurp", "facebookexternalhit", "facebot", "whatsapp", "telegram",
+            "embedly", "preview", "lighthouse", "google-inspectiontool", "headless", "curl/", "wget/", "python-", "go-http"];
+        return marks.Any(ua.Contains);
+    }
+
     /// <summary>Picks the language for a visitor with no saved choice, from the browser's Accept-Language.</summary>
     public static string FromAcceptLanguage(string? header)
     {
@@ -101,9 +124,9 @@ public static class LanguagePaths
                 }
                 var saved = CookieRequestCultureProvider.ParseCookieValue(
                     request.Cookies[CookieRequestCultureProvider.DefaultCookieName] ?? "")?.UICultures.FirstOrDefault().Value;
-                var wanted = saved is not null ? saved
-                    : request.Path == "/" ? FromAcceptLanguage(request.Headers.AcceptLanguage)
-                    : Languages.English;
+                var wanted = PreferredLanguage(saved, request.Headers.AcceptLanguage, request.Headers.UserAgent);
+                // The English address can send this visitor elsewhere, so caches must keep these apart.
+                http.Response.Headers.Vary = "Accept-Language, Cookie";
                 if (wanted != Languages.English && PrefixFor(wanted) is { Length: > 0 } p)
                 {
                     http.Response.Redirect(p + request.Path + request.QueryString);
