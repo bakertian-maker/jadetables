@@ -467,4 +467,5 @@ ZH_HANS = {
     "Room {0}: play Hong Kong mahjong with me in your browser. Free, no download or account needed.": "房间 {0}：在浏览器里和我一起打港式麻将。免费，免下载，无需注册。",
     "Room {0}: play Xiangqi (Chinese chess) with me in your browser. Free, no download or account needed.": "房间 {0}：在浏览器里和我下象棋。免费，免下载，无需注册。",
     "Xiangqi Rules: How to Play Chinese Chess | Jade Tables": "象棋规则：中国象棋怎么下 | 玉桌",
+    "Menu": "菜单",
 }

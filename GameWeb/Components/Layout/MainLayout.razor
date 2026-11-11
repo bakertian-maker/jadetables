@@ -15,8 +15,23 @@
                 <NavLink href="./" Match="NavLinkMatch.All" class="nav-home">@L["Home"]</NavLink>
                 @foreach (var g in Catalog.Playable)
                 {
-                    <NavLink href="@g.Url" Match="NavLinkMatch.Prefix">@L[g.NavName]</NavLink>
+                    <NavLink href="@g.Url" Match="NavLinkMatch.Prefix" class="nav-game">@L[g.NavName]</NavLink>
                 }
+                @* Phones: the pages go in one drop-down, so the header keeps fitting as games are added. *@
+                <details class="nav-menu">
+                    <summary aria-label="@L["Menu"]">
+                        <span class="nav-menu-icon" aria-hidden="true">☰</span>
+                        <span class="nav-menu-label">@L["Menu"]</span>
+                    </summary>
+                    <div class="nav-menu-list">
+                        <NavLink href="./" Match="NavLinkMatch.All" class="nav-menu-item">@L["Home"]</NavLink>
+                        @foreach (var g in Catalog.Playable)
+                        {
+                            <NavLink href="@g.Url" Match="NavLinkMatch.Prefix" class="nav-menu-item">@L[g.NavName]</NavLink>
+                        }
+                        <NavLink href="leaderboard" Match="NavLinkMatch.All" class="nav-menu-item">@L["Leaderboard"]</NavLink>
+                    </div>
+                </details>
                 @if (Accounts.Enabled)
                 {
                     if (HttpContext?.User.Identity?.IsAuthenticated == true)

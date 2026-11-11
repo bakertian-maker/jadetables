@@ -428,3 +428,32 @@ input:focus, select:focus { outline: 3px solid color-mix(in srgb, var(--focus) 6
     .consent p { font-size: .82rem; line-height: 1.4; }
     .consent-actions .consent-btn { min-width: 0; flex: 1; padding: 8px 10px; }
 }
+
+/* Phones: Home and the games collapse into one "Menu" drop-down. */
+.nav-menu { display: none; position: relative; }
+.nav-menu summary {
+    list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border: 1px solid rgba(243,234,212,.3); border-radius: 999px;
+    color: #f3ead4; font-weight: 600; font-size: .9rem; line-height: 1;
+}
+.nav-menu summary::-webkit-details-marker { display: none; }
+.nav-menu[open] summary { background: rgba(255,255,255,.1); }
+.nav-menu-icon { font-size: 1rem; }
+.nav-menu-list {
+    position: absolute; left: 0; top: calc(100% + 6px); z-index: 30; min-width: 170px;
+    background: var(--jade-900); border: 1px solid rgba(243,234,212,.2); border-radius: 12px;
+    padding: 6px; display: grid; gap: 2px; box-shadow: 0 10px 24px rgba(0,0,0,.3);
+}
+.site-nav .nav-menu-item { display: block; padding: 10px 12px; border-radius: 8px; color: #d9d0b9; text-decoration: none; font-size: .95rem; }
+.site-nav a.nav-menu-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+.site-nav a.nav-menu-item.active { background: #f3ead4; color: var(--jade-900); font-weight: 600; }
+@media (max-width: 560px) {
+    .site-nav a.nav-game { display: none; }
+    .nav-menu { display: block; }
+    /* There is room for the site name again now that the links have moved into the menu. */
+    .brand-name { display: inline; white-space: nowrap; font-size: 1rem; }
+}
+@media (max-width: 360px) {
+    .brand-name { display: none; }
+    .nav-menu-label { display: none; }
+}

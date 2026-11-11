@@ -182,6 +182,7 @@
   <data name="May we use analytics cookies (Google Tag Manager) to see how the site is used? Nothing is sent to Google unless you accept." xml:space="preserve"><value>可以使用分析 cookie（Google Tag Manager）了解网站的使用情况吗？除非你接受，否则不会向 Google 发送任何数据。</value></data>
   <data name="Me" xml:space="preserve"><value>我</value></data>
   <data name="Medium" xml:space="preserve"><value>中等</value></data>
+  <data name="Menu" xml:space="preserve"><value>菜单</value></data>
   <data name="Min {0} faan" xml:space="preserve"><value>{0} 番起和</value></data>
   <data name="Minimum faan" xml:space="preserve"><value>起和番数</value></data>
   <data name="Move" xml:space="preserve"><value>走棋</value></data>

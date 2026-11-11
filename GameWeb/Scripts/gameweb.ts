@@ -203,6 +203,27 @@ window.gameweb = {
     },
 };
 
+// ---- Header drop-downs (page menu and language on phones) ----------------------------
+// They are plain <details> elements, so they work before the page is live; this closes an open one
+// when the player taps elsewhere, picks an item, or presses Escape.
+
+function closeMenus(except?: Element | null): void {
+    document.querySelectorAll<HTMLDetailsElement>("details.nav-menu[open], details.lang-menu[open]").forEach((d) => {
+        if (d !== except) d.open = false;
+    });
+}
+
+document.addEventListener("click", (e) => {
+    const target = e.target as Element | null;
+    const menu = target?.closest("details.nav-menu, details.lang-menu") ?? null;
+    if (menu && target?.closest("a")) closeMenus();   // an item was chosen
+    else closeMenus(menu);                           // tapped elsewhere (or opened another menu)
+});
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenus();
+});
+
 // ---- Accounts ----------------------------------------------------------------------
 // Sign-in and register forms carry this browser's player id (input[data-player-id]), so the games
 // already played here are added to the account. Logging out (or deleting the account) gives the
