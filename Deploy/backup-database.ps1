@@ -84,6 +84,12 @@ $help = (& $script:sqlcmd '-?' 2>&1) -join "`n"
 $script:trust = @(if ($help -match '-C\b') { '-C' })
 
 if ($Install) {
+    # Creating a task that runs as SYSTEM needs an administrator PowerShell.
+    $principal = New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())
+    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        throw 'Setting up the nightly backup needs an administrator PowerShell: right-click PowerShell, choose "Run as administrator", and run this again.'
+    }
+
     Write-Host "Giving the SYSTEM account permission to back up [$Database]..."
     # Runs as you (the administrator who installed SQL Server is normally a SQL sysadmin).
     $grant = @"
