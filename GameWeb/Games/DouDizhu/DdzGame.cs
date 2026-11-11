@@ -79,6 +79,8 @@ public sealed class DdzGame
     public int LastSeat { get; private set; } = -1;
     /// <summary>What each seat did in the current trick, for display.</summary>
     public TrickAction?[] Trick { get; } = new TrickAction?[Players];
+    /// <summary>Every card played so far this hand (for the card counter).</summary>
+    public List<int> Played { get; } = [];
     /// <summary>Bombs and rockets played this hand.</summary>
     public int Bombs { get; private set; }
     public int[] Scores { get; } = new int[Players];
@@ -111,6 +113,7 @@ public sealed class DdzGame
         Array.Clear(Ready);
         LastCombo = null;
         LastSeat = -1;
+        Played.Clear();
         Bombs = 0;
         _landlordPlays = _farmerPlays = _passesInRow = 0;
         CurrentSeat = _firstBidder;
@@ -186,6 +189,7 @@ public sealed class DdzGame
     {
         if (CheckPlay(seat, cards) is not { } combo) return false;
         foreach (var c in cards) Hands[seat].Remove(c);
+        Played.AddRange(cards);
         if (combo.IsBomb) Bombs++;
         if (seat == Landlord) _landlordPlays++; else _farmerPlays++;
         if (LastCombo is null) Array.Clear(Trick);   // a new trick: clear the previous one from view

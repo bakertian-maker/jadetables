@@ -54,6 +54,7 @@
   <data name="Cannon" xml:space="preserve"><value>炮</value></data>
   <data name="Capture" xml:space="preserve"><value>食子</value></data>
   <data name="Captured pieces" xml:space="preserve"><value>食掉的棋子</value></data>
+  <data name="Cards still out" xml:space="preserve"><value>還沒出的牌</value></data>
   <data name="Change it in My games" xml:space="preserve"><value>在「我的對局」修改</value></data>
   <data name="Change password" xml:space="preserve"><value>更改密碼</value></data>
   <data name="Characters" xml:space="preserve"><value>漢字</value></data>
@@ -351,6 +352,7 @@
   <data name="Start game" xml:space="preserve"><value>開始遊戲</value></data>
   <data name="Start your own room" xml:space="preserve"><value>自己開一個房間</value></data>
   <data name="Starting position" xml:space="preserve"><value>開局局面</value></data>
+  <data name="Still out" xml:space="preserve"><value>記牌</value></data>
   <data name="Straight" xml:space="preserve"><value>順子</value></data>
   <data name="Table centre" xml:space="preserve"><value>牌桌中央</value></data>
   <data name="Tap a dot to move there." xml:space="preserve"><value>點小圓點走到那裡。</value></data>
@@ -443,12 +445,12 @@
   <data name="agreed" xml:space="preserve"><value>協議和棋</value></data>
   <data name="another player's discard to make a pung (three alike), kong (four alike) or, from the player before you, a chow (a run of three)." xml:space="preserve"><value>：要別人打出的牌組成碰（三張相同）、槓（四張相同），或上上家的牌組成順子（三張相連）。</value></data>
   <data name="any play: a single, a pair, a straight, three with one, an airplane…" xml:space="preserve"><value>任何牌型：單張、對子、順子、三帶一、飛機……</value></data>
+  <data name="ask for a new link" xml:space="preserve"><value>重新傳送</value></data>
   <data name="by checkmate, or when your opponent has no legal move." xml:space="preserve"><value>：將死對方，或者對方無子可走。</value></data>
   <data name="by moving onto an enemy piece. Cannons must jump exactly one piece to capture." xml:space="preserve"><value>：走到對方棋子的位置把它吃掉。炮必須隔一隻棋子才能食子。</value></data>
-  <data name="by playing with an account, and see the best players on the" xml:space="preserve"><value>：登入帳戶下棋即可獲得，最強玩家都在</value></data>
+  <data name="by playing with an account, and see the best players on" xml:space="preserve"><value>：登入帳戶下棋即可獲得，最強玩家都在</value></data>
   <data name="checkmate" xml:space="preserve"><value>將死</value></data>
   <data name="first to win for your side. Bombs and springs double the points." xml:space="preserve"><value>先出完的一方獲勝。炸彈和春天會令分數加倍。</value></data>
-  <data name="leaderboard" xml:space="preserve"><value>排行榜</value></data>
   <data name="no attackers left" xml:space="preserve"><value>雙方無進攻子力</value></data>
   <data name="no legal moves" xml:space="preserve"><value>無子可走</value></data>
   <data name="no turn timer" xml:space="preserve"><value>出牌不限時</value></data>
@@ -460,7 +462,7 @@
   <data name="privacy page" xml:space="preserve"><value>私隱頁面</value></data>
   <data name="repetition" xml:space="preserve"><value>重複局面</value></data>
   <data name="resignation" xml:space="preserve"><value>認輸</value></data>
-  <data name="send it again" xml:space="preserve"><value>重新傳送</value></data>
+  <data name="the leaderboard" xml:space="preserve"><value>排行榜</value></data>
   <data name="time" xml:space="preserve"><value>超時</value></data>
   <data name="to get a rating." xml:space="preserve"><value>，獲得你的等級分。</value></data>
   <data name="with a higher play of the same kind, or pass. A bomb beats anything; the rocket (both jokers) beats bombs." xml:space="preserve"><value>用同樣牌型、更大的牌壓過，或者不出。炸彈壓任何牌型，王炸（大小王）壓炸彈。</value></data>
@@ -511,6 +513,7 @@
   <data name="{0} won" xml:space="preserve"><value>{0}勝</value></data>
   <data name="{0}'s discards" xml:space="preserve"><value>{0} 的棄牌</value></data>
   <data name="{0}: {1}" xml:space="preserve"><value>{0}：{1}</value></data>
+  <data name="{0}: {1} still out" xml:space="preserve"><value>{0}：還有 {1} 張沒出</value></data>
   <data name="{0}s per move" xml:space="preserve"><value>每步 {0} 秒</value></data>
   <data name="{0}s per turn" xml:space="preserve"><value>每手 {0} 秒</value></data>
   <data name="廣東麻雀 · Hong Kong rules" xml:space="preserve"><value>廣東麻雀 · 港式規則</value></data>

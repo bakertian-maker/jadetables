@@ -33,3 +33,6 @@ GameWeb/wwwroot/js/
 
 # Database backups
 *.bak
+
+# Side-by-side preview builds
+.preview-build/

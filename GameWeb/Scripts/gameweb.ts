@@ -224,6 +224,52 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeMenus();
 });
 
+// ---- Swipe to select cards (Dou Dizhu) ------------------------------------------------
+// In a container marked data-swipe-select, sliding a finger or the mouse across the cards toggles each
+// card it passes over, as if each were tapped: quick for straights and airplanes. A plain tap still
+// works as before. Works by clicking the card buttons, so the game logic stays in one place.
+
+let swipe: { container: Element; start: HTMLElement; visited: Set<Element>; moved: boolean; pointerId: number } | null = null;
+
+function cardAt(x: number, y: number, container: Element): HTMLElement | null {
+    const el = document.elementFromPoint(x, y)?.closest<HTMLElement>("button.ddz-card");
+    return el && container.contains(el) ? el : null;
+}
+
+document.addEventListener("pointerdown", (e) => {
+    const target = e.target as Element | null;
+    const container = target?.closest("[data-swipe-select]");
+    const card = target?.closest<HTMLElement>("button.ddz-card");
+    if (!container || !card || (e.pointerType === "mouse" && e.button !== 0)) return;
+    swipe = { container, start: card, visited: new Set([card]), moved: false, pointerId: e.pointerId };
+});
+
+document.addEventListener("pointermove", (e) => {
+    if (!swipe || e.pointerId !== swipe.pointerId) return;
+    const card = cardAt(e.clientX, e.clientY, swipe.container);
+    if (!card || swipe.visited.has(card)) return;
+    if (!swipe.moved) {
+        // First move onto another card: this is a swipe. Toggle the card it started on too.
+        swipe.moved = true;
+        swipe.start.click();
+    }
+    swipe.visited.add(card);
+    card.click();
+});
+
+function endSwipe(e: PointerEvent): void {
+    if (!swipe || e.pointerId !== swipe.pointerId) return;
+    if (swipe.moved) {
+        // The browser may still send a click to the card under the finger: it was already toggled.
+        const swallow = (ev: Event) => { ev.stopPropagation(); ev.preventDefault(); };
+        window.addEventListener("click", swallow, { capture: true, once: true });
+        setTimeout(() => window.removeEventListener("click", swallow, { capture: true }), 350);
+    }
+    swipe = null;
+}
+document.addEventListener("pointerup", endSwipe);
+document.addEventListener("pointercancel", endSwipe);
+
 // ---- Accounts ----------------------------------------------------------------------
 // Sign-in and register forms carry this browser's player id (input[data-player-id]), so the games
 // already played here are added to the account. Logging out (or deleting the account) gives the

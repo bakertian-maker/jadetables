@@ -41,6 +41,8 @@ public sealed class DdzView
     public DdzCombo? LastCombo { get; init; }
     public int LastSeat { get; init; } = -1;
     public IReadOnlyList<int> AllowedBids { get; init; } = [];
+    /// <summary>Every card played so far this hand: public knowledge, used by the card counter.</summary>
+    public IReadOnlyList<int> Played { get; init; } = [];
     public DdzResult? Result { get; init; }
     public IReadOnlyList<DdzLogEntry> Log { get; init; } = [];
     public int PhaseVersion { get; init; }
@@ -248,6 +250,7 @@ public sealed class DdzRoom : Room
                 LastCombo = g.Phase == DdzPhase.Playing ? g.LastCombo : null,
                 LastSeat = g.LastSeat,
                 AllowedBids = me >= 0 ? g.AllowedBids(me).ToList() : [],
+                Played = g.Played.ToList(),
                 Result = g.LastResult,
                 Log = g.Log.TakeLast(10).ToList(),
                 PhaseVersion = g.PhaseVersion,

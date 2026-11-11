@@ -258,3 +258,28 @@ public class DouDizhuRoomTests
         Assert.Empty(watcher.AllowedBids);
     }
 }
+
+public class DouDizhuCounterTests
+{
+    [Fact]
+    public void PlayedCards_AreTracked_AndClearedOnTheNextDeal()
+    {
+        var g = new DdzGame(new DdzSettings { Hands = 2 }, new Random(31));
+        g.StartMatch();
+        g.Apply(g.CurrentSeat, new DdzAction(DdzActionType.Bid, 3));
+        int landlord = g.Landlord;
+        var low = g.Hands[landlord].OrderBy(Cards.Rank).First();
+        g.Apply(landlord, new DdzAction(DdzActionType.Play, Cards: [low]));
+        Assert.Equal([low], g.Played);
+
+        // Finish the hand quickly: the landlord's remaining cards as one rigged play.
+        g.Hands[landlord].Clear();
+        g.Hands[landlord].Add(Cards.BigJoker == low ? Cards.SmallJoker : Cards.BigJoker);
+        g.Apply((landlord + 1) % 3, new DdzAction(DdzActionType.Pass));
+        g.Apply((landlord + 2) % 3, new DdzAction(DdzActionType.Pass));
+        g.Apply(landlord, new DdzAction(DdzActionType.Play, Cards: g.Hands[landlord].ToList()));
+        Assert.Equal(DdzPhase.HandOver, g.Phase);
+        for (int s = 0; s < 3; s++) g.Apply(s, new DdzAction(DdzActionType.Ready));
+        Assert.Empty(g.Played);
+    }
+}

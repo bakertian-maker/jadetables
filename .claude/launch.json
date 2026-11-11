@@ -4,8 +4,33 @@
     {
       "name": "gameweb",
       "runtimeExecutable": "dotnet",
-      "runtimeArgs": ["run", "--project", "GameWeb/GameWeb.csproj", "--launch-profile", "http", "--no-launch-browser"],
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "GameWeb/GameWeb.csproj",
+        "--launch-profile",
+        "http",
+        "--no-launch-browser"
+      ],
       "port": 5096
+    },
+    {
+      "name": "gameweb-side",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "GameWeb/GameWeb.csproj",
+        "--no-launch-profile",
+        "--artifacts-path",
+        ".preview-build",
+        "--",
+        "--urls",
+        "http://localhost:5098",
+        "--environment",
+        "Development"
+      ],
+      "port": 5098
     }
   ]
 }

@@ -420,7 +420,7 @@ ZH_HANT = {
     "privacy page": "私隱頁面",
     "repetition": "重複局面",
     "resignation": "認輸",
-    "send it again": "重新傳送",
+    "ask for a new link": "重新傳送",
     "time": "超時",
     "{0} hands": "{0} 局",
     "{0} isn't a valid email address.": "{0} 不是有效的電郵地址。",
@@ -450,8 +450,8 @@ ZH_HANT = {
     "Won – drawn – lost": "勝 – 和 – 負",
     "Xiangqi leaderboard · Jade Tables": "象棋排行榜 · 玉桌",
     "Xiangqi rating": "象棋等級分",
-    "by playing with an account, and see the best players on the": "：登入帳戶下棋即可獲得，最強玩家都在",
-    "leaderboard": "排行榜",
+    "by playing with an account, and see the best players on": "：登入帳戶下棋即可獲得，最強玩家都在",
+    "the leaderboard": "排行榜",
     "to get a rating.": "，獲得你的等級分。",
     # Page titles and link previews
     "Hong Kong Mahjong Rules and Faan Scoring | Jade Tables": "港式麻雀規則與番數表 | 玉桌",
@@ -554,4 +554,7 @@ ZH_HANT = {
     "Diamonds": "階磚",
     "Play cards": "出牌",
     "{0}: {1}": "{0}：{1}",
+    "Cards still out": "還沒出的牌",
+    "Still out": "記牌",
+    "{0}: {1} still out": "{0}：還有 {1} 張沒出",
 }

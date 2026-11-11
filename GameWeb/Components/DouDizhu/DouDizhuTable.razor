@@ -46,6 +46,10 @@
             {
                 <p class="ddz-center-note">@(View.Bid > 0 ? L["Highest bid: {0}", View.Bid] : L["Bidding for landlord"])</p>
             }
+            @if (View.Phase == DdzPhase.Playing)
+            {
+                @Counter()
+            }
         </div>
 
         <div class="ddz-me">
@@ -64,13 +68,13 @@
             </div>
             @if (Me?.Hand is { } hand)
             {
-                <div class="ddz-hand" style="--n:@hand.Count">
+                <div class="ddz-hand" style="--n:@hand.Count" data-swipe-select="@(MyPlayTurn ? "on" : null)">
                     @foreach (var c in hand)
                     {
                         var card = c;
                         if (MyPlayTurn)
                         {
-                            <DdzCard Card="card" Size="lg" Selected="selected.Contains(card)" OnClick="() => Toggle(card)" />
+                            <DdzCard Card="card" Size="lg" Selected="selected.Contains(card)" Dim="IsDim(card)" OnClick="() => Toggle(card)" />
                         }
                         else
                         {
@@ -143,7 +147,55 @@
         }
         // Drop selections of cards no longer in the hand.
         if (Me?.Hand is { } hand) selected.IntersectWith(hand);
+        UpdateUsable();
     }
+
+    /// <summary>
+    /// Beginner mode: ranks that can be part of a play beating the current one. Null when every card could
+    /// help: when leading, or when the play to beat carries kickers (any card can be a kicker).
+    /// </summary>
+    HashSet<int>? usableRanks;
+
+    void UpdateUsable()
+    {
+        usableRanks = null;
+        if (!MyPlayTurn || View.LastCombo is not { } lead || Me?.Hand is not { } hand) return;
+        var beats = Combos.Beating(hand, lead);
+        bool kickers = lead.Kind is DdzKind.TripleSingle or DdzKind.TriplePair or DdzKind.AirplaneSingles
+            or DdzKind.AirplanePairs or DdzKind.FourTwoSingles or DdzKind.FourTwoPairs;
+        if (kickers && beats.Any(b => !b.IsBomb)) return;
+        usableRanks = beats.SelectMany(b => b.Cards).Select(Cards.Rank).ToHashSet();
+    }
+
+    bool IsDim(int card) => usableRanks is not null && !usableRanks.Contains(Cards.Rank(card));
+
+    static readonly int[] CounterRanks = [Cards.RankBigJoker, Cards.RankSmallJoker, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+
+    /// <summary>
+    /// The card counter (记牌器): how many of each rank are still out, i.e. not played and not in my hand.
+    /// Everything it shows is public: cards played are on the table, and my hand is mine.
+    /// </summary>
+    RenderFragment Counter() => __builder =>
+    {
+        var played = Cards.RankCounts(View.Played);
+        var mine = Cards.RankCounts(Me?.Hand ?? []);
+        <div class="ddz-counter" role="group" aria-label="@L["Cards still out"]">
+            <span class="ddz-counter-title">@L["Still out"]</span>
+            @foreach (var r in CounterRanks)
+            {
+                int total = r >= Cards.RankSmallJoker ? 1 : 4;
+                int left = total - played[r] - mine[r];
+                string label = r == Cards.RankBigJoker ? (Languages.IsChinese ? "大" : "BJ")
+                    : r == Cards.RankSmallJoker ? (Languages.IsChinese ? "小" : "SJ")
+                    : Cards.RankLabelOf(r);
+                <span class="ddz-counter-cell @(left == 0 ? "is-gone" : "") @(left == 4 ? "is-bomb" : "") @(r == Cards.RankBigJoker ? "is-big" : "")"
+                      title="@L["{0}: {1} still out", label, left]">
+                    <span class="ddz-counter-rank">@label</span>
+                    <span class="ddz-counter-left">@left</span>
+                </span>
+            }
+        </div>
+    };
 
     void Toggle(int card)
     {

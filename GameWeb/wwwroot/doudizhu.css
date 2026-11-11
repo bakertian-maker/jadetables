@@ -114,3 +114,36 @@ button.ddz-card:focus-visible { outline: 3px solid var(--focus, #e3b341); outlin
 @media (max-width: 860px) {
     .ddz-me .mj-plate { flex-direction: row; width: auto; border-radius: 999px; padding: 4px 12px 4px 4px; gap: 8px; }
 }
+
+/* ---------- Card counter (记牌器) ---------- */
+.ddz-counter {
+    display: flex; align-items: stretch; gap: 2px; padding: 4px 6px; border-radius: 10px;
+    background: rgba(0, 0, 0, .22); font-variant-numeric: tabular-nums; max-width: 100%;
+}
+.ddz-counter-title { writing-mode: vertical-rl; font-size: .62rem; color: #a9b5ae; letter-spacing: .05em; padding-right: 2px; }
+:lang(en) .ddz-counter-title { writing-mode: horizontal-tb; align-self: center; padding-right: 4px; }
+.ddz-counter-cell { display: flex; flex-direction: column; align-items: center; min-width: 20px; padding: 2px 1px; border-radius: 6px; line-height: 1.15; }
+.ddz-counter-rank { font-size: .72rem; font-weight: 700; color: #f3ead4; }
+.ddz-counter-left { font-size: .82rem; font-weight: 700; color: #f2c94c; }
+.ddz-counter-cell.is-big .ddz-counter-rank { color: #ff9b85; }
+.ddz-counter-cell.is-gone { opacity: .3; }
+.ddz-counter-cell.is-bomb { background: rgba(194, 59, 34, .35); }   /* all four still out: a possible bomb */
+
+/* ---------- Beginner mode: cards that can't help ---------- */
+.ddz-card.is-dim { filter: brightness(.62) saturate(.6); }
+.ddz-card.is-dim:hover { transform: none; }
+
+/* ---------- Swipe to select ---------- */
+.ddz-hand[data-swipe-select] { touch-action: pan-y; }
+
+@media (max-width: 760px) {
+    .ddz-counter { gap: 1px; padding: 3px 4px; }
+    .ddz-counter-cell { min-width: 18px; }
+    .ddz-counter-rank { font-size: .64rem; }
+    .ddz-counter-left { font-size: .74rem; }
+}
+@media (min-width: 761px) {
+    .ddz-counter-cell { min-width: 24px; }
+    .ddz-counter-rank { font-size: .8rem; }
+    .ddz-counter-left { font-size: .95rem; }
+}
